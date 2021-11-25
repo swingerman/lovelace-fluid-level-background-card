@@ -2,7 +2,7 @@
 import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
 import { HomeAssistant, fireEvent, LovelaceCardEditor, ActionConfig } from 'custom-card-helpers';
 
-import { BoilerplateCardConfig } from './types';
+import { FluidProgressBarCardConfig } from './types';
 import { customElement, property, state } from 'lit/decorators';
 
 const options = {
@@ -46,15 +46,15 @@ const options = {
   },
 };
 
-@customElement('boilerplate-card-editor')
+@customElement('fluid-progressbar-card-editor')
 export class BoilerplateCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass?: HomeAssistant;
-  @state() private _config?: BoilerplateCardConfig;
+  @state() private _config?: FluidProgressBarCardConfig;
   @state() private _toggle?: boolean;
   @state() private _helpers?: any;
   private _initialized = false;
 
-  public setConfig(config: BoilerplateCardConfig): void {
+  public setConfig(config: FluidProgressBarCardConfig): void {
     this._config = config;
 
     this.loadCardHelpers();
@@ -105,7 +105,7 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
     this._helpers.importMoreInfoControl('climate');
 
     // You can restrict on domain type
-    const entities = Object.keys(this.hass.states).filter(eid => eid.substr(0, eid.indexOf('.')) === 'sun');
+    const entities = Object.keys(this.hass.states).filter((eid) => eid.substr(0, eid.indexOf('.')) === 'sun');
 
     return html`
       <div class="card-config">
@@ -125,10 +125,8 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
                   .configValue=${'entity'}
                 >
                   <paper-listbox slot="dropdown-content" .selected=${entities.indexOf(this._entity)}>
-                    ${entities.map(entity => {
-                      return html`
-                        <paper-item>${entity}</paper-item>
-                      `;
+                    ${entities.map((entity) => {
+                      return html` <paper-item>${entity}</paper-item> `;
                     })}
                   </paper-listbox>
                 </paper-dropdown-menu>
