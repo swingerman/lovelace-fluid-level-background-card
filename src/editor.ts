@@ -47,7 +47,7 @@ const options = {
 };
 
 @customElement('fluid-progressbar-card-editor')
-export class BoilerplateCardEditor extends LitElement implements LovelaceCardEditor {
+export class FluidProgressBarCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private _config?: FluidProgressBarCardConfig;
   @state() private _toggle?: boolean;

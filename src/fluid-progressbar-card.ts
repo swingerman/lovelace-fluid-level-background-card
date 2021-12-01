@@ -12,6 +12,7 @@ import {
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types. https://github.com/custom-cards/custom-card-helpers
 
 import './editor';
+import './fluid-background';
 
 import type { FluidProgressBarCardConfig } from './types';
 import { actionHandler } from './action-handler-directive';
@@ -29,12 +30,12 @@ console.info(
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
   type: 'fluid-progressbar-card',
-  name: 'Boilerplate Card',
-  description: 'A template custom card for you to create something awesome',
+  name: 'Fluid Progress Bar Card',
+  description: 'A card that has a fluid progress bar as a background',
 });
 
 @customElement('fluid-progressbar-card')
-export class BoilerplateCard extends LitElement {
+export class FluidProgressBarCard extends LitElement {
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     return document.createElement('fluid-progressbar-card-editor');
   }
@@ -61,7 +62,7 @@ export class BoilerplateCard extends LitElement {
     }
 
     this.config = {
-      name: 'Boilerplate',
+      name: 'FluidProgressBar',
       ...config,
     };
   }
@@ -86,18 +87,18 @@ export class BoilerplateCard extends LitElement {
       return this._showError(localize('common.show_error'));
     }
 
-    return html`
-      <ha-card
-        .header=${this.config.name}
-        @action=${this._handleAction}
-        .actionHandler=${actionHandler({
-          hasHold: hasAction(this.config.hold_action),
-          hasDoubleClick: hasAction(this.config.double_tap_action),
-        })}
-        tabindex="0"
-        .label=${`Boilerplate: ${this.config.entity || 'No Entity Defined'}`}
-      ></ha-card>
-    `;
+    const haCard = html` <ha-card
+      .header=${this.config.name}
+      @action=${this._handleAction}
+      .actionHandler=${actionHandler({
+        hasHold: hasAction(this.config.hold_action),
+        hasDoubleClick: hasAction(this.config.double_tap_action),
+      })}
+      tabindex="0"
+      .label=${`Boilerplate: ${this.config.entity || 'No Entity Defined'}`}
+    ></ha-card>`;
+
+    return html` <fluid-background .haCard="${haCard}"></fluid-background> `;
   }
 
   private _handleAction(ev: ActionHandlerEvent): void {

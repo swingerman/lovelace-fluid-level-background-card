@@ -1,6 +1,6 @@
 views:
   - cards:
       - type: custom:fluid-progressbar-card
-        name: Boilerplate Card Development
+        name: Fluid Progress Bar Card
         entity: sun.sun
         test_gui: true

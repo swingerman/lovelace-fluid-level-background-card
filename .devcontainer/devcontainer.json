@@ -1,6 +1,6 @@
 // See https://aka.ms/vscode-remote/devcontainer.json for format details.
 {
-  "name": "Boilerplate Card Development",
+  "name": "Fluid Progress BAr Card Development",
   "image": "ghcr.io/ludeeus/devcontainer/generic:latest",
   "context": "..",
   "appPort": ["5000:5000", "9123:8123"],
