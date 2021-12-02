@@ -7,25 +7,25 @@ interface Bubble {
   swing: number;
 }
 
-interface Layer {
+export interface Layer {
   fillStyle: string;
-  angle: number;
-  horizontalPosition: number;
+  angle?: number;
+  horizontalPosition?: number;
   angularSpeed: number;
   maxAmplitude: number;
   frequency: number;
   horizontalSpeed: number;
-  initialHeight: number;
+  initialHeight?: number;
 }
 
-interface FluidMeterOptions {
-  drawShadow: boolean;
-  drawText: boolean;
+export interface FluidMeterOptions {
+  drawShadow?: boolean;
+  drawText?: boolean;
   drawPercentageSign: boolean;
   drawBubbles: boolean;
-  fontSize: string;
+  fontSize?: string;
   fontFamily: string;
-  fontFillStyle: string;
+  fontFillStyle?: string;
   size: number;
   borderWidth: number;
   backgroundColor: string;
@@ -34,9 +34,22 @@ interface FluidMeterOptions {
   height?: number;
   foregroundFluidColor?: string;
   backgroundFluidColor?: string;
+  foregroundFluidLayer?: Layer;
+  backgroundFluidLayer?: Layer;
 }
 
-function FluidMeter() {
+export interface FluidMeterEnv {
+  targetContainer: Element | null | undefined;
+  fillPercentage: number;
+  options: FluidMeterOptions;
+}
+
+export type FluidMeterInstance = {
+  init(env: FluidMeterEnv);
+  setPercentage(percentage: number);
+};
+
+export function FluidMeter(): FluidMeterInstance {
   let context: CanvasRenderingContext2D | null;
   let targetContainer: Element;
 
@@ -126,21 +139,24 @@ function FluidMeter() {
     canvas.width = options.size;
     canvas.height = options.size;
     context = canvas.getContext('2d');
-    context?.imageSmoothingEnabled = true;
-    targetContainer.appendChild(canvas);
 
-    // shadow is not required  to be on the draw loop
-    //#region shadow
-    if (options.drawShadow && context) {
-      context.save();
-      context.beginPath();
-      context.filter = 'drop-shadow(0px 4px 6px rgba(0,0,0,0.1))';
-      context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2, 0, 2 * Math.PI);
-      context.closePath();
-      context.fill();
-      context.restore();
+    if (context) {
+      context.imageSmoothingEnabled = true;
+      targetContainer.appendChild(canvas);
+
+      // shadow is not required  to be on the draw loop
+      //#region shadow
+      if (options.drawShadow) {
+        context.save();
+        context.beginPath();
+        context.filter = 'drop-shadow(0px 4px 6px rgba(0,0,0,0.1))';
+        context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2, 0, 2 * Math.PI);
+        context.closePath();
+        context.fill();
+        context.restore();
+      }
+      //#endregion
     }
-    //#endregion
   }
 
   /**
@@ -152,50 +168,64 @@ function FluidMeter() {
     time = now;
 
     requestAnimationFrame(draw);
-    context.clearRect(0, 0, options.width, options.height);
-    drawMeterBackground();
+    if (context) {
+      context.clearRect(0, 0, options.width as number, options.height as number);
+    }
+    //drawMeterBackground();
     drawFluid(dt);
     if (options.drawText) {
       drawText();
     }
-    drawMeterForeground();
+    //drawMeterForeground();
   }
 
   function drawMeterBackground() {
-    context.save();
-    context.fillStyle = options.backgroundColor;
-    context.beginPath();
-    context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth, 0, 2 * Math.PI);
-    context.closePath();
-    context.fill();
-    context.restore();
+    if (context) {
+      context.save();
+      context.fillStyle = options.backgroundColor;
+      context.beginPath();
+      //context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth, 0, 2 * Math.PI);
+      context.rect(0, 0, options.width as number, options.height as number);
+
+      context.closePath();
+      context.fill();
+      context.restore();
+    }
   }
 
   function drawMeterForeground() {
-    context.save();
-    context.lineWidth = options.borderWidth;
-    context.strokeStyle = options.foregroundColor;
-    context.beginPath();
-    context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth / 2, 0, 2 * Math.PI);
-    context.closePath();
-    context.stroke();
-    context.restore();
+    if (context) {
+      context.save();
+      context.lineWidth = options.borderWidth;
+      context.strokeStyle = options.foregroundColor;
+      context.beginPath();
+      //context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth / 2, 0, 2 * Math.PI);
+      context.rect(0, 0, options.width as number, options.height as number);
+
+      context.closePath();
+      context.stroke();
+      context.restore();
+    }
   }
   /**
    * draws the fluid contents of the meter
    * @param  {} dt elapsed time since last frame
    */
   function drawFluid(dt) {
-    context.save();
-    context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth, 0, Math.PI * 2);
-    context.clip();
-    drawFluidLayer(backgroundFluidLayer, dt);
-    drawFluidLayer(foregroundFluidLayer, dt);
-    if (options.drawBubbles) {
-      drawFluidMask(foregroundFluidLayer);
-      drawBubblesLayer(dt);
+    if (context) {
+      context.save();
+      //context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth, 0, Math.PI * 2);
+      //context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth, 0, Math.PI * 2);
+      //context.rect(options.size / 2, options.size / 2, (options.size / 2) as number, options.height as number);
+      //context.clip();
+      drawFluidLayer(backgroundFluidLayer, dt);
+      drawFluidLayer(foregroundFluidLayer, dt);
+      if (options.drawBubbles) {
+        //drawFluidMask(foregroundFluidLayer);
+        drawBubblesLayer(dt);
+      }
+      context.restore();
     }
-    context.restore();
   }
 
   /**
@@ -232,24 +262,27 @@ function FluidMeter() {
 
     layer.initialHeight = meterBottom - fluidAmount;
 
-    context.save();
-    context.beginPath();
+    if (context) {
+      context.save();
+      context.beginPath();
 
-    context.lineTo(0, layer.initialHeight);
+      context.lineTo(0, layer.initialHeight);
 
-    while (x < options.size) {
-      y = layer.initialHeight + amplitude * Math.sin((x + layer.horizontalPosition) / layer.frequency);
-      context.lineTo(x, y);
-      x++;
+      while (x < options.size) {
+        y = layer.initialHeight + amplitude * Math.sin((x + layer.horizontalPosition) / layer.frequency);
+        context.lineTo(x, y);
+        x++;
+      }
+
+      context.lineTo(x, options.size);
+      context.lineTo(0, options.size);
+      context.closePath();
+
+      context.fillStyle = layer.fillStyle;
+      context.fill();
+      context.clip();
+      context.restore();
     }
-
-    context.lineTo(x, options.size);
-    context.lineTo(0, options.size);
-    context.closePath();
-
-    context.fillStyle = layer.fillStyle;
-    context.fill();
-    context.restore();
   }
 
   /**
@@ -261,19 +294,21 @@ function FluidMeter() {
     let y = 0;
     const amplitude = layer.maxAmplitude * Math.sin((layer.angle * Math.PI) / 180);
 
-    context.beginPath();
+    if (context) {
+      context.beginPath();
 
-    context.lineTo(0, layer.initialHeight);
+      context.lineTo(0, layer.initialHeight);
 
-    while (x < options.size) {
-      y = layer.initialHeight + amplitude * Math.sin((x + layer.horizontalPosition) / layer.frequency);
-      context.lineTo(x, y);
-      x++;
+      while (x < options.size) {
+        y = layer.initialHeight + amplitude * Math.sin((x + layer.horizontalPosition) / layer.frequency);
+        context.lineTo(x, y);
+        x++;
+      }
+      context.lineTo(x, options.size);
+      context.lineTo(0, options.size);
+      context.closePath();
+      context.clip();
     }
-    context.lineTo(x, options.size);
-    context.lineTo(0, options.size);
-    context.closePath();
-    context.clip();
   }
 
   function drawBubblesLayer(dt) {
@@ -284,7 +319,7 @@ function FluidMeter() {
 
         context.beginPath();
         context.strokeStyle = 'white';
-        context.arc(bubble.x, bubble.y, bubble.r, 2 * Math.PI, false);
+        context.arc(bubble.x, bubble.y, bubble.r, 2 * Math.PI, 2 * Math.PI, false);
         context.stroke();
         context.closePath();
 
@@ -316,7 +351,7 @@ function FluidMeter() {
     if (context) {
       context.save();
       context.font = getFontSize();
-      context.fillStyle = options.fontFillStyle;
+      context.fillStyle = options.fontFillStyle as string;
       context.textAlign = 'center';
       context.textBaseline = 'middle';
       context.filter = 'drop-shadow(0px 0px 5px rgba(0,0,0,0.4))';
@@ -344,7 +379,7 @@ function FluidMeter() {
   //#endregion
 
   return {
-    init: function (env) {
+    init: function (env: FluidMeterEnv) {
       if (!env.targetContainer) throw 'empty or invalid container';
 
       targetContainer = env.targetContainer;
@@ -394,7 +429,7 @@ function FluidMeter() {
       setupCanvas();
       draw();
     },
-    setPercentage(percentage) {
+    setPercentage(percentage: number) {
       fillPercentage = clamp(percentage, 0, 100);
     },
   };
