@@ -171,7 +171,7 @@ export function FluidMeter(): FluidMeterInstance {
     if (context) {
       context.clearRect(0, 0, options.width as number, options.height as number);
     }
-    //drawMeterBackground();
+    drawMeterBackground();
     drawFluid(dt);
     if (options.drawText) {
       drawText();
@@ -185,6 +185,7 @@ export function FluidMeter(): FluidMeterInstance {
       context.fillStyle = options.backgroundColor;
       context.beginPath();
       //context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth, 0, 2 * Math.PI);
+      context.arc(options.size / 2, options.size / 2, getMeterRadius() - options.borderWidth, 0, 2 * Math.PI);
       context.rect(0, 0, options.width as number, options.height as number);
 
       context.closePath();
@@ -199,7 +200,7 @@ export function FluidMeter(): FluidMeterInstance {
       context.lineWidth = options.borderWidth;
       context.strokeStyle = options.foregroundColor;
       context.beginPath();
-      //context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth / 2, 0, 2 * Math.PI);
+      context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth / 2, 0, 2 * Math.PI);
       context.rect(0, 0, options.width as number, options.height as number);
 
       context.closePath();
@@ -214,10 +215,10 @@ export function FluidMeter(): FluidMeterInstance {
   function drawFluid(dt) {
     if (context) {
       context.save();
-      //context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth, 0, Math.PI * 2);
-      //context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth, 0, Math.PI * 2);
+      context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth, 0, Math.PI * 2);
+      //context.arc(options.size / 2, options.size / 2, getMeterRadius() - options.borderWidth, 0, Math.PI * 2);
       //context.rect(options.size / 2, options.size / 2, (options.size / 2) as number, options.height as number);
-      //context.clip();
+      context.clip();
       drawFluidLayer(backgroundFluidLayer, dt);
       drawFluidLayer(foregroundFluidLayer, dt);
       if (options.drawBubbles) {
