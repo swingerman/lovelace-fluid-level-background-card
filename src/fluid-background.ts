@@ -8,7 +8,7 @@ export class FluidBackground extends LitElement {
   haCard;
 
   protected render(): TemplateResult | void {
-    return html` <div id="fluid-background">${this.haCard}</div> `;
+    return html` <div id="fluid-background"></div> `;
   }
 
   static get styles() {
@@ -17,8 +17,6 @@ export class FluidBackground extends LitElement {
         background: var(--ha-card-background, var(--card-background-color, white));
       }
 
-      #fluid-background ha-card {
-      }
     `;
   }
 

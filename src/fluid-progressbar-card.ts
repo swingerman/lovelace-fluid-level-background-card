@@ -76,7 +76,9 @@ export class FluidProgressBarCard extends LitElement {
     return hasConfigOrEntityChanged(this, changedProps, false);
   }
 
+
   // https://lit.dev/docs/components/rendering/
+  // https://developpaper.com/realization-of-html5-canvas-background-animation-by-levitation-of-div-layer/
   protected render(): TemplateResult | void {
     // TODO Check for stateObj or other necessary things and render a warning if missing
     if (this.config.show_warning) {
@@ -98,7 +100,12 @@ export class FluidProgressBarCard extends LitElement {
       .label=${`Boilerplate: ${this.config.entity || 'No Entity Defined'}`}
     ></ha-card>`;
 
-    return html` <fluid-background .haCard="${haCard}"></fluid-background> `;
+    return html`
+      <div class="container">
+        <fluid-background></fluid-background>
+        ${haCard}
+      </div>
+    `;
   }
 
   private _handleAction(ev: ActionHandlerEvent): void {
@@ -123,7 +130,15 @@ export class FluidProgressBarCard extends LitElement {
   }
 
   // https://lit.dev/docs/components/styles/
-  static get styles(): CSSResultGroup {
-    return css``;
+  static get styles() {
+    return css`
+      container{
+        position: relative;
+      }
+
+      ha-card {
+        position: relative
+      }
+    `;
   }
 }
