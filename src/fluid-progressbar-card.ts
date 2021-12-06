@@ -76,7 +76,6 @@ export class FluidProgressBarCard extends LitElement {
     return hasConfigOrEntityChanged(this, changedProps, false);
   }
 
-
   // https://lit.dev/docs/components/rendering/
   // https://developpaper.com/realization-of-html5-canvas-background-animation-by-levitation-of-div-layer/
   protected render(): TemplateResult | void {
@@ -132,12 +131,12 @@ export class FluidProgressBarCard extends LitElement {
   // https://lit.dev/docs/components/styles/
   static get styles() {
     return css`
-      container{
+      .container {
         position: relative;
       }
 
       ha-card {
-        position: relative
+        position: relative;
       }
     `;
   }

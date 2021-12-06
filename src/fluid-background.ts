@@ -13,10 +13,17 @@ export class FluidBackground extends LitElement {
 
   static get styles() {
     return css`
+      :host {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
       #fluid-background {
         background: var(--ha-card-background, var(--card-background-color, white));
       }
-
     `;
   }
 
