@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
-import { HomeAssistant, fireEvent, LovelaceCardEditor, ActionConfig } from 'custom-card-helpers';
+import { HomeAssistant, fireEvent, LovelaceCardEditor, ActionConfig, LovelaceCard } from 'custom-card-helpers';
 
 import { FluidProgressBarCardConfig } from './types';
 import { customElement, property, state } from 'lit/decorators';
@@ -49,9 +49,21 @@ const options = {
 @customElement('fluid-progressbar-card-editor')
 export class FluidProgressBarCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass?: HomeAssistant;
-  @state() private _config?: FluidProgressBarCardConfig;
+
+  @property() protected _cards?: LovelaceCard[];
+
+  @state() protected _config?: FluidProgressBarCardConfig;
+
+  @state() protected _selectedCard = 0;
+
+  @state() protected _GUImode = true;
+
+  @state() protected _guiModeAvailable?= true;
+
   @state() private _toggle?: boolean;
+
   @state() private _helpers?: any;
+
   private _initialized = false;
 
   public setConfig(config: FluidProgressBarCardConfig): void {
@@ -104,8 +116,9 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
     // The climate more-info has ha-switch and paper-dropdown-menu elements that are lazy loaded unless explicitly done here
     this._helpers.importMoreInfoControl('climate');
 
+
     // You can restrict on domain type
-    const entities = Object.keys(this.hass.states).filter((eid) => eid.substr(0, eid.indexOf('.')) === 'sun');
+    const entities = Object.keys(this.hass.states).filter((eid) => eid.substr(0, eid.indexOf('.')) === 'input_number');
 
     return html`
       <div class="card-config">

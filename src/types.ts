@@ -10,6 +10,7 @@ declare global {
 export interface FluidProgressBarCardConfig extends LovelaceCardConfig {
   type: string;
   name?: string;
+  cards: LovelaceCardConfig[];
   show_warning?: boolean;
   show_error?: boolean;
   test_gui?: boolean;
