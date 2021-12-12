@@ -1,6 +1,5 @@
 default_config:
 lovelace:
-  mode: yaml
   resources:
     - url: http://127.0.0.1:5000/fluid-progressbar-card.js
       type: module
@@ -15,5 +14,5 @@ input_number:
     icon: hass:battery
 
 
-demo:
+#demo:
 
