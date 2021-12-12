@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
-import { HomeAssistant, fireEvent, LovelaceCardEditor, ActionConfig, LovelaceCard } from 'custom-card-helpers';
+import { HomeAssistant, fireEvent, LovelaceCardEditor, ActionConfig, LovelaceCard, LovelaceConfig, HASSDomEvent, LovelaceCardConfig } from 'custom-card-helpers';
 
-import { FluidProgressBarCardConfig } from './types';
+import { FluidProgressBarCardConfig, GUIModeChangedEvent, UIConfigChangedEvent } from './types';
 import { customElement, property, state } from 'lit/decorators';
 
 const options = {
@@ -50,7 +50,9 @@ const options = {
 export class FluidProgressBarCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass?: HomeAssistant;
 
-  @property() protected _cards?: LovelaceCard[];
+  @property({ attribute: false }) public lovelace?: LovelaceConfig;
+
+  @property() protected _card?: LovelaceCard;
 
   @state() protected _config?: FluidProgressBarCardConfig;
 
@@ -129,6 +131,23 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
           </div>
           <div class="secondary">${options.required.secondary}</div>
         </div>
+        ${this._card
+      ? html`
+         <hui-card-element-editor
+                  .hass=${this.hass}
+                  .value=${this._config?.card}
+                  .lovelace=${this.lovelace}
+                  @config-changed=${this._handleConfigChanged}
+                  @GUImode-changed=${this._handleGUIModeChanged}
+                ></hui-card-element-editor>
+                `
+          : html`
+        <hui-card-picker
+                  .hass=${this.hass}
+                  .lovelace=${this.lovelace}
+                  @config-changed=${this._handleCardPicked}
+                > </hui-card-picker>`
+  }
         ${options.required.show
           ? html`
               <div class="values">
@@ -244,6 +263,34 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
     if (this._config === undefined) return;
     if (this._helpers === undefined) return;
     this._initialized = true;
+  }
+
+  protected _handleCardPicked(ev) {
+    ev.stopPropagation();
+    if (!this._config) {
+      return;
+    }
+    const config = ev.detail.config;
+    const card = config;
+    this._config = { ...this._config, card };
+    fireEvent(this, "config-changed", { config: this._config });
+  }
+
+  protected _handleConfigChanged(ev): void {
+    ev.stopPropagation();
+    if (!this._config) {
+      return;
+    }
+    const card = ev.detail.config as LovelaceCardConfig;
+    this._config = { ...this._config, card };
+    this._guiModeAvailable = ev.detail.guiModeAvailable;
+    fireEvent(this, "config-changed", { config: this._config });
+  }
+
+  protected _handleGUIModeChanged(ev: HASSDomEvent<GUIModeChangedEvent>): void {
+    ev.stopPropagation();
+    this._GUImode = ev.detail.guiMode;
+    this._guiModeAvailable = ev.detail.guiModeAvailable;
   }
 
   private async loadCardHelpers(): Promise<void> {
