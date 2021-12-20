@@ -34,8 +34,15 @@ console.info(
   description: 'A card that has a fluid progress bar as a background',
 });
 
+export interface ElementSize {
+  widht: number;
+  height: number;
+}
+
 @customElement('fluid-progressbar-card')
 export class FluidProgressBarCard extends LitElement {
+  //size: ElementSize = { widht: 0, height: 0 };
+
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     return document.createElement('fluid-progressbar-card-editor');
   }
@@ -47,6 +54,7 @@ export class FluidProgressBarCard extends LitElement {
   // TODO Add any properities that should cause your element to re-render here
   // https://lit.dev/docs/components/properties/
   @property({ attribute: false }) public hass!: HomeAssistant;
+  @property({ attribute: false }) public size!: ElementSize;
 
   @state() private config!: FluidProgressBarCardConfig;
 
@@ -101,10 +109,17 @@ export class FluidProgressBarCard extends LitElement {
 
     return html`
       <div class="container">
-        <fluid-background></fluid-background>
+        <fluid-background .size=${this.size}></fluid-background>
         ${haCard}
       </div>
     `;
+  }
+
+  firstUpdated(): void {
+    window.setTimeout(() => {
+      const container = this.shadowRoot?.querySelector('.container');
+      this.size = { widht: container?.clientWidth as number, height: container?.clientHeight as number };
+    }, 0);
   }
 
   private _handleAction(ev: ActionHandlerEvent): void {

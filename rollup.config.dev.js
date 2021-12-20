@@ -4,6 +4,8 @@ import babel from "rollup-plugin-babel";
 import serve from "rollup-plugin-serve";
 import { terser } from "rollup-plugin-terser";
 import json from '@rollup/plugin-json';
+import summary from 'rollup-plugin-summary';
+
 
 export default {
   input: ["src/fluid-progressbar-card.ts"],
@@ -19,6 +21,7 @@ export default {
       exclude: "node_modules/**",
     }),
     terser(),
+    summary(),
     serve({
       contentBase: "./dist",
       host: "0.0.0.0",

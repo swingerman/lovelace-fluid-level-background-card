@@ -136,8 +136,8 @@ export function FluidMeter(): FluidMeterInstance {
    */
   function setupCanvas() {
     const canvas = document.createElement('canvas');
-    canvas.width = options.size;
-    canvas.height = options.size;
+    canvas.width = options.width as number;
+    canvas.height = options.height as number;
     context = canvas.getContext('2d');
 
     if (context) {

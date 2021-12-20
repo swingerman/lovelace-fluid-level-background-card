@@ -1,11 +1,15 @@
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators';
 import { FluidMeter, FluidMeterEnv } from './fliud-meter';
+import { ElementSize } from './fluid-progressbar-card';
 
 @customElement('fluid-background')
 export class FluidBackground extends LitElement {
   @property()
   haCard;
+
+  @property()
+  size!: ElementSize;
 
   protected render(): TemplateResult | void {
     return html` <div id="fluid-background"></div> `;
@@ -28,38 +32,42 @@ export class FluidBackground extends LitElement {
   }
 
   protected firstUpdated(): void {
-    const fm = FluidMeter();
-    const container = this.shadowRoot?.querySelector('#fluid-background');
-    const size = Math.max(container?.clientWidth as number, container?.clientWidth as number);
-    const env: FluidMeterEnv = {
-      targetContainer: container,
-      fillPercentage: 15,
-      options: {
-        fontFamily: 'Raleway',
-        drawPercentageSign: false,
-        drawBubbles: true,
-        drawShadow: false,
-        drawText: false,
-        size: size,
-        borderWidth: 0,
-        backgroundColor: 'rgb(28, 28, 28)',
-        foregroundColor: '#fafafa',
-        foregroundFluidLayer: {
-          fillStyle: 'purple',
-          angularSpeed: 100,
-          maxAmplitude: 12,
-          frequency: 30,
-          horizontalSpeed: -150,
+    window.setTimeout(() => {
+      const fm = FluidMeter();
+      const container = this.shadowRoot?.querySelector('#fluid-background');
+
+      const env: FluidMeterEnv = {
+        targetContainer: container,
+        fillPercentage: 15,
+        options: {
+          fontFamily: 'Raleway',
+          drawPercentageSign: false,
+          drawBubbles: true,
+          drawShadow: false,
+          drawText: false,
+          size: Math.max(this.size.widht, this.size.height),
+          width: this.size.widht,
+          height: this.size.height,
+          borderWidth: 0,
+          backgroundColor: 'rgb(28, 28, 28)',
+          foregroundColor: '#fafafa',
+          foregroundFluidLayer: {
+            fillStyle: 'purple',
+            angularSpeed: 100,
+            maxAmplitude: 12,
+            frequency: 30,
+            horizontalSpeed: -150,
+          },
+          backgroundFluidLayer: {
+            fillStyle: 'pink',
+            angularSpeed: 100,
+            maxAmplitude: 9,
+            frequency: 30,
+            horizontalSpeed: 150,
+          },
         },
-        backgroundFluidLayer: {
-          fillStyle: 'pink',
-          angularSpeed: 100,
-          maxAmplitude: 9,
-          frequency: 30,
-          horizontalSpeed: 150,
-        },
-      },
-    };
-    fm.init(env);
+      };
+      fm.init(env);
+    }, 0);
   }
 }

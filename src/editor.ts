@@ -1,6 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
-import { HomeAssistant, fireEvent, LovelaceCardEditor, ActionConfig, LovelaceCard, LovelaceConfig, HASSDomEvent, LovelaceCardConfig } from 'custom-card-helpers';
+import {
+  HomeAssistant,
+  fireEvent,
+  LovelaceCardEditor,
+  ActionConfig,
+  LovelaceCard,
+  LovelaceConfig,
+  HASSDomEvent,
+  LovelaceCardConfig,
+} from 'custom-card-helpers';
 
 import { FluidProgressBarCardConfig, GUIModeChangedEvent, UIConfigChangedEvent } from './types';
 import { customElement, property, state } from 'lit/decorators';
@@ -60,7 +69,7 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
 
   @state() protected _GUImode = true;
 
-  @state() protected _guiModeAvailable?= true;
+  @state() protected _guiModeAvailable? = true;
 
   @state() private _toggle?: boolean;
 
@@ -118,7 +127,6 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
     // The climate more-info has ha-switch and paper-dropdown-menu elements that are lazy loaded unless explicitly done here
     this._helpers.importMoreInfoControl('climate');
 
-
     // You can restrict on domain type
     const entities = Object.keys(this.hass.states).filter((eid) => eid.substr(0, eid.indexOf('.')) === 'input_number');
 
@@ -132,22 +140,21 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
           <div class="secondary">${options.required.secondary}</div>
         </div>
         ${this._card
-      ? html`
-         <hui-card-element-editor
-                  .hass=${this.hass}
-                  .value=${this._config?.card}
-                  .lovelace=${this.lovelace}
-                  @config-changed=${this._handleConfigChanged}
-                  @GUImode-changed=${this._handleGUIModeChanged}
-                ></hui-card-element-editor>
-                `
-          : html`
-        <hui-card-picker
-                  .hass=${this.hass}
-                  .lovelace=${this.lovelace}
-                  @config-changed=${this._handleCardPicked}
-                > </hui-card-picker>`
-  }
+          ? html`
+              <hui-card-element-editor
+                .hass=${this.hass}
+                .value=${this._config?.card}
+                .lovelace=${this.lovelace}
+                @config-changed=${this._handleConfigChanged}
+                @GUImode-changed=${this._handleGUIModeChanged}
+              ></hui-card-element-editor>
+            `
+          : html` <hui-card-picker
+              .hass=${this.hass}
+              .lovelace=${this.lovelace}
+              @config-changed=${this._handleCardPicked}
+            >
+            </hui-card-picker>`}
         ${options.required.show
           ? html`
               <div class="values">
@@ -273,7 +280,7 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
     const config = ev.detail.config;
     const card = config;
     this._config = { ...this._config, card };
-    fireEvent(this, "config-changed", { config: this._config });
+    fireEvent(this, 'config-changed', { config: this._config });
   }
 
   protected _handleConfigChanged(ev): void {
@@ -284,7 +291,7 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
     const card = ev.detail.config as LovelaceCardConfig;
     this._config = { ...this._config, card };
     this._guiModeAvailable = ev.detail.guiModeAvailable;
-    fireEvent(this, "config-changed", { config: this._config });
+    fireEvent(this, 'config-changed', { config: this._config });
   }
 
   protected _handleGUIModeChanged(ev: HASSDomEvent<GUIModeChangedEvent>): void {
