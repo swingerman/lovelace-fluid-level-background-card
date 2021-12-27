@@ -9,7 +9,7 @@ export class FluidBackground extends LitElement {
   haCard;
 
   @property()
-  size!: ElementSize;
+  size!: ElementSize | null;
 
   protected render(): TemplateResult | void {
     return html` <div id="fluid-background"></div> `;
@@ -35,19 +35,20 @@ export class FluidBackground extends LitElement {
     window.setTimeout(() => {
       const fm = FluidMeter();
       const container = this.shadowRoot?.querySelector('#fluid-background');
+      console.log(this.size);
 
       const env: FluidMeterEnv = {
         targetContainer: container,
-        fillPercentage: 15,
+        fillPercentage: 85,
         options: {
           fontFamily: 'Raleway',
           drawPercentageSign: false,
           drawBubbles: true,
           drawShadow: false,
           drawText: false,
-          size: Math.max(this.size.widht, this.size.height),
-          width: this.size.widht,
-          height: this.size.height,
+          size: Math.max(this.size?.width as number, this.size?.height as number),
+          width: this.size?.width,
+          height: this.size?.height,
           borderWidth: 0,
           backgroundColor: 'rgb(28, 28, 28)',
           foregroundColor: '#fafafa',
@@ -67,6 +68,7 @@ export class FluidBackground extends LitElement {
           },
         },
       };
+      console.log(env);
       fm.init(env);
     }, 0);
   }

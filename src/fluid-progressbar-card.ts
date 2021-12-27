@@ -35,13 +35,13 @@ console.info(
 });
 
 export interface ElementSize {
-  widht: number;
+  width: number;
   height: number;
 }
 
 @customElement('fluid-progressbar-card')
 export class FluidProgressBarCard extends LitElement {
-  //size: ElementSize = { widht: 0, height: 0 };
+  //size: ElementSize = { width: 0, height: 0 };
 
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     return document.createElement('fluid-progressbar-card-editor');
@@ -118,7 +118,7 @@ export class FluidProgressBarCard extends LitElement {
   firstUpdated(): void {
     window.setTimeout(() => {
       const container = this.shadowRoot?.querySelector('.container');
-      this.size = { widht: container?.clientWidth as number, height: container?.clientHeight as number };
+      this.size = { width: container?.clientWidth as number, height: container?.clientHeight as number };
     }, 0);
   }
 

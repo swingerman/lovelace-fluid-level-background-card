@@ -389,6 +389,8 @@ export function FluidMeter(): FluidMeterInstance {
       if (env.options) {
         options.drawShadow = env.options.drawShadow === false ? false : true;
         options.size = env.options.size;
+        options.width = env.options.width;
+        options.height = env.options.height;
         options.drawBubbles = env.options.drawBubbles === false ? false : true;
         options.borderWidth = env.options.borderWidth || options.borderWidth;
         options.foregroundFluidColor = env.options.foregroundFluidColor || options.foregroundFluidColor;
