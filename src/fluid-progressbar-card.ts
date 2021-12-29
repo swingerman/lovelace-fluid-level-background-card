@@ -9,6 +9,8 @@ import {
   handleAction,
   LovelaceCardEditor,
   getLovelace,
+  LovelaceCard,
+  LovelaceCardConfig,
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types. https://github.com/custom-cards/custom-card-helpers
 
 import './editor';
@@ -64,6 +66,8 @@ export class FluidProgressBarCard extends LitElement {
     if (!config) {
       throw new Error(localize('common.invalid_configuration'));
     }
+
+    console.log(config);
 
     if (config.test_gui) {
       getLovelace().setEditMode(true);
@@ -142,6 +146,24 @@ export class FluidProgressBarCard extends LitElement {
 
     return html` ${errorCard} `;
   }
+
+  // private _createCardElement(cardConfig: LovelaceCardConfig) {
+  //   // const element = createCardElement(cardConfig) as LovelaceCard;
+  //   // if (this.hass) {
+  //   //   element.hass = this.hass;
+  //   // }
+  //   // element.addEventListener(
+  //   //   "ll-rebuild",
+  //   //   (ev) => {
+  //   //     ev.stopPropagation();
+  //   //     this._rebuildCard(element, cardConfig);
+  //   //   },
+  //   //   { once: true }
+  //   // );
+  //   // return element;
+  // }
+
+
 
   // https://lit.dev/docs/components/styles/
   static get styles() {
