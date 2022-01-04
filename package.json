@@ -16,7 +16,6 @@
   "license": "MIT",
   "dependencies": {
     "custom-card-helpers": "^1.7.2",
-    "home-assistant-frontend": "https://github.com/home-assistant/frontend.git",
     "home-assistant-js-websocket": "^5.11.1",
     "lit": "^2.0.2",
     "rollup-plugin-sourcemaps": "^0.6.3"

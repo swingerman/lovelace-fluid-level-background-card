@@ -93,6 +93,25 @@ export class FluidProgressBarCard extends LitElement {
     return hasConfigOrEntityChanged(this, changedProps, false);
   }
 
+  protected updated(changedProps: PropertyValues) {
+    super.updated(changedProps);
+    if (
+      !this._card ||
+      (!changedProps.has("hass") && !changedProps.has("editMode"))
+    ) {
+      return;
+    }
+
+    //for (const element of this._cards) {
+      if (this.hass) {
+        this._card.hass = this.hass;
+      }
+      // if (this.editMode !== undefined) {
+      //   this._card.editMode = this.editMode;
+      // }
+    //}
+  }
+
   // https://lit.dev/docs/components/rendering/
   // https://developpaper.com/realization-of-html5-canvas-background-animation-by-levitation-of-div-layer/
   protected render(): TemplateResult | void {
@@ -113,7 +132,7 @@ export class FluidProgressBarCard extends LitElement {
         hasDoubleClick: hasAction(this.config.double_tap_action),
       })}
       tabindex="0"
-      .label=${`Boilerplate: ${this.config.entity || 'No Entity Defined'}`}
+      .label=${`FluidProgressBar: ${this.config.entity || 'No Entity Defined'}`}
       >${this._card}</ha-card
     >`;
 
@@ -155,6 +174,7 @@ export class FluidProgressBarCard extends LitElement {
 
   private _createCardElement(cardConfig: LovelaceCardConfig) {
     const element = createThing(cardConfig) as LovelaceCard;
+    console.log(element);
     if (this.hass) {
       element.hass = this.hass;
     }
