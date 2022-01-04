@@ -11,7 +11,9 @@ import {
   getLovelace,
   LovelaceCard,
   LovelaceCardConfig,
+  createThing,
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types. https://github.com/custom-cards/custom-card-helpers
+//import { createCardElement } from 'home-assistant-frontend/src/panels/lovelace/custom-card-helpers';
 
 import './editor';
 import './fluid-background';
@@ -57,6 +59,7 @@ export class FluidProgressBarCard extends LitElement {
   // https://lit.dev/docs/components/properties/
   @property({ attribute: false }) public hass!: HomeAssistant;
   @property({ attribute: false }) public size!: ElementSize;
+  @property() protected _card?: LovelaceCard;
 
   @state() private config!: FluidProgressBarCardConfig;
 
@@ -77,6 +80,8 @@ export class FluidProgressBarCard extends LitElement {
       name: 'FluidProgressBar',
       ...config,
     };
+
+    this._card = this._createCardElement(config.card);
   }
 
   // https://lit.dev/docs/components/lifecycle/#reactive-update-cycle-performing
@@ -109,7 +114,8 @@ export class FluidProgressBarCard extends LitElement {
       })}
       tabindex="0"
       .label=${`Boilerplate: ${this.config.entity || 'No Entity Defined'}`}
-    ></ha-card>`;
+      >${this._card}</ha-card
+    >`;
 
     return html`
       <div class="container">
@@ -147,23 +153,21 @@ export class FluidProgressBarCard extends LitElement {
     return html` ${errorCard} `;
   }
 
-  // private _createCardElement(cardConfig: LovelaceCardConfig) {
-  //   // const element = createCardElement(cardConfig) as LovelaceCard;
-  //   // if (this.hass) {
-  //   //   element.hass = this.hass;
-  //   // }
-  //   // element.addEventListener(
-  //   //   "ll-rebuild",
-  //   //   (ev) => {
-  //   //     ev.stopPropagation();
-  //   //     this._rebuildCard(element, cardConfig);
-  //   //   },
-  //   //   { once: true }
-  //   // );
-  //   // return element;
-  // }
-
-
+  private _createCardElement(cardConfig: LovelaceCardConfig) {
+    const element = createThing(cardConfig) as LovelaceCard;
+    if (this.hass) {
+      element.hass = this.hass;
+    }
+    element.addEventListener(
+      'll-rebuild',
+      (ev) => {
+        ev.stopPropagation();
+        //this._rebuildCard(element, cardConfig);
+      },
+      { once: true },
+    );
+    return element;
+  }
 
   // https://lit.dev/docs/components/styles/
   static get styles() {
