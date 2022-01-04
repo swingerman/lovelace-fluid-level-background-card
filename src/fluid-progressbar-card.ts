@@ -162,11 +162,19 @@ export class FluidProgressBarCard extends LitElement {
       'll-rebuild',
       (ev) => {
         ev.stopPropagation();
-        //this._rebuildCard(element, cardConfig);
+        this._rebuildCard(element, cardConfig);
       },
       { once: true },
     );
     return element;
+  }
+
+  private _rebuildCard(cardElToReplace: LovelaceCard, config: LovelaceCardConfig): void {
+    const newCardEl = this._createCardElement(config);
+    if (cardElToReplace.parentElement) {
+      cardElToReplace.parentElement.replaceChild(newCardEl, cardElToReplace);
+    }
+    this._card = newCardEl;
   }
 
   // https://lit.dev/docs/components/styles/
