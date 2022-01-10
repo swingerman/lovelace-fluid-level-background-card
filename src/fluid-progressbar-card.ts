@@ -95,20 +95,17 @@ export class FluidProgressBarCard extends LitElement {
 
   protected updated(changedProps: PropertyValues) {
     super.updated(changedProps);
-    if (
-      !this._card ||
-      (!changedProps.has("hass") && !changedProps.has("editMode"))
-    ) {
+    if (!this._card || (!changedProps.has('hass') && !changedProps.has('editMode'))) {
       return;
     }
 
     //for (const element of this._cards) {
-      if (this.hass) {
-        this._card.hass = this.hass;
-      }
-      // if (this.editMode !== undefined) {
-      //   this._card.editMode = this.editMode;
-      // }
+    if (this.hass) {
+      this._card.hass = this.hass;
+    }
+    // if (this.editMode !== undefined) {
+    //   this._card.editMode = this.editMode;
+    // }
     //}
   }
 
@@ -141,6 +138,12 @@ export class FluidProgressBarCard extends LitElement {
         <fluid-background .size=${this.size}></fluid-background>
         ${haCard}
       </div>
+      <style>
+        ha-card {
+          --ha-card-background: transparent;
+          --card-background-color: transparent;
+        }
+      </style>
     `;
   }
 
@@ -206,6 +209,7 @@ export class FluidProgressBarCard extends LitElement {
 
       ha-card {
         position: relative;
+        background: transparent;
       }
     `;
   }

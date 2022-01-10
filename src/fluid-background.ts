@@ -57,14 +57,14 @@ export class FluidBackground extends LitElement {
             angularSpeed: 100,
             maxAmplitude: 12,
             frequency: 30,
-            horizontalSpeed: -150,
+            horizontalSpeed: -75,
           },
           backgroundFluidLayer: {
             fillStyle: 'pink',
             angularSpeed: 100,
             maxAmplitude: 9,
             frequency: 30,
-            horizontalSpeed: 150,
+            horizontalSpeed: 75,
           },
         },
       };
