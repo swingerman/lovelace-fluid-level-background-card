@@ -61,7 +61,7 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
 
   @property({ attribute: false }) public lovelace?: LovelaceConfig;
 
-  @property() protected _card?: LovelaceCard;
+  //@property() protected _card?: LovelaceCard;
 
   @state() protected _config?: FluidProgressBarCardConfig;
 
@@ -139,7 +139,7 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
           </div>
           <div class="secondary">${options.required.secondary}</div>
         </div>
-        ${this._card
+        ${this._config?.card
           ? html`
               <hui-card-element-editor
                 .hass=${this.hass}

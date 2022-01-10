@@ -11,6 +11,10 @@ export class FluidBackground extends LitElement {
   @property()
   size!: ElementSize | null;
 
+  @property()
+  value!: number;
+
+
   protected render(): TemplateResult | void {
     return html` <div id="fluid-background"></div> `;
   }
@@ -35,11 +39,10 @@ export class FluidBackground extends LitElement {
     window.setTimeout(() => {
       const fm = FluidMeter();
       const container = this.shadowRoot?.querySelector('#fluid-background');
-      console.log(this.size);
 
       const env: FluidMeterEnv = {
         targetContainer: container,
-        fillPercentage: 85,
+        fillPercentage: this.value,
         options: {
           fontFamily: 'Raleway',
           drawPercentageSign: false,

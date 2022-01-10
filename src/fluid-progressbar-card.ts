@@ -121,6 +121,9 @@ export class FluidProgressBarCard extends LitElement {
       return this._showError(localize('common.show_error'));
     }
 
+    const value = this.config.entity ?
+      parseInt(this.hass.states[this.config.entity].state, 10) : 0;
+
     const haCard = html` <ha-card
       .header=${this.config.name}
       @action=${this._handleAction}
@@ -135,7 +138,7 @@ export class FluidProgressBarCard extends LitElement {
 
     return html`
       <div class="container">
-        <fluid-background .size=${this.size}></fluid-background>
+        <fluid-background .size=${this.size} .value=${value}></fluid-background>
         ${haCard}
       </div>
       <style>
