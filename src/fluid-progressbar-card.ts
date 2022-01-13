@@ -70,8 +70,6 @@ export class FluidProgressBarCard extends LitElement {
       throw new Error(localize('common.invalid_configuration'));
     }
 
-    console.log(config);
-
     if (config.test_gui) {
       getLovelace().setEditMode(true);
     }
@@ -82,6 +80,21 @@ export class FluidProgressBarCard extends LitElement {
     };
 
     this._card = this._createCardElement(config.card);
+  }
+
+
+  requestUpdate(name?: PropertyKey, oldValue?: unknown):void {
+    //console.log(name, oldValue);
+
+    if (name === 'hass' && this.config.entity) {
+      console.log(this[name].states[this.config.entity].state, oldValue);
+      super.requestUpdate(name, oldValue);
+    }
+
+    // You can process the "newValue" and "oldValue" here
+    // ....
+    // Proceed to schedule an update
+    //return super.requestUpdate(name, oldValue);
   }
 
   // https://lit.dev/docs/components/lifecycle/#reactive-update-cycle-performing

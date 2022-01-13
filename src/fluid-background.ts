@@ -14,6 +14,8 @@ export class FluidBackground extends LitElement {
   @property()
   value!: number;
 
+  fm = FluidMeter();
+
 
   protected render(): TemplateResult | void {
     return html` <div id="fluid-background"></div> `;
@@ -35,9 +37,25 @@ export class FluidBackground extends LitElement {
     `;
   }
 
+  requestUpdate(name?: PropertyKey, oldValue?: unknown):void {
+    console.log(name, oldValue);
+
+    if (name === 'value') {
+      console.log(this.value, oldValue);
+      this.fm.setPercentage(this.value);
+      //console.log(this[name].states[this.config.entity].state, oldValue);
+      super.requestUpdate(name, oldValue);
+    }
+
+    // You can process the "newValue" and "oldValue" here
+    // ....
+    // Proceed to schedule an update
+    //return super.requestUpdate(name, oldValue);
+  }
+
   protected firstUpdated(): void {
     window.setTimeout(() => {
-      const fm = FluidMeter();
+      //const fm = FluidMeter();
       const container = this.shadowRoot?.querySelector('#fluid-background');
 
       const env: FluidMeterEnv = {
@@ -72,7 +90,7 @@ export class FluidBackground extends LitElement {
         },
       };
       console.log(env);
-      fm.init(env);
+      this.fm.init(env);
     }, 0);
   }
 }
