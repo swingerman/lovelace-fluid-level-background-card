@@ -2,6 +2,8 @@
 
 A card that wraps other card or cards and renders a fluid progress background behind them.
 
+<img style="border: 5px solid #767676;border-radius: 10px;box-sizing: border-box;" src="https://github.com/swingerman/fluid-progress-bar-card/blob/master/docs/assets/grid-card.jpg?raw=true" alt="Demo">
+
 [![GitHub Release][releases-shield]][releases]
 [![License][license-shield]](LICENSE.md)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/swingerman/fluid-progress-bar-card)
