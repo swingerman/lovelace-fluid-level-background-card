@@ -7,7 +7,8 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
-  validate:
+  validate_hacs:
+    name: Valiate With HACS
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
@@ -15,3 +16,10 @@ jobs:
         uses: 'hacs/action@main'
         with:
           CATEGORY: 'plugin'
+
+  validate_hassfest:
+    name: Validate with Hassfest
+    runs-on: "ubuntu-latest"
+    steps:
+        - uses: "actions/checkout@v2"
+        - uses: "home-assistant/actions/hassfest@master"
