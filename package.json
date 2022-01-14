@@ -21,7 +21,7 @@
     "rollup-plugin-sourcemaps": "^0.6.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.0",
+    "@babel/core": "^7.16.7",
     "@babel/plugin-proposal-class-properties": "^7.14.5",
     "@babel/plugin-proposal-decorators": "^7.14.5",
     "@rollup/plugin-json": "^4.1.0",
