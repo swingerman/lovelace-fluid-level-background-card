@@ -14,9 +14,9 @@ jobs:
       # Build
       - name: Build the file
         run: |
-          cd /home/runner/work/fluid-progressbar-card/fluid-progressbar-card
-          npm install
+          npm ci
           npm run build
+          ls
 
       # Upload build file to the releas as an asset.
       - name: Upload zip to release
