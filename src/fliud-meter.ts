@@ -432,6 +432,7 @@ export function FluidMeter(): FluidMeterInstance {
       setupCanvas();
       draw();
     },
+    // TODO: implement parameter setting methods
     setPercentage(percentage: number) {
       fillPercentage = clamp(percentage, 0, 100);
     },

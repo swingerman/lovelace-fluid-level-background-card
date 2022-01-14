@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LitElement, html, TemplateResult, css, PropertyValues, CSSResultGroup } from 'lit';
+import { LitElement, html, TemplateResult, css, PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators';
 import {
   HomeAssistant,
@@ -45,7 +45,13 @@ export interface ElementSize {
 
 @customElement('fluid-progressbar-card')
 export class FluidProgressBarCard extends LitElement {
-  //size: ElementSize = { width: 0, height: 0 };
+  @property({ attribute: false }) public hass!: HomeAssistant;
+
+  @property({ attribute: false }) public size!: ElementSize;
+
+  @state() protected _card?: LovelaceCard;
+
+  @state() private config!: FluidProgressBarCardConfig;
 
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     return document.createElement('fluid-progressbar-card-editor');
@@ -54,14 +60,6 @@ export class FluidProgressBarCard extends LitElement {
   public static getStubConfig(): Record<string, unknown> {
     return {};
   }
-
-  // TODO Add any properities that should cause your element to re-render here
-  // https://lit.dev/docs/components/properties/
-  @property({ attribute: false }) public hass!: HomeAssistant;
-  @property({ attribute: false }) public size!: ElementSize;
-  @property() protected _card?: LovelaceCard;
-
-  @state() private config!: FluidProgressBarCardConfig;
 
   // https://lit.dev/docs/components/properties/#accessors-custom
   public setConfig(config: FluidProgressBarCardConfig): void {
@@ -82,19 +80,15 @@ export class FluidProgressBarCard extends LitElement {
     this._card = this._createCardElement(config.card);
   }
 
-
-  requestUpdate(name?: PropertyKey, oldValue?: unknown):void {
-    //console.log(name, oldValue);
-
+  requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
     if (name === 'hass' && this.config.entity) {
       console.log(this[name].states[this.config.entity].state, oldValue);
       super.requestUpdate(name, oldValue);
     }
 
-    // You can process the "newValue" and "oldValue" here
-    // ....
-    // Proceed to schedule an update
-    //return super.requestUpdate(name, oldValue);
+    if (name === 'size') {
+      super.requestUpdate(name, oldValue);
+    }
   }
 
   // https://lit.dev/docs/components/lifecycle/#reactive-update-cycle-performing
@@ -106,7 +100,7 @@ export class FluidProgressBarCard extends LitElement {
     return hasConfigOrEntityChanged(this, changedProps, false);
   }
 
-  protected updated(changedProps: PropertyValues) {
+  protected updated(changedProps: PropertyValues): void {
     super.updated(changedProps);
     if (!this._card || (!changedProps.has('hass') && !changedProps.has('editMode'))) {
       return;
@@ -134,11 +128,9 @@ export class FluidProgressBarCard extends LitElement {
       return this._showError(localize('common.show_error'));
     }
 
-    const value = this.config.entity ?
-      parseInt(this.hass.states[this.config.entity].state, 10) : 0;
+    const value = this.config.entity ? parseInt(this.hass.states[this.config.entity].state, 10) : 50;
 
     const haCard = html` <ha-card
-      .header=${this.config.name}
       @action=${this._handleAction}
       .actionHandler=${actionHandler({
         hasHold: hasAction(this.config.hold_action),
