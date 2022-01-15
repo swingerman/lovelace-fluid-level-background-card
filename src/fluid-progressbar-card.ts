@@ -82,7 +82,6 @@ export class FluidProgressBarCard extends LitElement {
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
     if (name === 'hass' && this.config.entity) {
-      console.log(this[name].states[this.config.entity].state, oldValue);
       super.requestUpdate(name, oldValue);
     }
 
@@ -185,7 +184,6 @@ export class FluidProgressBarCard extends LitElement {
 
   private _createCardElement(cardConfig: LovelaceCardConfig) {
     const element = createThing(cardConfig) as LovelaceCard;
-    console.log(element);
     if (this.hass) {
       element.hass = this.hass;
     }
@@ -209,6 +207,7 @@ export class FluidProgressBarCard extends LitElement {
   }
 
   // https://lit.dev/docs/components/styles/
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   static get styles() {
     return css`
       .container {

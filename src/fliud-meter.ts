@@ -47,6 +47,8 @@ export interface FluidMeterEnv {
 export type FluidMeterInstance = {
   init(env: FluidMeterEnv);
   setPercentage(percentage: number);
+  setDrawBubbles(draw: boolean);
+  setColor(foreggroundColor: string, backgroundColor: string);
 };
 
 export function FluidMeter(): FluidMeterInstance {
@@ -194,6 +196,7 @@ export function FluidMeter(): FluidMeterInstance {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function drawMeterForeground() {
     if (context) {
       context.save();
@@ -290,6 +293,7 @@ export function FluidMeter(): FluidMeterInstance {
    * clipping mask for objects within the fluid constrains
    * @param {Object} layer layer to be used as a mask
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function drawFluidMask(layer) {
     let x = 0;
     let y = 0;
@@ -435,6 +439,21 @@ export function FluidMeter(): FluidMeterInstance {
     // TODO: implement parameter setting methods
     setPercentage(percentage: number) {
       fillPercentage = clamp(percentage, 0, 100);
+    },
+    setDrawBubbles(draw: boolean) {
+      if (!draw) return;
+
+      const drawBubbles = () => {
+        const now = new Date().getTime();
+        dt = (now - (time || now)) / 1000;
+        drawBubblesLayer(dt);
+      };
+
+      requestAnimationFrame(drawBubbles);
+    },
+    setColor(foreggroundColor: string, backgroundColor: string) {
+      backgroundFluidLayer.fillStyle = backgroundColor;
+      foregroundFluidLayer.fillStyle = foreggroundColor;
     },
   };
 }

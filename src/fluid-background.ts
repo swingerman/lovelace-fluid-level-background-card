@@ -20,6 +20,7 @@ export class FluidBackground extends LitElement {
     return html` <div class="fluid-background"></div> `;
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   static get styles() {
     return css`
       :host {
@@ -38,7 +39,6 @@ export class FluidBackground extends LitElement {
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
     if (name === 'value' || name === 'size') {
-      console.log(this.value, oldValue);
       this.fm.setPercentage(this.value);
       super.requestUpdate(name, oldValue);
     }
@@ -63,7 +63,7 @@ export class FluidBackground extends LitElement {
           height: this.size?.height,
           borderWidth: 0,
           backgroundColor: 'rgb(28, 28, 28)',
-          foregroundColor: 'rgba(28, 28, 28,.3)',
+          foregroundColor: 'rgba(28, 28, 28,.5)',
           foregroundFluidLayer: {
             fillStyle: 'rgba(0, 128, 0,1)',
             angularSpeed: 100,
@@ -80,7 +80,6 @@ export class FluidBackground extends LitElement {
           },
         },
       };
-      console.log(env);
       this.fm.init(env);
     }, 0);
   }
