@@ -5,13 +5,12 @@ import {
   fireEvent,
   LovelaceCardEditor,
   ActionConfig,
-  LovelaceCard,
   LovelaceConfig,
   HASSDomEvent,
   LovelaceCardConfig,
 } from 'custom-card-helpers';
 
-import { FluidProgressBarCardConfig, GUIModeChangedEvent, UIConfigChangedEvent } from './types';
+import { FluidProgressBarCardConfig, GUIModeChangedEvent } from './types';
 import { customElement, property, state } from 'lit/decorators';
 
 const options = {
@@ -272,7 +271,8 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
     this._initialized = true;
   }
 
-  protected _handleCardPicked(ev) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  protected _handleCardPicked(ev): void {
     ev.stopPropagation();
     if (!this._config) {
       return;
@@ -283,6 +283,7 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   protected _handleConfigChanged(ev): void {
     ev.stopPropagation();
     if (!this._config) {

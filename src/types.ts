@@ -1,4 +1,11 @@
-import { ActionConfig, EntityConfig, HomeAssistant, LovelaceCard, LovelaceCardConfig, LovelaceCardEditor } from 'custom-card-helpers';
+import {
+  ActionConfig,
+  EntityConfig,
+  HomeAssistant,
+  LovelaceCard,
+  LovelaceCardConfig,
+  LovelaceCardEditor,
+} from 'custom-card-helpers';
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -19,12 +26,12 @@ export interface Condition {
 
 export interface UIConfigChangedEvent extends Event {
   detail: {
-    config: LovelaceCardConfig | LovelaceRowConfig ;
+    config: LovelaceCardConfig | LovelaceRowConfig;
   };
 }
 
 export interface ButtonsRowConfig {
-  type: "buttons";
+  type: 'buttons';
   entities: Array<string | EntityConfig>;
 }
 export interface ActionRowConfig extends EntityConfig {
@@ -34,15 +41,15 @@ export interface EntityFilterEntityConfig extends EntityConfig {
   state_filter?: Array<{ key: string } | string>;
 }
 export interface DividerConfig {
-  type: "divider";
+  type: 'divider';
   style?: Record<string, string>;
 }
 export interface SectionConfig {
-  type: "section";
+  type: 'section';
   label: string;
 }
 export interface WeblinkConfig {
-  type: "weblink";
+  type: 'weblink';
   name?: string;
   icon?: string;
   url: string;
@@ -50,26 +57,26 @@ export interface WeblinkConfig {
   download?: boolean;
 }
 export interface TextConfig {
-  type: "text";
+  type: 'text';
   name: string;
   icon?: string;
   text: string;
 }
 export interface CallServiceConfig extends EntityConfig {
-  type: "call-service";
+  type: 'call-service';
   service: string;
-  service_data?: Record<string, any>;
+  service_data?: Record<string, unknown>;
   action_name?: string;
 }
 export interface ButtonRowConfig extends EntityConfig {
-  type: "button";
+  type: 'button';
   action_name?: string;
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
   double_tap_action?: ActionConfig;
 }
 export interface CastConfig {
-  type: "cast";
+  type: 'cast';
   icon?: string;
   name?: string;
   view: string | number;
@@ -78,7 +85,7 @@ export interface CastConfig {
   hide_if_unavailable?: boolean;
 }
 export interface ButtonsRowConfig {
-  type: "buttons";
+  type: 'buttons';
   entities: Array<string | EntityConfig>;
 }
 export type LovelaceRowConfig =
