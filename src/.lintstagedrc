@@ -1,0 +1,13 @@
+{
+  "*.{js,json,md,html}": [
+    "prettier --write"
+  ],
+  "*.{css,scss,sass}": [
+    "prettier --write",
+    "npm run lint-css"
+  ],
+  "*.ts": [
+    "prettier --write",
+    "eslint --max-warnings=0 --cache --fix"
+  ]
+}
