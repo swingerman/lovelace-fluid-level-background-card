@@ -1,6 +1,6 @@
 // See https://aka.ms/vscode-remote/devcontainer.json for format details.
 {
-  "name": "Fluid Progress Bar Card Development",
+  "name": "Fluid Level Background Card",
   "image": "ghcr.io/ludeeus/devcontainer/generic:latest",
   "context": "..",
   "appPort": ["5000:5000", "9123:8123"],

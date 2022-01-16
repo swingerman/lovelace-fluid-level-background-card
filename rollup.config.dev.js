@@ -8,7 +8,7 @@ import summary from 'rollup-plugin-summary';
 
 
 export default {
-  input: ["src/fluid-progressbar-card.ts"],
+  input: ["src/fluid-level-background-card.ts"],
   output: {
     dir: "./dist",
     format: "es",

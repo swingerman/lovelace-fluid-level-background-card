@@ -9,7 +9,7 @@ import {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'fluid-progressbar-card-editor': LovelaceCardEditor;
+    'fluid-level-background-card-editor': LovelaceCardEditor;
     'hui-error-card': LovelaceCard;
   }
 }

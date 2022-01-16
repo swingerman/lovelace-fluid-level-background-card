@@ -1,7 +1,7 @@
 views:
   - cards:
-      - type: custom:fluid-progressbar-card
-        name: Fluid Progress Bar Card
+      - type: custom:fluid-level-background-card
+        name: Fluid Level Background Card
         entity: input_number.battery_evel
         test_gui: true
       - type: entities

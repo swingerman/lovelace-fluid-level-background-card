@@ -25,7 +25,7 @@ import { localize } from './localize/localize';
 
 /* eslint no-console: 0 */
 console.info(
-  `%c  fluid-progressbar-card \n%c  ${localize('common.version')} ${CARD_VERSION}    `,
+  `%c  fluid-level-background-card \n%c  ${localize('common.version')} ${CARD_VERSION}    `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
@@ -33,9 +33,9 @@ console.info(
 // This puts your card into the UI card picker dialog
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
-  type: 'fluid-progressbar-card',
-  name: 'Fluid Progress Bar Card',
-  description: 'A card that has a fluid progress bar as a background',
+  type: 'fluid-level-background-card',
+  name: 'Fluid Level Background Card',
+  description: 'A card that has a fluid level as the background',
 });
 
 export interface ElementSize {
@@ -43,7 +43,7 @@ export interface ElementSize {
   height: number;
 }
 
-@customElement('fluid-progressbar-card')
+@customElement('fluid-level-background-card')
 export class FluidProgressBarCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
@@ -54,7 +54,7 @@ export class FluidProgressBarCard extends LitElement {
   @state() private config!: FluidProgressBarCardConfig;
 
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
-    return document.createElement('fluid-progressbar-card-editor');
+    return document.createElement('fluid-level-background-card-editor');
   }
 
   public static getStubConfig(): Record<string, unknown> {

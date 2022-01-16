@@ -54,7 +54,7 @@ const options = {
   },
 };
 
-@customElement('fluid-progressbar-card-editor')
+@customElement('fluid-level-background-card-editor')
 export class FluidProgressBarCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass?: HomeAssistant;
 

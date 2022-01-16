@@ -1,6 +1,6 @@
-# Lovelace Fluid Progressbar Card by [@swingerman](https://www.github.com/swingerman)
+# Lovelace Fluid Level Background Card by [@swingerman](https://www.github.com/swingerman)
 
-A card that wraps other card or cards and renders a fluid progress background behind them.
+A card that wraps other card or cards and renders a fluid level background behind them.
 
 <img style="border: 5px solid #767676;border-radius: 10px;box-sizing: border-box;" src="https://github.com/swingerman/fluid-progress-bar-card/blob/master/docs/assets/grid-card.jpg?raw=true" alt="Demo">
 
@@ -21,7 +21,7 @@ Hey dude! Help me out for a couple of :beers: or a :coffee:!
 
 | Name              | Type    | Requirement  | Description                                 | Default             |
 | ----------------- | ------- | ------------ | ------------------------------------------- | ------------------- |
-| type              | string  | **Required** | `custom:fluid-progressbar-card`             |
+| type              | string  | **Required** | `custom:fluid-level-background-card`        |
 | name              | string  | **Optional** | Card name                                   | `Boilerplate`       |
 | show_error        | boolean | **Optional** | Show what an error looks like for the card  | `false`             |
 | show_warning      | boolean | **Optional** | Show what a warning looks like for the card | `false`             |

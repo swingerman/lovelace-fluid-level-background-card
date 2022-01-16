@@ -1,7 +1,7 @@
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators';
 import { FluidMeter, FluidMeterEnv } from './fliud-meter';
-import { ElementSize } from './fluid-progressbar-card';
+import { ElementSize } from './fluid-level-background-card';
 
 @customElement('fluid-background')
 export class FluidBackground extends LitElement {

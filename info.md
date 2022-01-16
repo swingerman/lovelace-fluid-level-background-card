@@ -13,6 +13,6 @@ A card that wraps other card or cards and renders a fluid progress background be
 
 ```yaml
 resources:
-  - url: /community_plugin/fluid-progreesbar-card/fluid-progressbar-card.js
+  - url: /community_plugin/fluid-progreesbar-card/fluid-level-background-card.js
     type: module
 ```

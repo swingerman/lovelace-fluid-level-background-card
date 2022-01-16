@@ -1,7 +1,7 @@
 {
-  "name": "fluid-progressbar-card",
+  "name": "fluid-level-background-card",
   "version": "0.0.1",
-  "description": "Lovelace fluid-progressbar-card",
+  "description": "Lovelace fluid-level-background-card",
   "keywords": [
     "home-assistant",
     "homeassistant",
@@ -10,8 +10,8 @@
     "lovelace",
     "custom-cards"
   ],
-  "module": "fluid-progressbar-card.js",
-  "repository": "git@github.com:custom_cards/fluid-progressbar-card.git",
+  "module": "fluid-level-background-card.js",
+  "repository": "git@github.com:custom_cards/fluid-level-background-card.git",
   "author": "Ian Richardson <iantrich@gmail.com>",
   "license": "MIT",
   "dependencies": {

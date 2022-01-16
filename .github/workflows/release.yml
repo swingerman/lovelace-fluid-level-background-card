@@ -24,7 +24,7 @@ jobs:
 
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: dist/fluid-progressbar-card.js
-          asset_name: fluid-progressbar-card.js
+          file: dist/fluid-level-background-card.js
+          asset_name: fluid-level-background-card.js
           tag: ${{ github.ref }}
           overwrite: true
