@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { noChange } from 'lit';
-import { AttributePart, directive, Directive, DirectiveParameters } from 'lit/directive';
 
 import { ActionHandlerDetail, ActionHandlerOptions } from 'custom-card-helpers/dist/types';
 import { fireEvent } from 'custom-card-helpers';
+import { AttributePart, Directive, directive, DirectiveParameters } from '../node_modules/lit-html/directive';
+import { noChange } from 'lit-element';
 
 const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.maxTouchPoints > 0;
 
@@ -163,15 +163,15 @@ class ActionHandler extends HTMLElement implements ActionHandler {
   }
 }
 
-customElements.define('action-handler-fluid-progressbar', ActionHandler);
+customElements.define('action-handler-fluid-level-background-card', ActionHandler);
 
 const getActionHandler = (): ActionHandler => {
   const body = document.body;
-  if (body.querySelector('action-handler-fluid-progressbar')) {
-    return body.querySelector('action-handler-fluid-progressbar') as ActionHandler;
+  if (body.querySelector('action-handler-sbar')) {
+    return body.querySelector('action-handler-fluid-level-background-card') as ActionHandler;
   }
 
-  const actionhandler = document.createElement('action-handler-fluid-progressbar');
+  const actionhandler = document.createElement('action-handler-fluid-level-background-card');
   body.appendChild(actionhandler);
 
   return actionhandler as ActionHandler;
