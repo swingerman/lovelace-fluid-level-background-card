@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
+import { LitElement, html, TemplateResult, css, CSSResultGroup, customElement, property, state } from 'lit-element';
 import {
   HomeAssistant,
   fireEvent,
@@ -10,8 +10,7 @@ import {
   LovelaceCardConfig,
 } from 'custom-card-helpers';
 
-import { FluidProgressBarCardConfig, GUIModeChangedEvent } from './types';
-import { customElement, property, state } from 'lit/decorators';
+import { FluidLevelBackgroundCardConfig, GUIModeChangedEvent } from './types';
 
 const options = {
   required: {
@@ -55,14 +54,14 @@ const options = {
 };
 
 @customElement('fluid-level-background-card-editor')
-export class FluidProgressBarCardEditor extends LitElement implements LovelaceCardEditor {
+export class FluidLevelBackgroundCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass?: HomeAssistant;
 
   @property({ attribute: false }) public lovelace?: LovelaceConfig;
 
   //@property() protected _card?: LovelaceCard;
 
-  @state() protected _config?: FluidProgressBarCardConfig;
+  @state() protected _config?: FluidLevelBackgroundCardConfig;
 
   @state() protected _selectedCard = 0;
 
@@ -76,7 +75,7 @@ export class FluidProgressBarCardEditor extends LitElement implements LovelaceCa
 
   private _initialized = false;
 
-  public setConfig(config: FluidProgressBarCardConfig): void {
+  public setConfig(config: FluidLevelBackgroundCardConfig): void {
     this._config = config;
 
     this.loadCardHelpers();

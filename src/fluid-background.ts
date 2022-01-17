@@ -1,5 +1,5 @@
 import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement, property } from 'lit/decorators';
+import { customElement, property } from 'lit-element';
 import { FluidMeter, FluidMeterEnv } from './fliud-meter';
 import { ElementSize } from './fluid-level-background-card';
 

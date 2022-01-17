@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LitElement, html, TemplateResult, css, PropertyValues, customElement, property, state } from 'lit-element';
+import { LitElement, html, TemplateResult, css, PropertyValues, CSSResult } from 'lit';
+import { customElement, property, state } from 'lit/decorators';
 import {
   HomeAssistant,
   hasConfigOrEntityChanged,
@@ -12,6 +13,7 @@ import {
   LovelaceCardConfig,
   createThing,
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types. https://github.com/custom-cards/custom-card-helpers
+//import { createCardElement } from 'home-assistant-frontend/src/panels/lovelace/custom-card-helpers';
 
 import './editor';
 import './fluid-background';
@@ -23,7 +25,7 @@ import { localize } from './localize/localize';
 
 /* eslint no-console: 0 */
 console.info(
-  `%c  fluid-level-background-card \n%c  ${localize('common.version')} ${CARD_VERSION}    `,
+  `%c  fluid-progressbar-card \n%c  ${localize('common.version')} ${CARD_VERSION}    `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
@@ -31,9 +33,9 @@ console.info(
 // This puts your card into the UI card picker dialog
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
-  type: 'fluid-level-background-card',
-  name: 'Fluid Level Background Card',
-  description: 'A card that has a fluid level as the background',
+  type: 'fluid-progressbar-card',
+  name: 'Fluid Progress Bar Card',
+  description: 'A card that has a fluid progress bar as a background',
 });
 
 export interface ElementSize {
@@ -42,7 +44,7 @@ export interface ElementSize {
 }
 
 @customElement('fluid-level-background-card')
-export class FluidLevelBackgroundCard extends LitElement {
+export class FluidProgressBarCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
   @property({ attribute: false }) public size!: ElementSize;
@@ -205,8 +207,7 @@ export class FluidLevelBackgroundCard extends LitElement {
   }
 
   // https://lit.dev/docs/components/styles/
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  static get styles() {
+  static get styles(): CSSResult {
     return css`
       .container {
         position: relative;

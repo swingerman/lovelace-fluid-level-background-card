@@ -125,7 +125,7 @@ export interface LovelaceRow extends HTMLElement {
   setConfig(config: LovelaceRowConfig);
 }
 
-export interface FluidProgressBarCardConfig extends LovelaceCardConfig {
+export interface FluidLevelBackgroundCardConfig extends LovelaceCardConfig {
   type: string;
   name?: string;
   card: LovelaceCardConfig;
