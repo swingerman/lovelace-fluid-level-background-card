@@ -138,7 +138,7 @@ export class FluidLevelBackgroundCard extends LitElement {
     >`;
 
     return html`
-      <div class="container">
+      <div id="container">
         <fluid-background .size=${this.size} .value=${value}></fluid-background>
         ${haCard}
       </div>
@@ -152,7 +152,7 @@ export class FluidLevelBackgroundCard extends LitElement {
   }
 
   firstUpdated(): void {
-    const container = this.shadowRoot?.querySelector('.container');
+    const container = this.shadowRoot?.querySelector('#container');
     if (container) {
       this.ro.observe(container as Element);
     }
@@ -215,7 +215,7 @@ export class FluidLevelBackgroundCard extends LitElement {
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   static get styles() {
     return css`
-      .container {
+      #container {
         position: relative;
       }
 
