@@ -53,6 +53,8 @@ export type FluidMeterInstance = {
   setDrawBubbles(draw: boolean);
   setColor(foreggroundColor: string, backgroundColor: string);
   resizeCanvas(newSize: ElementSize);
+  stop();
+  start();
 };
 
 export function FluidMeter(): FluidMeterInstance {
@@ -64,7 +66,7 @@ export function FluidMeter(): FluidMeterInstance {
   let dt: number | null = null;
 
   //let frameCount = 0;
-  const stop = false;
+  let stop = false;
   let fpsInterval, startTime, then, elapsed;
 
   const options: FluidMeterOptions = {
@@ -468,10 +470,8 @@ export function FluidMeter(): FluidMeterInstance {
 
       bubblesLayer.init();
       setupCanvas();
-      //draw();
-      startDrawing(24);
+      this.start();
     },
-    // TODO: implement parameter setting methods
     setPercentage(percentage: number) {
       fillPercentage = clamp(percentage, 0, 100);
     },
@@ -500,6 +500,13 @@ export function FluidMeter(): FluidMeterInstance {
         canvas.height = size.height;
         context = canvas.getContext('2d');
       }
+    },
+    stop() {
+      stop = true;
+    },
+    start() {
+      stop = false;
+      startDrawing(24);
     },
   };
 }
