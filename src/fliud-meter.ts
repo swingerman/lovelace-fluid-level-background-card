@@ -1,3 +1,5 @@
+import { ElementSize } from './fluid-level-background-card';
+
 interface Bubble {
   r: number;
   x: number;
@@ -28,6 +30,7 @@ export interface FluidMeterOptions {
   fontFillStyle?: string;
   size: number;
   borderWidth: number;
+  levelOffset: number;
   backgroundColor: string;
   foregroundColor: string;
   width?: number;
@@ -49,14 +52,20 @@ export type FluidMeterInstance = {
   setPercentage(percentage: number);
   setDrawBubbles(draw: boolean);
   setColor(foreggroundColor: string, backgroundColor: string);
+  resizeCanvas(newSize: ElementSize);
 };
 
 export function FluidMeter(): FluidMeterInstance {
+  let canvas;
   let context: CanvasRenderingContext2D | null;
   let targetContainer: Element;
 
   let time: number | null = null;
   let dt: number | null = null;
+
+  //let frameCount = 0;
+  const stop = false;
+  let fpsInterval, startTime, then, elapsed;
 
   const options: FluidMeterOptions = {
     drawShadow: true,
@@ -67,6 +76,7 @@ export function FluidMeter(): FluidMeterInstance {
     fontFamily: 'Arial',
     fontFillStyle: 'white',
     size: 300,
+    levelOffset: 0,
     borderWidth: 25,
     backgroundColor: '#e2e2e2',
     foregroundColor: '#fafafa',
@@ -137,7 +147,7 @@ export function FluidMeter(): FluidMeterInstance {
    * initializes and mount the canvas element on the document
    */
   function setupCanvas() {
-    const canvas = document.createElement('canvas');
+    canvas = document.createElement('canvas');
     canvas.width = options.width as number;
     canvas.height = options.height as number;
     context = canvas.getContext('2d');
@@ -152,7 +162,7 @@ export function FluidMeter(): FluidMeterInstance {
         context.save();
         context.beginPath();
         context.filter = 'drop-shadow(0px 4px 6px rgba(0,0,0,0.1))';
-        context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2, 0, 2 * Math.PI);
+        context.arc(options.size * 0.5, options.size * 0.5, getMeterRadius() * 0.5, 0, 2 * Math.PI);
         context.closePath();
         context.fill();
         context.restore();
@@ -161,24 +171,40 @@ export function FluidMeter(): FluidMeterInstance {
     }
   }
 
+  function startDrawing(fps: number) {
+    fpsInterval = 1000 / fps;
+    then = window.performance.now();
+    startTime = then;
+    draw(startTime);
+  }
+
   /**
    * draw cycle
    */
-  function draw() {
-    const now = new Date().getTime();
-    dt = (now - (time || now)) / 1000;
-    time = now;
+  function draw(newtime: number) {
+    if (stop) {
+      return;
+    }
+    const now = newtime ?? new Date().getTime();
+    dt = (newtime - (time || now)) / 1000;
+    time = newtime;
+
+    elapsed = now - then;
 
     requestAnimationFrame(draw);
-    if (context) {
-      context.clearRect(0, 0, options.width as number, options.height as number);
+
+    if (elapsed > fpsInterval) {
+      if (context) {
+        context.clearRect(0, 0, options.width as number, options.height as number);
+      }
+      drawMeterBackground();
+      drawFluid(dt);
+      if (options.drawText) {
+        drawText();
+      }
+
+      //drawMeterForeground();
     }
-    drawMeterBackground();
-    drawFluid(dt);
-    if (options.drawText) {
-      drawText();
-    }
-    //drawMeterForeground();
   }
 
   function drawMeterBackground() {
@@ -187,7 +213,7 @@ export function FluidMeter(): FluidMeterInstance {
       context.fillStyle = options.backgroundColor;
       context.beginPath();
       //context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth, 0, 2 * Math.PI);
-      context.arc(options.size / 2, options.size / 2, getMeterRadius() - options.borderWidth, 0, 2 * Math.PI);
+      context.arc(options.size * 0.5, options.size * 0.5, getMeterRadius() - options.borderWidth, 0, 2 * Math.PI);
       context.rect(0, 0, options.width as number, options.height as number);
 
       context.closePath();
@@ -203,7 +229,13 @@ export function FluidMeter(): FluidMeterInstance {
       context.lineWidth = options.borderWidth;
       context.strokeStyle = options.foregroundColor;
       context.beginPath();
-      context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth / 2, 0, 2 * Math.PI);
+      context.arc(
+        options.size * 0.5,
+        options.size * 0.5,
+        getMeterRadius() * 0.5 - options.borderWidth * 0.5,
+        0,
+        2 * Math.PI,
+      );
       context.rect(0, 0, options.width as number, options.height as number);
 
       context.closePath();
@@ -218,7 +250,7 @@ export function FluidMeter(): FluidMeterInstance {
   function drawFluid(dt) {
     if (context) {
       context.save();
-      context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth, 0, Math.PI * 2);
+      context.arc(options.size * 0.5, options.size * 0.5, getMeterRadius() * 0.5 - options.borderWidth, 0, Math.PI * 2);
       //context.arc(options.size / 2, options.size / 2, getMeterRadius() - options.borderWidth, 0, Math.PI * 2);
       //context.rect(options.size / 2, options.size / 2, (options.size / 2) as number, options.height as number);
       context.clip();
@@ -255,8 +287,10 @@ export function FluidMeter(): FluidMeterInstance {
     let y = 0;
     const amplitude = layer.maxAmplitude * Math.sin((layer.angle * Math.PI) / 180);
 
-    const meterBottom = options.size - (options.size - getMeterRadius()) / 2 - options.borderWidth;
-    const fluidAmount = (currentFillPercentage * (getMeterRadius() - options.borderWidth * 2)) / 100;
+    const meterBottom =
+      options.height ?? 0 - options.levelOffset - (options.size - getMeterRadius()) * 0.5 - options.borderWidth;
+    const fluidAmount =
+      (currentFillPercentage * (getMeterRadius() - options.levelOffset * 0.5 - options.borderWidth * 2)) / 100;
 
     if (currentFillPercentage < fillPercentage) {
       currentFillPercentage += 15 * dt;
@@ -434,7 +468,8 @@ export function FluidMeter(): FluidMeterInstance {
 
       bubblesLayer.init();
       setupCanvas();
-      draw();
+      //draw();
+      startDrawing(24);
     },
     // TODO: implement parameter setting methods
     setPercentage(percentage: number) {
@@ -454,6 +489,17 @@ export function FluidMeter(): FluidMeterInstance {
     setColor(foreggroundColor: string, backgroundColor: string) {
       backgroundFluidLayer.fillStyle = backgroundColor;
       foregroundFluidLayer.fillStyle = foreggroundColor;
+    },
+    resizeCanvas(size: ElementSize) {
+      options.width = size.width;
+      options.height = size.height;
+      options.size = Math.max(size.height, size.width);
+      options.levelOffset = Math.abs(size.width - size.height);
+      if (canvas) {
+        canvas.width = size.width;
+        canvas.height = size.height;
+        context = canvas.getContext('2d');
+      }
     },
   };
 }

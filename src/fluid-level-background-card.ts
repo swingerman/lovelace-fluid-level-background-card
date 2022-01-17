@@ -40,7 +40,6 @@ export interface ElementSize {
   width: number;
   height: number;
 }
-
 @customElement('fluid-level-background-card')
 export class FluidLevelBackgroundCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
@@ -71,7 +70,7 @@ export class FluidLevelBackgroundCard extends LitElement {
     }
 
     this.config = {
-      name: 'FluidProgressBar',
+      name: 'FluidLevelBackgroundCard',
       ...config,
     };
 
@@ -153,11 +152,19 @@ export class FluidLevelBackgroundCard extends LitElement {
   }
 
   firstUpdated(): void {
-    window.setTimeout(() => {
-      const container = this.shadowRoot?.querySelector('.container');
-      this.size = { width: container?.clientWidth as number, height: container?.clientHeight as number };
-    }, 0);
+    const container = this.shadowRoot?.querySelector('.container');
+    if (container) {
+      this.ro.observe(container as Element);
+    }
   }
+
+  private updateSize(newSize: { width; height }): void {
+    this.size = { width: newSize.width, height: newSize.height };
+  }
+
+  ro = new ResizeObserver((entries) => {
+    entries.forEach((entry) => this.updateSize(entry.contentRect));
+  });
 
   private _handleAction(ev: ActionHandlerEvent): void {
     if (this.hass && this.config && ev.detail.action) {

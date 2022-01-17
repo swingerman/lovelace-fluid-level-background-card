@@ -39,6 +39,11 @@ export class FluidBackground extends LitElement {
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
     if (name === 'value' || name === 'size') {
+      if (name === 'size') {
+        if (this.size) {
+          this.fm.resizeCanvas(this.size as ElementSize);
+        }
+      }
       this.fm.setPercentage(this.value);
       super.requestUpdate(name, oldValue);
     }
@@ -59,6 +64,7 @@ export class FluidBackground extends LitElement {
           drawText: false,
           // TODO: improve aspcet ratio issues
           size: Math.max(this.size?.width as number, this.size?.height as number),
+          levelOffset: this.size ? Math.abs((this.size?.width as number) - this.size?.height) : 0,
           width: this.size?.width,
           height: this.size?.height,
           borderWidth: 0,
