@@ -4,13 +4,14 @@ A card that wraps other card or cards and renders a fluid level background behin
 
 ---
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/swingerman/lovelace-fluid-level-background-card)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/swingerman/lovelace-fluid-level-background-card) ![GitHub release (latest by date)](https://img.shields.io/github/downloads/swingerman/lovelace-fluid-level-background-card/v0.0.1-beta7/total?style=for-the-badge)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-yellowgreen?style=for-the-badge&logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S6NC9BYVDDJMA&source=url)
 
 <div style="display: flex; margin-bottom: 20px;">
 
 <img style="margin-right: 30px; border: 5px solid #767676;border-radius: 10px;box-sizing: border-box;" src="https://github.com/swingerman/lovelace-fluid-level-background-card/blob/master/docs/assets/fluid-person-card.gif?raw=true" alt="Demo">
 
-<div >
+<div>
 
 ```yaml
 type: custom:fluid-level-background-card
@@ -21,9 +22,6 @@ card:
         style: |
         state-badge { width: 60px; height: 60px }
 entity: sensor.battery_level
-show_name: false
-state_color: false
-show_state: true
 ```
 
 </div>
@@ -61,6 +59,8 @@ Note: This card is a wrapper. This means that it's designed to wrap other existi
 ## Support
 
 Hey dude! Help me out for a couple of :beers: or a :coffee:!
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S6NC9BYVDDJMA&source=url)
 
 [![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/swingerman)
 
