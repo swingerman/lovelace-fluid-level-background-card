@@ -12,8 +12,8 @@ A card that wraps other card or cards and renders a fluid level background behin
 Note: This card is a wrapper. This means that it's designed to wrap other existing lovelace cards, so you welcome to use any card (including grid and stack cards)
 
 1. Add this card using the UI (serach for fluid level background card)
-2. Select the level entity - this will control the level
-3. Select the card to to have the card you would like to render for your entities
+2. Select the card you would like to render for your entities
+3. Select the level entity - this will control the level
 
 ## Known Issues
 
