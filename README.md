@@ -22,7 +22,7 @@ Note: This card is a wrapper. This means that it's designed to wrap other existi
 - You cannot change the color of the floud at this point
 - You cannot fine tune the fluid effect at this point
 
-## PLanned Features
+## Planned Features
 
 - Level based colors
 - Change default color
