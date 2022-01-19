@@ -7,12 +7,23 @@ A card that wraps other card or cards and renders a fluid level background behin
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/swingerman/lovelace-fluid-level-background-card) ![GitHub release (latest by date)](https://img.shields.io/github/downloads/swingerman/lovelace-fluid-level-background-card/v0.0.1-beta7/total?style=for-the-badge)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-yellowgreen?style=for-the-badge&logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S6NC9BYVDDJMA&source=url)
 
-<div style="display: flex; margin-bottom: 20px;">
 
-<img style="margin-right: 30px; border: 5px solid #767676;border-radius: 10px;box-sizing: border-box;" src="https://github.com/swingerman/lovelace-fluid-level-background-card/blob/master/docs/assets/fluid-person-card.gif?raw=true" alt="Demo">
+<img style="border: 5px solid #767676;border-radius: 10px;box-sizing: border-box;" src="https://github.com/swingerman/lovelace-fluid-level-background-card/blob/master/docs/assets/fluid-person-card.gif?raw=true" alt="Demo">
 
-<div>
 
+
+```yaml
+type: custom:fluid-level-background-card
+card:
+    type: glance
+    entities:
+    - entity: person.xxx
+entity: sensor.battery_level
+```
+
+To add custom styles to the card you wrapped consider using [card-mod](https://github.com/thomasloven/lovelace-card-mod).
+
+example:
 ```yaml
 type: custom:fluid-level-background-card
 card:
@@ -23,9 +34,6 @@ card:
         state-badge { width: 60px; height: 60px }
 entity: sensor.battery_level
 ```
-
-</div>
-</div>
 
 ## How To Install
 
