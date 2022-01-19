@@ -10,8 +10,10 @@ A card that wraps other card or cards and renders a fluid level background behin
 
 <img style="border: 5px solid #767676;border-radius: 10px;box-sizing: border-box;" src="https://github.com/swingerman/lovelace-fluid-level-background-card/blob/master/docs/assets/fluid-person-card.gif?raw=true" alt="Demo">
 
+*Note: the above card uses [card-mod](https://github.com/thomasloven/lovelace-card-mod) for extra styling of the person entity.*
 
 
+example without card-mod
 ```yaml
 type: custom:fluid-level-background-card
 card:
@@ -23,7 +25,7 @@ entity: sensor.battery_level
 
 To add custom styles to the card you wrapped consider using [card-mod](https://github.com/thomasloven/lovelace-card-mod).
 
-example:
+example with card-mod:
 ```yaml
 type: custom:fluid-level-background-card
 card:
