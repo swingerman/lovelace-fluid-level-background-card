@@ -30,7 +30,7 @@ card:
     type: glance
     entities:
     - entity: person.xxx
-        style: |
+      style: |
         state-badge { width: 60px; height: 60px }
 entity: sensor.battery_level
 ```
