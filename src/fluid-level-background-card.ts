@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LitElement, html, TemplateResult, css, PropertyValues, customElement, property, state } from 'lit-element';
+import { LitElement, html, TemplateResult, css, PropertyValues } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
 import {
   HomeAssistant,
   hasConfigOrEntityChanged,
