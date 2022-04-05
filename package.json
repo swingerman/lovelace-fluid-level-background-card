@@ -42,7 +42,7 @@
     "eslint-plugin-lit": "^1.6.1",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.4",
-    "prettier": "^2.6.1",
+    "prettier": "^2.6.2",
     "rollup": "^2.70.1",
     "rollup-plugin-serve": "^1.1.0",
     "rollup-plugin-summary": "^1.4.0",
