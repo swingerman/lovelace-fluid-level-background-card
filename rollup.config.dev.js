@@ -6,31 +6,38 @@ import { terser } from 'rollup-plugin-terser';
 import json from '@rollup/plugin-json';
 import summary from 'rollup-plugin-summary';
 
-export default {
-  input: ['src/fluid-level-background-card.ts'],
-  output: {
-    dir: './dist',
-    format: 'es',
+const plugins = [
+  nodeResolve({
+    extensions: ['.ts'],
+    preferBuiltins: true,
+  }),
+  commonjs(),
+  typescript(),
+  json(),
+  babel({
+    exclude: 'node_modules/**',
+    babelHelpers: 'bundled',
+  }),
+  terser(),
+  summary(),
+  serve({
+    contentBase: './dist',
+    host: '0.0.0.0',
+    port: 5000,
+    allowCrossOrigin: true,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+  }),
+];
+
+export default [
+  {
+    input: ['src/fluid-level-background-card.ts'],
+    output: {
+      dir: 'dist',
+      format: 'es',
+    },
+    plugins: [...plugins],
   },
-  plugins: [
-    nodeResolve({extensions:['.ts'],
-      preferBuiltins: true,}),
-    typescript(),
-    json(),
-    babel({
-      exclude: 'node_modules/**',
-      babelHelpers: 'bundled',
-    }),
-    terser(),
-    summary(),
-    serve({
-      contentBase: './dist',
-      host: '0.0.0.0',
-      port: 5000,
-      allowCrossOrigin: true,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
-    }),
-  ],
-};
+];
