@@ -23,7 +23,7 @@
     "rollup-plugin-sourcemaps": "^0.6.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.9",
+    "@babel/core": "^7.17.10",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/plugin-proposal-decorators": "^7.17.9",
     "@digitalroute/cz-conventional-changelog-for-jira": "^7.3.0",
