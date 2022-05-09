@@ -12,6 +12,7 @@ import {
   LovelaceCard,
   LovelaceCardConfig,
   createThing,
+  Themes,
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types. https://github.com/custom-cards/custom-card-helpers
 
 import './editor';
@@ -21,6 +22,10 @@ import type { FluidLevelBackgroundCardConfig } from './types';
 import { actionHandler } from './action-handler-directive';
 import { CARD_VERSION } from './const';
 import { localize } from './localize/localize';
+
+export interface FluidThemes extends Themes {
+  darkMode: boolean;
+}
 
 /* eslint no-console: 0 */
 console.info(
@@ -47,9 +52,13 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @property({ attribute: false }) public size!: ElementSize;
 
+  @property({ attribute: false }) public backgroundColor = this.getThemeBackgroundColor();
+
   @state() protected _card?: LovelaceCard;
 
   @state() private config!: FluidLevelBackgroundCardConfig;
+
+  private _darkModeLastValue!: boolean;
 
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     return document.createElement('fluid-level-background-card-editor');
@@ -94,11 +103,22 @@ export class FluidLevelBackgroundCard extends LitElement {
       return false;
     }
 
+    if (changedProps.get('hass') !== undefined) {
+      const { themes } = changedProps.get('hass') as HomeAssistant;
+      const { darkMode } = themes as FluidThemes;
+      if (this._darkModeLastValue !== darkMode) {
+        this._darkModeLastValue = darkMode;
+        this.backgroundColor = this.getThemeBackgroundColor();
+        return true;
+      }
+    }
+
     return hasConfigOrEntityChanged(this, changedProps, false);
   }
 
   protected updated(changedProps: PropertyValues): void {
     super.updated(changedProps);
+
     if (!this._card || (!changedProps.has('hass') && !changedProps.has('editMode'))) {
       return;
     }
@@ -107,6 +127,8 @@ export class FluidLevelBackgroundCard extends LitElement {
     if (this.hass) {
       this._card.hass = this.hass;
     }
+
+    this.backgroundColor = this.getThemeBackgroundColor();
     // if (this.editMode !== undefined) {
     //   this._card.editMode = this.editMode;
     // }
@@ -140,7 +162,11 @@ export class FluidLevelBackgroundCard extends LitElement {
 
     return html`
       <div id="container">
-        <fluid-background .size=${this.size} .value=${value}></fluid-background>
+        <fluid-background
+          .size=${this.size}
+          .value=${value}
+          .backgroundColor=${this.backgroundColor}
+        ></fluid-background>
         ${haCard}
       </div>
       <style>
@@ -212,6 +238,15 @@ export class FluidLevelBackgroundCard extends LitElement {
     this._card = newCardEl;
   }
 
+  private getThemeBackgroundColor(): string {
+    const body = document.querySelector('body') as HTMLElement;
+    const fakeCard = document.createElement('ha-card');
+    body.appendChild(fakeCard);
+    const backgroundColor = getComputedStyle(fakeCard).getPropertyValue('--card-background-color');
+    fakeCard.remove();
+    return backgroundColor || '#ffffff';
+  }
+
   // https://lit.dev/docs/components/styles/
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   static get styles() {
@@ -219,12 +254,11 @@ export class FluidLevelBackgroundCard extends LitElement {
       #container {
         position: relative;
         border-radius: var(--ha-card-border-radius, 4px);
-        overflow: hidden;
       }
 
       ha-card {
         position: relative;
-        background: transparent;
+        overflow: hidden;
       }
     `;
   }

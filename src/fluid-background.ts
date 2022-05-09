@@ -14,6 +14,9 @@ export class FluidBackground extends LitElement {
   @property()
   value!: number;
 
+  @property()
+  backgroundColor = 'rgb(28, 28, 28)';
+
   fm = FluidMeter();
 
   protected render(): TemplateResult | void {
@@ -25,6 +28,15 @@ export class FluidBackground extends LitElement {
       this.updateSize();
       this.fm.setPercentage(this.value);
       super.requestUpdate(name, oldValue);
+    }
+    if (name === 'backgroundColor') {
+      this.setBackgroundcolor(this.backgroundColor);
+    }
+  }
+
+  private setBackgroundcolor(backgroundColor: string): void {
+    if (this.fm) {
+      this.fm.setBackGroundColor(backgroundColor);
     }
   }
 
@@ -61,7 +73,7 @@ export class FluidBackground extends LitElement {
         width: this.size?.width,
         height: this.size?.height,
         borderWidth: 0,
-        backgroundColor: 'rgb(28, 28, 28)',
+        backgroundColor: this.backgroundColor,
         foregroundColor: 'rgba(28, 28, 28,.5)',
         foregroundFluidLayer: {
           fillStyle: 'rgba(0, 128, 0,1)',
@@ -95,9 +107,9 @@ export class FluidBackground extends LitElement {
         overflow: hidden;
       }
 
-      .fluid-background {
+      /* .fluid-background {
         background: var(--ha-card-background, var(--card-background-color, white));
-      }
+      } */
     `;
   }
 }
