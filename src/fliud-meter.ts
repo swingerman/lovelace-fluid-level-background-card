@@ -52,6 +52,7 @@ export type FluidMeterInstance = {
   setPercentage(percentage: number);
   setDrawBubbles(draw: boolean);
   setColor(foreggroundColor: string, backgroundColor: string);
+  setBackGroundColor(backgroundColor: string);
   resizeCanvas(newSize: ElementSize);
   stop();
   start();
@@ -489,6 +490,9 @@ export function FluidMeter(): FluidMeterInstance {
     setColor(foreggroundColor: string, backgroundColor: string) {
       backgroundFluidLayer.fillStyle = backgroundColor;
       foregroundFluidLayer.fillStyle = foreggroundColor;
+    },
+    setBackGroundColor(backgroundColor: string) {
+      options.backgroundColor = backgroundColor;
     },
     resizeCanvas(size: ElementSize) {
       options.width = size.width;
