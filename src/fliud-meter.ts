@@ -1,4 +1,4 @@
-import { ElementSize } from '../fluid-level-background-card';
+import { ElementSize } from './fluid-level-background-card';
 import { FluidMeterInstance, FluidMeterOptions, Layer, FluidMeterEnv, Bubble } from './fluid-meter.interface';
 
 export function FluidMeter(): FluidMeterInstance {

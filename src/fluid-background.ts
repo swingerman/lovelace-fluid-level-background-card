@@ -1,8 +1,8 @@
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property } from 'lit-element';
 import { ElementSize } from './fluid-level-background-card';
-import { FluidMeter } from './fluid-meter/fliud-meter';
-import { FluidMeterEnv } from './fluid-meter/fluid-meter.interface';
+import { FluidMeterEnv } from './fluid-meter.interface';
+import { FluidMeter } from './fliud-meter';
 
 @customElement('fluid-background')
 export class FluidBackground extends LitElement {
