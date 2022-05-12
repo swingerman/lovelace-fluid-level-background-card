@@ -1,62 +1,5 @@
-import { ElementSize } from './fluid-level-background-card';
-
-interface Bubble {
-  r: number;
-  x: number;
-  y: number;
-  velX: number;
-  velY: number;
-  swing: number;
-}
-
-export interface Layer {
-  fillStyle: string;
-  angle?: number;
-  horizontalPosition?: number;
-  angularSpeed: number;
-  maxAmplitude: number;
-  frequency: number;
-  horizontalSpeed: number;
-  initialHeight?: number;
-}
-
-export interface FluidMeterOptions {
-  drawShadow?: boolean;
-  drawText?: boolean;
-  drawPercentageSign: boolean;
-  drawBubbles: boolean;
-  fontSize?: string;
-  fontFamily: string;
-  fontFillStyle?: string;
-  size: number;
-  borderWidth: number;
-  levelOffset: number;
-  backgroundColor: string;
-  foregroundColor: string;
-  width?: number;
-  height?: number;
-  foregroundFluidColor?: string;
-  backgroundFluidColor?: string;
-  foregroundFluidLayer?: Layer;
-  backgroundFluidLayer?: Layer;
-}
-
-export interface FluidMeterEnv {
-  targetContainer: Element | null | undefined;
-  fillPercentage: number;
-  options: FluidMeterOptions;
-}
-
-export type FluidMeterInstance = {
-  init(env: FluidMeterEnv);
-  setPercentage(percentage: number);
-  setDrawBubbles(draw: boolean);
-  setColor(foreggroundColor: string, backgroundColor: string);
-  setBackGroundColor(backgroundColor: string);
-  resizeCanvas(newSize: ElementSize);
-  stop();
-  start();
-};
+import { ElementSize } from '../fluid-level-background-card';
+import { FluidMeterInstance, FluidMeterOptions, Layer, FluidMeterEnv, Bubble } from './fluid-meter.interface';
 
 export function FluidMeter(): FluidMeterInstance {
   let canvas;
@@ -64,9 +7,8 @@ export function FluidMeter(): FluidMeterInstance {
   let targetContainer: Element;
 
   let time: number | null = null;
-  let dt: number | null = null;
+  let dt = 0;
 
-  //let frameCount = 0;
   let stop = false;
   let fpsInterval, startTime, then, elapsed;
 
@@ -74,11 +16,12 @@ export function FluidMeter(): FluidMeterInstance {
     drawShadow: true,
     drawText: true,
     drawPercentageSign: true,
-    drawBubbles: true,
+    drawBubbles: false,
     fontSize: '70px',
     fontFamily: 'Arial',
     fontFillStyle: 'white',
     size: 300,
+    width: 300,
     levelOffset: 0,
     borderWidth: 25,
     backgroundColor: '#e2e2e2',
@@ -120,22 +63,23 @@ export function FluidMeter(): FluidMeterInstance {
     size: 2,
     reset: function (bubble: Bubble) {
       // calculate the area where to spawn the bubble based on the fluid area
-      const meterBottom = options.size - (options.size - getMeterRadius()) / 2 - options.borderWidth;
-      const fluidAmount = (currentFillPercentage * (getMeterRadius() - options.borderWidth * 2)) / 100;
+      const meterBottom = getMeterBottom();
+      const fluidAmount = getFluidAmount();
 
       bubble.r = random(this.size, this.size * 2) / 2;
-      bubble.x = random(0, options.size);
+      bubble.x = random(0, options.width);
       bubble.y = random(meterBottom, meterBottom - fluidAmount);
       bubble.velX = 0;
       bubble.velY = random(this.speed, this.speed * 2);
       bubble.swing = random(0, 2 * Math.PI);
     },
     init() {
+      const meterBottom = getMeterBottom();
+      const fluidAmount = getFluidAmount();
+
       for (let i = 0; i < this.amount; i++) {
-        const meterBottom = options.size - (options.size - getMeterRadius()) / 2 - options.borderWidth;
-        const fluidAmount = (currentFillPercentage * (getMeterRadius() - options.borderWidth * 2)) / 100;
         (this.bubbles as Bubble[]).push({
-          x: random(0, options.size),
+          x: random(0, options.width),
           y: random(meterBottom, meterBottom - fluidAmount),
           r: random(this.size, this.size * 2) / 2,
           velX: 0,
@@ -201,12 +145,10 @@ export function FluidMeter(): FluidMeterInstance {
         context.clearRect(0, 0, options.width as number, options.height as number);
       }
       drawMeterBackground();
-      drawFluid(dt);
+      drawFluid();
       if (options.drawText) {
         drawText();
       }
-
-      //drawMeterForeground();
     }
   }
 
@@ -215,7 +157,6 @@ export function FluidMeter(): FluidMeterInstance {
       context.save();
       context.fillStyle = options.backgroundColor;
       context.beginPath();
-      //context.arc(options.size / 2, options.size / 2, getMeterRadius() / 2 - options.borderWidth, 0, 2 * Math.PI);
       context.arc(options.size * 0.5, options.size * 0.5, getMeterRadius() - options.borderWidth, 0, 2 * Math.PI);
       context.rect(0, 0, options.width as number, options.height as number);
 
@@ -248,20 +189,15 @@ export function FluidMeter(): FluidMeterInstance {
   }
   /**
    * draws the fluid contents of the meter
-   * @param  {} dt elapsed time since last frame
    */
-  function drawFluid(dt) {
+  function drawFluid() {
     if (context) {
       context.save();
-      context.arc(options.size * 0.5, options.size * 0.5, getMeterRadius() * 0.5 - options.borderWidth, 0, Math.PI * 2);
-      //context.arc(options.size / 2, options.size / 2, getMeterRadius() - options.borderWidth, 0, Math.PI * 2);
-      //context.rect(options.size / 2, options.size / 2, (options.size / 2) as number, options.height as number);
-      context.clip();
-      drawFluidLayer(backgroundFluidLayer, dt);
-      drawFluidLayer(foregroundFluidLayer, dt);
+
+      drawFluidLayer(backgroundFluidLayer);
+      drawFluidLayer(foregroundFluidLayer);
       if (options.drawBubbles) {
-        //drawFluidMask(foregroundFluidLayer);
-        drawBubblesLayer(dt);
+        drawBubblesLayer();
       }
       context.restore();
     }
@@ -271,7 +207,7 @@ export function FluidMeter(): FluidMeterInstance {
    * draws the foreground fluid layer
    * @param  {} dt elapsed time since last frame
    */
-  function drawFluidLayer(layer, dt) {
+  function drawFluidLayer(layer) {
     // calculate wave angle
     if (layer.angularSpeed > 0) {
       layer.angle += layer.angularSpeed * dt;
@@ -281,19 +217,17 @@ export function FluidMeter(): FluidMeterInstance {
     // calculate horizontal position
     layer.horizontalPosition += layer.horizontalSpeed * dt;
     if (layer.horizontalSpeed > 0) {
-      layer.horizontalPosition > Math.pow(2, 53) ? 0 : layer.horizontalPosition;
+      layer.horizontalPosition = layer.horizontalPosition > Math.pow(2, 53) ? 0 : layer.horizontalPosition;
     } else if (layer.horizontalPosition < 0) {
-      layer.horizontalPosition < -1 * Math.pow(2, 53) ? 0 : layer.horizontalPosition;
+      layer.horizontalPosition = layer.horizontalPosition < -1 * Math.pow(2, 53) ? 0 : layer.horizontalPosition;
     }
 
     let x = 0;
     let y = 0;
     const amplitude = layer.maxAmplitude * Math.sin((layer.angle * Math.PI) / 180);
 
-    const meterBottom =
-      options.height ?? 0 - options.levelOffset - (options.size - getMeterRadius()) * 0.5 - options.borderWidth;
-    const fluidAmount =
-      (currentFillPercentage * (getMeterRadius() - options.levelOffset * 0.5 - options.borderWidth * 2)) / 100;
+    const meterBottom = getMeterBottom();
+    const fluidAmount = getFluidAmount();
 
     if (currentFillPercentage < fillPercentage) {
       currentFillPercentage += 15 * dt;
@@ -353,37 +287,45 @@ export function FluidMeter(): FluidMeterInstance {
     }
   }
 
-  function drawBubblesLayer(dt) {
-    if (context) {
-      context.save();
-      for (let i = 0; i < bubblesLayer.bubbles.length; i++) {
-        const bubble = bubblesLayer.bubbles[i] as Bubble;
+  function drawBubblesLayer() {
+    if (!context) {
+      return;
+    }
+    context.save();
+    const meterBottom = getMeterBottom();
+    const fluidAmount = getFluidAmount();
 
-        context.beginPath();
-        context.strokeStyle = 'white';
-        context.arc(bubble.x, bubble.y, bubble.r, 2 * Math.PI, 2 * Math.PI, false);
-        context.stroke();
-        context.closePath();
+    bubblesLayer.bubbles.forEach((bubble: Bubble) => drawBubble(bubble, fluidAmount, meterBottom));
 
-        const currentSpeed = bubblesLayer.current * dt;
+    context.restore();
+  }
 
-        bubble.velX =
-          Math.abs(bubble.velX) < Math.abs(bubblesLayer.current) ? bubble.velX + currentSpeed : bubblesLayer.current;
-        bubble.y = bubble.y - bubble.velY * dt;
-        bubble.x =
-          bubble.x +
-          (bubblesLayer.swing ? 0.4 * Math.cos((bubblesLayer.swing += 0.03)) * bubblesLayer.swing : 0) +
-          bubble.velX * 0.5;
+  function drawBubble(bubble: Bubble, fluidAmount: number, meterBottom: number): void {
+    if (!context) {
+      return;
+    }
 
-        // determine if current bubble is outside the safe area
-        const meterBottom = options.size - (options.size - getMeterRadius()) / 2 - options.borderWidth;
-        const fluidAmount = (currentFillPercentage * (getMeterRadius() - options.borderWidth * 2)) / 100;
+    const limit = meterBottom - fluidAmount;
+    const opacity = (bubble.y - limit) / (meterBottom - limit);
 
-        if (bubble.y <= meterBottom - fluidAmount) {
-          bubblesLayer.reset(bubble);
-        }
-      }
-      context.restore();
+    context.beginPath();
+    context.strokeStyle = `rgba(255,255,255, ${opacity})`;
+    context.arc(bubble.x, bubble.y, bubble.r, 0, 2 * Math.PI, false);
+    context.stroke();
+    context.closePath();
+
+    const currentSpeed = bubblesLayer.current * dt;
+    let swing = bubblesLayer.swing;
+    const adjustedSwing = (swing += 0.03);
+
+    bubble.velX =
+      Math.abs(bubble.velX) < Math.abs(bubblesLayer.current) ? bubble.velX + currentSpeed : bubblesLayer.current;
+    bubble.y = bubble.y - bubble.velY * dt;
+    bubble.x += (swing ? 0.4 * Math.cos(adjustedSwing) * swing : 0) + bubble.velX * 0.5;
+
+    // determine if current bubble is outside the safe area
+    if (bubble.y <= meterBottom - fluidAmount + 10) {
+      bubblesLayer.reset(bubble);
     }
   }
 
@@ -406,6 +348,7 @@ export function FluidMeter(): FluidMeterInstance {
   function clamp(number, min, max) {
     return Math.min(Math.max(number, min), max);
   }
+
   function getMeterRadius() {
     return options.size * 0.9;
   }
@@ -418,55 +361,63 @@ export function FluidMeter(): FluidMeterInstance {
   function getFontSize() {
     return options.fontSize + ' ' + options.fontFamily;
   }
+
+  function getMeterBottom(): number {
+    return options.height ?? 0 - options.levelOffset - (options.size - getMeterRadius()) * 0.5 - options.borderWidth;
+  }
+
+  function getFluidAmount(): number {
+    return (currentFillPercentage * (getMeterRadius() - options.levelOffset * 0.5 - options.borderWidth * 2)) / 100;
+  }
+
+  function initOptions(envOptions: FluidMeterOptions): void {
+    options.drawShadow = envOptions.drawShadow === false ? false : true;
+    options.size = envOptions.size;
+    options.width = envOptions.width;
+    options.height = envOptions.height;
+    options.drawBubbles = envOptions.drawBubbles === false ? false : true;
+    options.borderWidth = envOptions.borderWidth || options.borderWidth;
+    options.foregroundFluidColor = envOptions.foregroundFluidColor || options.foregroundFluidColor;
+    options.backgroundFluidColor = envOptions.backgroundFluidColor || options.backgroundFluidColor;
+    options.backgroundColor = envOptions.backgroundColor || options.backgroundColor;
+    options.foregroundColor = envOptions.foregroundColor || options.foregroundColor;
+
+    options.drawText = envOptions.drawText === false ? false : true;
+    options.drawPercentageSign = envOptions.drawPercentageSign === false ? false : true;
+    options.fontSize = envOptions.fontSize || options.fontSize;
+    options.fontFamily = envOptions.fontFamily || options.fontFamily;
+    options.fontFillStyle = envOptions.fontFillStyle || options.fontFillStyle;
+    // fluid settings
+
+    if (envOptions.foregroundFluidLayer) {
+      initLayerOptions(foregroundFluidLayer, envOptions.foregroundFluidLayer);
+    }
+
+    if (envOptions.backgroundFluidLayer) {
+      initLayerOptions(backgroundFluidLayer, envOptions.backgroundFluidLayer);
+    }
+  }
+
+  function initLayerOptions(layer: Layer, envLayer: Layer): void {
+    layer.fillStyle = envLayer.fillStyle || layer.fillStyle;
+    layer.angularSpeed = envLayer.angularSpeed || layer.angularSpeed;
+    layer.maxAmplitude = envLayer.maxAmplitude || layer.maxAmplitude;
+    layer.frequency = envLayer.frequency || layer.frequency;
+    layer.horizontalSpeed = envLayer.horizontalSpeed || layer.horizontalSpeed;
+  }
   //#endregion
 
   return {
     init: function (env: FluidMeterEnv) {
-      if (!env.targetContainer) throw 'empty or invalid container';
+      if (!env.targetContainer) {
+        throw new Error('empty or invalid container');
+      }
 
       targetContainer = env.targetContainer;
       fillPercentage = clamp(env.fillPercentage, 0, 100);
 
       if (env.options) {
-        options.drawShadow = env.options.drawShadow === false ? false : true;
-        options.size = env.options.size;
-        options.width = env.options.width;
-        options.height = env.options.height;
-        options.drawBubbles = env.options.drawBubbles === false ? false : true;
-        options.borderWidth = env.options.borderWidth || options.borderWidth;
-        options.foregroundFluidColor = env.options.foregroundFluidColor || options.foregroundFluidColor;
-        options.backgroundFluidColor = env.options.backgroundFluidColor || options.backgroundFluidColor;
-        options.backgroundColor = env.options.backgroundColor || options.backgroundColor;
-        options.foregroundColor = env.options.foregroundColor || options.foregroundColor;
-
-        options.drawText = env.options.drawText === false ? false : true;
-        options.drawPercentageSign = env.options.drawPercentageSign === false ? false : true;
-        options.fontSize = env.options.fontSize || options.fontSize;
-        options.fontFamily = env.options.fontFamily || options.fontFamily;
-        options.fontFillStyle = env.options.fontFillStyle || options.fontFillStyle;
-        // fluid settings
-
-        if (env.options.foregroundFluidLayer) {
-          foregroundFluidLayer.fillStyle = env.options.foregroundFluidLayer.fillStyle || foregroundFluidLayer.fillStyle;
-          foregroundFluidLayer.angularSpeed =
-            env.options.foregroundFluidLayer.angularSpeed || foregroundFluidLayer.angularSpeed;
-          foregroundFluidLayer.maxAmplitude =
-            env.options.foregroundFluidLayer.maxAmplitude || foregroundFluidLayer.maxAmplitude;
-          foregroundFluidLayer.frequency = env.options.foregroundFluidLayer.frequency || foregroundFluidLayer.frequency;
-          foregroundFluidLayer.horizontalSpeed =
-            env.options.foregroundFluidLayer.horizontalSpeed || foregroundFluidLayer.horizontalSpeed;
-        }
-
-        if (env.options.backgroundFluidLayer) {
-          backgroundFluidLayer.fillStyle = env.options.backgroundFluidLayer.fillStyle || backgroundFluidLayer.fillStyle;
-          backgroundFluidLayer.angularSpeed =
-            env.options.backgroundFluidLayer.angularSpeed || backgroundFluidLayer.angularSpeed;
-          backgroundFluidLayer.maxAmplitude =
-            env.options.backgroundFluidLayer.maxAmplitude || backgroundFluidLayer.maxAmplitude;
-          backgroundFluidLayer.frequency = env.options.backgroundFluidLayer.frequency || backgroundFluidLayer.frequency;
-          backgroundFluidLayer.horizontalSpeed =
-            env.options.backgroundFluidLayer.horizontalSpeed || backgroundFluidLayer.horizontalSpeed;
-        }
+        initOptions(env.options);
       }
 
       bubblesLayer.init();
@@ -476,13 +427,17 @@ export function FluidMeter(): FluidMeterInstance {
     setPercentage(percentage: number) {
       fillPercentage = clamp(percentage, 0, 100);
     },
-    setDrawBubbles(draw: boolean) {
-      if (!draw) return;
+    setDrawBubbles(shouldDraw: boolean) {
+      if (!shouldDraw) {
+        options.drawBubbles = false;
+        return;
+      }
 
       const drawBubbles = () => {
         const now = new Date().getTime();
         dt = (now - (time || now)) / 1000;
-        drawBubblesLayer(dt);
+        options.drawBubbles = true;
+        drawBubblesLayer();
       };
 
       requestAnimationFrame(drawBubbles);
