@@ -1,4 +1,4 @@
-import { ElementSize } from '../fluid-level-background-card';
+import { ElementSize } from './fluid-level-background-card';
 
 export interface Bubble {
   r: number;
