@@ -1,36 +1,62 @@
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property } from 'lit-element';
-import { FluidMeter, FluidMeterEnv } from './fliud-meter';
 import { ElementSize } from './fluid-level-background-card';
+import { FluidMeter } from './fluid-meter/fliud-meter';
+import { FluidMeterEnv } from './fluid-meter/fluid-meter.interface';
 
 @customElement('fluid-background')
 export class FluidBackground extends LitElement {
   @property()
   haCard;
 
-  @property()
+  @property({ type: Object })
   size!: ElementSize | null;
 
-  @property()
+  @property({ type: Number })
   value!: number;
 
-  @property()
+  @property({ type: String })
   backgroundColor = 'rgb(28, 28, 28)';
 
+  @property({ type: Boolean, attribute: false })
+  filling = false;
+
   fm = FluidMeter();
+
+  private _previuosvValue = this.value;
 
   protected render(): TemplateResult | void {
     return html` <div class="fluid-background"></div> `;
   }
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
-    if (name === 'value' || name === 'size') {
+    if (name === 'value') {
+      this.fm.setPercentage(this.value);
+      super.requestUpdate(name, oldValue);
+
+      this.filling = this.value > this._previuosvValue;
+      this._previuosvValue = this.value;
+    }
+
+    if (name === 'size') {
       this.updateSize();
       this.fm.setPercentage(this.value);
       super.requestUpdate(name, oldValue);
     }
+
     if (name === 'backgroundColor') {
       this.setBackgroundcolor(this.backgroundColor);
+    }
+
+    if (name === 'filling') {
+      this.setBubbles(this.filling);
+    }
+  }
+
+  private setBubbles(filling: boolean): void {
+    if (this.fm) {
+      this.fm.setDrawBubbles(filling);
+      this.fm.start();
     }
   }
 
@@ -65,7 +91,7 @@ export class FluidBackground extends LitElement {
       options: {
         fontFamily: 'Raleway',
         drawPercentageSign: false,
-        drawBubbles: true,
+        drawBubbles: this.filling,
         drawShadow: false,
         drawText: false,
         size: Math.max(this.size?.width as number, this.size?.height as number),
@@ -106,10 +132,6 @@ export class FluidBackground extends LitElement {
         border-radius: var(--ha-card-border-radius, 4px);
         overflow: hidden;
       }
-
-      /* .fluid-background {
-        background: var(--ha-card-background, var(--card-background-color, white));
-      } */
     `;
   }
 }
