@@ -41,7 +41,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-lit": "^1.6.1",
     "eslint-plugin-prettier": "^4.0.0",
-    "husky": "^8.0.0",
+    "husky": "^8.0.1",
     "prettier": "^2.6.2",
     "rollup": "^2.73.0",
     "rollup-plugin-serve": "^1.1.0",
