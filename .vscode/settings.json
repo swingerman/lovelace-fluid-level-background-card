@@ -1,0 +1,4 @@
+{
+    "lit-plugin.rules.no-unknown-tag-name": "off",
+    "lit-plugin.rules.no-missing-element-type-definition": "off"
+}

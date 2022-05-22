@@ -3,6 +3,26 @@
     "version": "Version",
     "invalid_configuration": "Invalid configuration",
     "show_warning": "Show Warning",
-    "show_error": "Show Error"
+    "show_error": "Show Error",
+    "required": "Required",
+    "optional": "Optional"
+  },
+  "editor": {
+    "tab": {
+      "card": {
+        "title": "Card*",
+        "chose-card": "Chose a Dashboard Card"
+      },
+      "entities": {
+        "title": "Entities*",
+        "chose-entities": "Chose Entities",
+        "labels": {
+          "level-entity": "Level Entity",
+          "fill-entity": "Fill State Entity"
+        }
+      },
+      "actions": "Actions",
+      "appearance": "Appearance"
+    }
   }
 }

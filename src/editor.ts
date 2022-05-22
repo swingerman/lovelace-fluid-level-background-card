@@ -12,6 +12,41 @@ import {
 } from 'custom-card-helpers';
 
 import { FluidLevelBackgroundCardConfig, GUIModeChangedEvent } from './types';
+import { localize } from './localize/localize';
+
+export interface EditorTab {
+  slug: string;
+  localizedLabel: string;
+  renderer: string;
+  enabled: boolean;
+}
+
+const editorTabs = [
+  {
+    slug: 'card',
+    localizedLabel: localize('editor.tab.card.title'),
+    renderer: 'renderCardTab',
+    enabled: true,
+  },
+  {
+    slug: 'entities',
+    localizedLabel: localize('editor.tab.entities.title'),
+    renderer: 'renderEntitiesTab',
+    enabled: true,
+  },
+  {
+    slug: 'actions',
+    localizedLabel: localize('editor.tab.actions'),
+    renderer: 'renderActionsTab',
+    enabled: false,
+  },
+  {
+    slug: 'appearance',
+    localizedLabel: localize('editor.tab.appearance'),
+    renderer: 'renderAppearanceTab',
+    enabled: false,
+  },
+];
 
 const options = {
   required: {
@@ -64,7 +99,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
 
   @state() protected _config?: FluidLevelBackgroundCardConfig;
 
-  @state() protected _selectedCard = 0;
+  @state() protected _selectedTab = 0;
 
   @state() protected _GUImode = true;
 
@@ -98,6 +133,10 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return this._config?.entity || '';
   }
 
+  get _fill_entity(): string {
+    return this._config?.fill_entity || '';
+  }
+
   get _show_warning(): boolean {
     return this._config?.show_warning || false;
   }
@@ -126,142 +165,11 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     // The climate more-info has ha-switch and paper-dropdown-menu elements that are lazy loaded unless explicitly done here
     this._helpers.importMoreInfoControl('climate');
 
-    // You can restrict on domain type
-    const entities = Object.keys(this.hass.states).filter((eid) => eid.substr(0, eid.indexOf('.')) === 'input_number');
+    const tab = editorTabs[this._selectedTab];
 
-    return html`
-      <div class="card-config">
-        <div class="option" @click=${this._toggleOption} .option=${'required'}>
-          <div class="row">
-            <ha-icon .icon=${`mdi:${options.required.icon}`}></ha-icon>
-            <div class="title">${options.required.name}</div>
-          </div>
-          <div class="secondary">${options.required.secondary}</div>
-        </div>
-        ${this._config?.card
-          ? html`
-              <hui-card-element-editor
-                .hass=${this.hass}
-                .value=${this._config?.card}
-                .lovelace=${this.lovelace}
-                @config-changed=${this._handleConfigChanged}
-                @GUImode-changed=${this._handleGUIModeChanged}
-              ></hui-card-element-editor>
-            `
-          : html` <hui-card-picker
-              .hass=${this.hass}
-              .lovelace=${this.lovelace}
-              @config-changed=${this._handleCardPicked}
-            >
-            </hui-card-picker>`}
-        ${options.required.show
-          ? html`
-              <div class="values">
-                <paper-dropdown-menu
-                  label="Entity (Required)"
-                  @value-changed=${this._valueChanged}
-                  .configValue=${'entity'}
-                >
-                  <paper-listbox slot="dropdown-content" .selected=${entities.indexOf(this._entity)}>
-                    ${entities.map((entity) => {
-                      return html` <paper-item>${entity}</paper-item> `;
-                    })}
-                  </paper-listbox>
-                </paper-dropdown-menu>
-              </div>
-            `
-          : ''}
-        <div class="option" @click=${this._toggleOption} .option=${'actions'}>
-          <div class="row">
-            <ha-icon .icon=${`mdi:${options.actions.icon}`}></ha-icon>
-            <div class="title">${options.actions.name}</div>
-          </div>
-          <div class="secondary">${options.actions.secondary}</div>
-        </div>
-        ${options.actions.show
-          ? html`
-              <div class="values">
-                <div class="option" @click=${this._toggleAction} .option=${'tap'}>
-                  <div class="row">
-                    <ha-icon .icon=${`mdi:${options.actions.options.tap.icon}`}></ha-icon>
-                    <div class="title">${options.actions.options.tap.name}</div>
-                  </div>
-                  <div class="secondary">${options.actions.options.tap.secondary}</div>
-                </div>
-                ${options.actions.options.tap.show
-                  ? html`
-                      <div class="values">
-                        <paper-item>Action Editors Coming Soon</paper-item>
-                      </div>
-                    `
-                  : ''}
-                <div class="option" @click=${this._toggleAction} .option=${'hold'}>
-                  <div class="row">
-                    <ha-icon .icon=${`mdi:${options.actions.options.hold.icon}`}></ha-icon>
-                    <div class="title">${options.actions.options.hold.name}</div>
-                  </div>
-                  <div class="secondary">${options.actions.options.hold.secondary}</div>
-                </div>
-                ${options.actions.options.hold.show
-                  ? html`
-                      <div class="values">
-                        <paper-item>Action Editors Coming Soon</paper-item>
-                      </div>
-                    `
-                  : ''}
-                <div class="option" @click=${this._toggleAction} .option=${'double_tap'}>
-                  <div class="row">
-                    <ha-icon .icon=${`mdi:${options.actions.options.double_tap.icon}`}></ha-icon>
-                    <div class="title">${options.actions.options.double_tap.name}</div>
-                  </div>
-                  <div class="secondary">${options.actions.options.double_tap.secondary}</div>
-                </div>
-                ${options.actions.options.double_tap.show
-                  ? html`
-                      <div class="values">
-                        <paper-item>Action Editors Coming Soon</paper-item>
-                      </div>
-                    `
-                  : ''}
-              </div>
-            `
-          : ''}
-        <div class="option" @click=${this._toggleOption} .option=${'appearance'}>
-          <div class="row">
-            <ha-icon .icon=${`mdi:${options.appearance.icon}`}></ha-icon>
-            <div class="title">${options.appearance.name}</div>
-          </div>
-          <div class="secondary">${options.appearance.secondary}</div>
-        </div>
-        ${options.appearance.show
-          ? html`
-              <div class="values">
-                <paper-input
-                  label="Name (Optional)"
-                  .value=${this._name}
-                  .configValue=${'name'}
-                  @value-changed=${this._valueChanged}
-                ></paper-input>
-                <br />
-                <ha-formfield .label=${`Toggle warning ${this._show_warning ? 'off' : 'on'}`}>
-                  <ha-switch
-                    .checked=${this._show_warning !== false}
-                    .configValue=${'show_warning'}
-                    @change=${this._valueChanged}
-                  ></ha-switch>
-                </ha-formfield>
-                <ha-formfield .label=${`Toggle error ${this._show_error ? 'off' : 'on'}`}>
-                  <ha-switch
-                    .checked=${this._show_error !== false}
-                    .configValue=${'show_error'}
-                    @change=${this._valueChanged}
-                  ></ha-switch>
-                </ha-formfield>
-              </div>
-            `
-          : ''}
-      </div>
-    `;
+    return this[tab.renderer] && tab.enabled
+      ? html` <div class="card-config">${this.renderToolbar()} ${this[tab.renderer]()}</div> `
+      : html``;
   }
 
   private _initialize(): void {
@@ -269,6 +177,159 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     if (this._config === undefined) return;
     if (this._helpers === undefined) return;
     this._initialized = true;
+  }
+
+  renderToolbar(): TemplateResult {
+    const selected = this._selectedTab;
+    const numTabs = editorTabs.length;
+
+    return html` <div class="toolbar">
+      <paper-tabs .selected=${selected} @iron-activate=${this._handleSelectedCard}>
+        ${editorTabs.map((_tab) => (_tab.enabled ? html` <paper-tab> ${_tab.localizedLabel} </paper-tab> ` : null))}
+      </paper-tabs>
+      <paper-tabs
+        id="add-card"
+        .selected=${selected === numTabs ? '0' : undefined}
+        @iron-activate=${this._handleSelectedCard}
+      >
+      </paper-tabs>
+    </div>`;
+  }
+
+  renderCardTab(): TemplateResult {
+    return this._config?.card
+      ? html`
+          <hui-card-element-editor
+            .hass=${this.hass}
+            .value=${this._config?.card}
+            .lovelace=${this.lovelace}
+            @config-changed=${this._handleConfigChanged}
+            @GUImode-changed=${this._handleGUIModeChanged}
+          ></hui-card-element-editor>
+          <mwc-button @click=${this._handleCardDropped}>Choose a differnt card</mwc-button>
+        `
+      : html`
+          <h3>${localize('editor.tab.card.chose-card')} (${localize('common.required')})</h3>
+          <hui-card-picker
+            .hass=${this.hass}
+            .lovelace=${this.lovelace}
+            @config-changed=${this._handleCardPicked}
+          ></hui-card-picker>
+        `;
+  }
+
+  renderEntitiesTab(): TemplateResult {
+    if (!this.hass || !this._helpers) {
+      return html``;
+    }
+    const entities = Object.keys(this.hass.states);
+
+    return html`
+      <h3>${localize('editor.tab.entities.chose-entities')} (${localize('common.required')})</h3>
+      <div class="values">
+        <paper-dropdown-menu
+          label="${localize('editor.tab.entities.labels.level-entity')} (${localize('common.required')})"
+          @value-changed=${this._valueChanged}
+          .configValue=${'entity'}
+        >
+          <paper-listbox slot="dropdown-content" .selected=${entities.indexOf(this._entity)}>
+            ${entities.map((entity) => {
+              return html` <paper-item>${entity}</paper-item> `;
+            })}
+          </paper-listbox>
+        </paper-dropdown-menu>
+      </div>
+      <div class="values">
+        <paper-dropdown-menu
+          label="${localize('editor.tab.entities.labels.fill-entity')} (${localize('common.optional')})"
+          @value-changed=${this._valueChanged}
+          .configValue=${'fill_entity'}
+        >
+          <paper-listbox slot="dropdown-content" .selected=${entities.indexOf(this._fill_entity)}>
+            ${entities.map((entity) => {
+              return html` <paper-item>${entity}</paper-item> `;
+            })}
+          </paper-listbox>
+        </paper-dropdown-menu>
+      </div>
+    `;
+  }
+
+  renderActionsTab(): TemplateResult {
+    return html`
+      <div class="values">
+        <div class="option" @click=${this._toggleAction} .option=${'tap'}>
+          <div class="row">
+            <ha-icon .icon=${`mdi:${options.actions.options.tap.icon}`}></ha-icon>
+            <div class="title">${options.actions.options.tap.name}</div>
+          </div>
+          <div class="secondary">${options.actions.options.tap.secondary}</div>
+        </div>
+        ${options.actions.options.tap.show
+          ? html`
+              <div class="values">
+                <paper-item>Action Editors Coming Soon</paper-item>
+              </div>
+            `
+          : ''}
+        <div class="option" @click=${this._toggleAction} .option=${'hold'}>
+          <div class="row">
+            <ha-icon .icon=${`mdi:${options.actions.options.hold.icon}`}></ha-icon>
+            <div class="title">${options.actions.options.hold.name}</div>
+          </div>
+          <div class="secondary">${options.actions.options.hold.secondary}</div>
+        </div>
+        ${options.actions.options.hold.show
+          ? html`
+              <div class="values">
+                <paper-item>Action Editors Coming Soon</paper-item>
+              </div>
+            `
+          : ''}
+        <div class="option" @click=${this._toggleAction} .option=${'double_tap'}>
+          <div class="row">
+            <ha-icon .icon=${`mdi:${options.actions.options.double_tap.icon}`}></ha-icon>
+            <div class="title">${options.actions.options.double_tap.name}</div>
+          </div>
+          <div class="secondary">${options.actions.options.double_tap.secondary}</div>
+        </div>
+        ${options.actions.options.double_tap.show
+          ? html`
+              <div class="values">
+                <paper-item>Action Editors Coming Soon</paper-item>
+              </div>
+            `
+          : ''}
+      </div>
+    `;
+  }
+
+  renderAppearanceTab(): TemplateResult {
+    return html`
+      <div class="values">
+        <paper-input
+          label="Name (Optional)"
+          .value=${this._name}
+          .configValue=${'name'}
+          @value-changed=${this._valueChanged}
+        ></paper-input>
+        <br />
+        <ha-formfield .label=${`Toggle warning ${this._show_warning ? 'off' : 'on'}`}>
+          <ha-switch
+            .checked=${this._show_warning !== false}
+            .configValue=${'show_warning'}
+            @change=${this._valueChanged}
+          ></ha-switch>
+        </ha-formfield>
+        <ha-formfield .label=${`Toggle error ${this._show_error ? 'off' : 'on'}`}>
+          <ha-switch
+            .checked=${this._show_error !== false}
+            .configValue=${'show_error'}
+            @change=${this._valueChanged}
+          ></ha-switch>
+        </ha-formfield>
+      </div>
+    `;
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -281,6 +342,13 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     const card = config;
     this._config = { ...this._config, card };
     fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _handleCardDropped(): void {
+    if (!this._config) {
+      return;
+    }
+    this._config = { ...this._config, card: undefined };
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -345,8 +413,22 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
+  private _handleSelectedCard(ev) {
+    this._selectedTab = parseInt(ev.detail.selected, 10);
+  }
+
   static get styles(): CSSResultGroup {
     return css`
+      .toolbar {
+        display: flex;
+        --paper-tabs-selection-bar-color: var(--primary-color);
+        --paper-tab-ink: var(--primary-color);
+      }
+      paper-tabs {
+        display: flex;
+        font-size: 14px;
+        flex-grow: 1;
+      }
       .option {
         padding: 4px 0px;
         cursor: pointer;
