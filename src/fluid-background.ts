@@ -18,12 +18,10 @@ export class FluidBackground extends LitElement {
   @property({ type: String })
   backgroundColor = 'rgb(28, 28, 28)';
 
-  @property({ type: Boolean, attribute: false })
+  @property({ type: Boolean })
   filling = false;
 
   fm = FluidMeter();
-
-  private _previuosvValue = this.value;
 
   protected render(): TemplateResult | void {
     return html` <div class="fluid-background"></div> `;
@@ -33,9 +31,6 @@ export class FluidBackground extends LitElement {
     if (name === 'value') {
       this.fm.setPercentage(this.value);
       super.requestUpdate(name, oldValue);
-
-      this.filling = this.value > this._previuosvValue;
-      this._previuosvValue = this.value;
     }
 
     if (name === 'size') {

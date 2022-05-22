@@ -7,3 +7,4 @@ views:
       - type: entities
         entities:
           - input_number.battery_level
+          - input_number.battery_charging

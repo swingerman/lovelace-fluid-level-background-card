@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LitElement, html, TemplateResult, css, PropertyValues } from 'lit';
+import { LitElement, html, TemplateResult, css, PropertyValues, CSSResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import {
   HomeAssistant,
@@ -22,6 +22,7 @@ import type { FluidLevelBackgroundCardConfig } from './types';
 import { actionHandler } from './action-handler-directive';
 import { CARD_VERSION } from './const';
 import { localize } from './localize/localize';
+import { getThemeBackgroundColor } from './utils/theme-parser';
 
 export interface FluidThemes extends Themes {
   darkMode: boolean;
@@ -48,13 +49,18 @@ export interface ElementSize {
 }
 @customElement('fluid-level-background-card')
 export class FluidLevelBackgroundCard extends LitElement {
-  @property({ attribute: false }) public hass!: HomeAssistant;
+  @property({ attribute: false })
+  public hass!: HomeAssistant;
 
   @property({ attribute: false }) public size!: ElementSize;
 
-  @property({ attribute: false }) public backgroundColor = this.getThemeBackgroundColor();
+  @property({ attribute: false }) public backgroundColor = getThemeBackgroundColor();
 
   @state() protected _card?: LovelaceCard;
+
+  @state() protected _level_entity?: string;
+
+  @state() protected _fill_entity?: string;
 
   @state() private config!: FluidLevelBackgroundCardConfig;
 
@@ -68,7 +74,6 @@ export class FluidLevelBackgroundCard extends LitElement {
     return {};
   }
 
-  // https://lit.dev/docs/components/properties/#accessors-custom
   public setConfig(config: FluidLevelBackgroundCardConfig): void {
     // TODO Check for required fields and that they are of the proper format
     if (!config) {
@@ -84,7 +89,12 @@ export class FluidLevelBackgroundCard extends LitElement {
       ...config,
     };
 
-    this._card = this._createCardElement(config.card);
+    if (config.card) {
+      this._card = this._createCardElement(config.card);
+    }
+
+    this._level_entity = config.entity;
+    this._fill_entity = config.fill_entity;
   }
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
@@ -92,27 +102,49 @@ export class FluidLevelBackgroundCard extends LitElement {
       super.requestUpdate(name, oldValue);
     }
 
+    if (name === 'hass' && this.config.fill_entity) {
+      super.requestUpdate(name, oldValue);
+    }
+
     if (name === 'size') {
+      super.requestUpdate(name, oldValue);
+    }
+
+    if (name === '_level_entity') {
+      super.requestUpdate(name, oldValue);
+    }
+
+    if (name === '_fill_entity') {
+      super.requestUpdate(name, oldValue);
+    }
+
+    if (name === 'config') {
       super.requestUpdate(name, oldValue);
     }
   }
 
-  // https://lit.dev/docs/components/lifecycle/#reactive-update-cycle-performing
   protected shouldUpdate(changedProps: PropertyValues): boolean {
     if (!this.config) {
       return false;
     }
 
-    if (changedProps.get('hass') !== undefined) {
-      const { themes } = changedProps.get('hass') as HomeAssistant;
-      const { darkMode } = themes as FluidThemes;
-      if (this._darkModeLastValue !== darkMode) {
-        this._darkModeLastValue = darkMode;
-        this.backgroundColor = this.getThemeBackgroundColor();
+    if (changedProps.get('hass') === undefined) {
+      return true;
+    }
+
+    const { themes } = changedProps.get('hass') as HomeAssistant;
+    const { darkMode } = themes as FluidThemes;
+    const hass = changedProps.get('hass') as HomeAssistant;
+    if (this.config && this.config.fill_entity && hass && hass.states[this.config.fill_entity]) {
+      if (hass.states[this.config.fill_entity].state !== this.hass.states[this.config.fill_entity].state) {
         return true;
       }
     }
-
+    if (this._darkModeLastValue !== darkMode) {
+      this._darkModeLastValue = darkMode;
+      this.backgroundColor = getThemeBackgroundColor();
+      return true;
+    }
     return hasConfigOrEntityChanged(this, changedProps, false);
   }
 
@@ -123,21 +155,18 @@ export class FluidLevelBackgroundCard extends LitElement {
       return;
     }
 
-    //for (const element of this._cards) {
     if (this.hass) {
       this._card.hass = this.hass;
     }
 
-    this.backgroundColor = this.getThemeBackgroundColor();
-    // if (this.editMode !== undefined) {
-    //   this._card.editMode = this.editMode;
-    // }
-    //}
+    this.backgroundColor = getThemeBackgroundColor();
   }
 
-  // https://lit.dev/docs/components/rendering/
-  // https://developpaper.com/realization-of-html5-canvas-background-animation-by-levitation-of-div-layer/
   protected render(): TemplateResult | void {
+    if (!this.hass || !this.config) {
+      return html``;
+    }
+
     // TODO Check for stateObj or other necessary things and render a warning if missing
     if (this.config.show_warning) {
       return this._showWarning(localize('common.show_warning'));
@@ -147,27 +176,11 @@ export class FluidLevelBackgroundCard extends LitElement {
       return this._showError(localize('common.show_error'));
     }
 
-    const value = this.config.entity ? parseInt(this.hass.states[this.config.entity].state, 10) : 50;
-
-    const haCard = html` <ha-card
-      @action=${this._handleAction}
-      .actionHandler=${actionHandler({
-        hasHold: hasAction(this.config.hold_action),
-        hasDoubleClick: hasAction(this.config.double_tap_action),
-      })}
-      tabindex="0"
-      .label=${`FluidProgressBar: ${this.config.entity || 'No Entity Defined'}`}
-      >${this._card}</ha-card
-    >`;
-
+    // prettier-ignore
     return html`
       <div id="container">
-        <fluid-background
-          .size=${this.size}
-          .value=${value}
-          .backgroundColor=${this.backgroundColor}
-        ></fluid-background>
-        ${haCard}
+        ${this.makeFluidBackground()}
+        ${this.makeEntityCard()}
       </div>
       <style>
         ha-card {
@@ -219,37 +232,54 @@ export class FluidLevelBackgroundCard extends LitElement {
     if (this.hass) {
       element.hass = this.hass;
     }
-    element.addEventListener(
-      'll-rebuild',
-      (ev) => {
-        ev.stopPropagation();
-        this._rebuildCard(element, cardConfig);
-      },
-      { once: true },
-    );
     return element;
   }
 
-  private _rebuildCard(cardElToReplace: LovelaceCard, config: LovelaceCardConfig): void {
-    const newCardEl = this._createCardElement(config);
-    if (cardElToReplace.parentElement) {
-      cardElToReplace.parentElement.replaceChild(newCardEl, cardElToReplace);
+  private getSafeLevelValue(entityId: string | undefined): number {
+    if (!entityId) {
+      return 0;
     }
-    this._card = newCardEl;
+
+    const value = this.hass.states[entityId].state;
+
+    if (typeof value === 'number') {
+      return value;
+    }
+    if (typeof value === 'string') {
+      return isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10);
+    }
+    return 0;
   }
 
-  private getThemeBackgroundColor(): string {
-    const body = document.querySelector('body') as HTMLElement;
-    const fakeCard = document.createElement('ha-card');
-    body.appendChild(fakeCard);
-    const backgroundColor = getComputedStyle(fakeCard).getPropertyValue('--card-background-color');
-    fakeCard.remove();
-    return backgroundColor || '#ffffff';
+  private makeFluidBackground(): TemplateResult {
+    const value = this.getSafeLevelValue(this._level_entity);
+    const filling =
+      this._fill_entity && this.hass.states[this._fill_entity]
+        ? this.hass.states[this._fill_entity].state === 'on'
+        : false;
+
+    return html` <fluid-background
+      .size=${this.size}
+      .value=${value}
+      .backgroundColor=${this.backgroundColor}
+      .filling=${filling}
+    ></fluid-background>`;
   }
 
-  // https://lit.dev/docs/components/styles/
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  static get styles() {
+  private makeEntityCard(): TemplateResult {
+    return html` <ha-card
+      @action=${this._handleAction}
+      .actionHandler=${actionHandler({
+        hasHold: hasAction(this.config.hold_action),
+        hasDoubleClick: hasAction(this.config.double_tap_action),
+      })}
+      tabindex="0"
+      .label=${`FluidProgressBar: ${this._level_entity || 'No Entity Defined'}`}
+      >${this._card}</ha-card
+    >`;
+  }
+
+  static get styles(): CSSResult {
     return css`
       #container {
         position: relative;

@@ -13,6 +13,8 @@ input_number:
     step: .5
     icon: hass:battery
 
-
+input_boolean:
+  battery_charging:
+    name: Battery charging
 #demo:
 

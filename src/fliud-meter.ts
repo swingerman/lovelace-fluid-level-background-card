@@ -57,6 +57,7 @@ export function FluidMeter(): FluidMeterInstance {
   const bubblesLayer = {
     bubbles: [],
     amount: 12,
+    amountLimit: 12,
     speed: 20,
     current: 0,
     swing: 0,
@@ -295,7 +296,11 @@ export function FluidMeter(): FluidMeterInstance {
     const meterBottom = getMeterBottom();
     const fluidAmount = getFluidAmount();
 
-    bubblesLayer.bubbles.forEach((bubble: Bubble) => drawBubble(bubble, fluidAmount, meterBottom));
+    bubblesLayer.bubbles.forEach((bubble: Bubble, index: number) => {
+      if (fillPercentage > 10 && index < Math.max(bubblesLayer.amountLimit - 1, 1)) {
+        drawBubble(bubble, fluidAmount, meterBottom);
+      }
+    });
 
     context.restore();
   }
@@ -426,6 +431,7 @@ export function FluidMeter(): FluidMeterInstance {
     },
     setPercentage(percentage: number) {
       fillPercentage = clamp(percentage, 0, 100);
+      bubblesLayer.amountLimit = Math.round(bubblesLayer.amount * (fillPercentage / 100));
     },
     setDrawBubbles(shouldDraw: boolean) {
       if (!shouldDraw) {
