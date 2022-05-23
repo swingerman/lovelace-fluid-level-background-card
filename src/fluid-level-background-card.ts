@@ -190,9 +190,10 @@ export class FluidLevelBackgroundCard extends LitElement {
         ${this.makeEntityCard()}
       </div>
       <style>
-        ha-card {
+        ha-card, ha-card > * {
           --ha-card-background: transparent;
           --card-background-color: transparent;
+          --ha-card-box-shadow: none;
         }
       </style>
     `;
@@ -292,6 +293,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       #container {
         position: relative;
         border-radius: var(--ha-card-border-radius, 4px);
+        box-shadow: var(--ha-card-box-shadow, 0 2px 4px 0 rgba(0, 0, 0, 0.14);
       }
 
       ha-card {
