@@ -3,6 +3,7 @@ import { customElement, property } from 'lit-element';
 import { ElementSize } from './fluid-level-background-card';
 import { FluidMeterEnv } from './fluid-meter.interface';
 import { FluidMeter } from './fliud-meter';
+import { rgbaToString } from './utils/color';
 
 @customElement('fluid-background')
 export class FluidBackground extends LitElement {
@@ -17,6 +18,9 @@ export class FluidBackground extends LitElement {
 
   @property({ type: String })
   backgroundColor = 'rgb(28, 28, 28)';
+
+  @property({ type: String })
+  levelColor = [0, 128, 0];
 
   @property({ type: Boolean })
   filling = false;
@@ -40,7 +44,11 @@ export class FluidBackground extends LitElement {
     }
 
     if (name === 'backgroundColor') {
-      this.setBackgroundcolor(this.backgroundColor);
+      this.setBackgroundColor(this.backgroundColor);
+    }
+
+    if (name === 'levelColor') {
+      this.setLevelColor(this.levelColor);
     }
 
     if (name === 'filling') {
@@ -55,9 +63,15 @@ export class FluidBackground extends LitElement {
     }
   }
 
-  private setBackgroundcolor(backgroundColor: string): void {
+  private setBackgroundColor(backgroundColor: string): void {
     if (this.fm) {
       this.fm.setBackGroundColor(backgroundColor);
+    }
+  }
+
+  private setLevelColor(levelColor: number[]): void {
+    if (this.fm && levelColor) {
+      this.fm.setLevelColor(levelColor);
     }
   }
 
@@ -97,14 +111,14 @@ export class FluidBackground extends LitElement {
         backgroundColor: this.backgroundColor,
         foregroundColor: 'rgba(28, 28, 28,.5)',
         foregroundFluidLayer: {
-          fillStyle: 'rgba(0, 128, 0,1)',
+          fillStyle: rgbaToString(this.levelColor, 1),
           angularSpeed: 100,
           maxAmplitude: 8,
           frequency: 30,
           horizontalSpeed: -75,
         },
         backgroundFluidLayer: {
-          fillStyle: 'rgba(0, 128, 0,.3)',
+          fillStyle: rgbaToString(this.levelColor, 0.3),
           angularSpeed: 100,
           maxAmplitude: 6,
           frequency: 30,

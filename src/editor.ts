@@ -13,6 +13,7 @@ import {
 
 import { FluidLevelBackgroundCardConfig, GUIModeChangedEvent } from './types';
 import { localize } from './localize/localize';
+import { LEVEL_COLOR } from './const';
 
 export interface EditorTab {
   slug: string;
@@ -35,15 +36,15 @@ const editorTabs = [
     enabled: true,
   },
   {
-    slug: 'actions',
-    localizedLabel: localize('editor.tab.actions'),
-    renderer: 'renderActionsTab',
-    enabled: false,
+    slug: 'appearance',
+    localizedLabel: localize('editor.tab.appearance.title'),
+    renderer: 'renderAppearanceTab',
+    enabled: true,
   },
   {
-    slug: 'appearance',
-    localizedLabel: localize('editor.tab.appearance'),
-    renderer: 'renderAppearanceTab',
+    slug: 'actions',
+    localizedLabel: localize('editor.tab.actions.title'),
+    renderer: 'renderActionsTab',
     enabled: false,
   },
 ];
@@ -94,8 +95,6 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   @property({ attribute: false }) public hass?: HomeAssistant;
 
   @property({ attribute: false }) public lovelace?: LovelaceConfig;
-
-  //@property() protected _card?: LovelaceCard;
 
   @state() protected _config?: FluidLevelBackgroundCardConfig;
 
@@ -309,29 +308,15 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
 
   renderAppearanceTab(): TemplateResult {
     return html`
-      <div class="values">
-        <paper-input
-          label="Name (Optional)"
-          .value=${this._name}
-          .configValue=${'name'}
-          @value-changed=${this._valueChanged}
-        ></paper-input>
-        <br />
-        <ha-formfield .label=${`Toggle warning ${this._show_warning ? 'off' : 'on'}`}>
-          <ha-switch
-            .checked=${this._show_warning !== false}
-            .configValue=${'show_warning'}
-            @change=${this._valueChanged}
-          ></ha-switch>
-        </ha-formfield>
-        <ha-formfield .label=${`Toggle error ${this._show_error ? 'off' : 'on'}`}>
-          <ha-switch
-            .checked=${this._show_error !== false}
-            .configValue=${'show_error'}
-            @change=${this._valueChanged}
-          ></ha-switch>
-        </ha-formfield>
-      </div>
+      <h3>${localize('editor.tab.appearance.choose-colors')}</h3>
+      <ha-selector
+        .hass=${this.hass}
+        .selector=${{ color_rgb: {} }}
+        .label=${localize('editor.tab.appearance.labels.level-color')}
+        .value=${this._config?.level_color ? this._config?.level_color : LEVEL_COLOR}
+        .configValue=${'level_color'}
+        @value-changed=${this._colorChanged}
+      ></ha-selector>
     `;
   }
 
@@ -391,6 +376,15 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     }
     optionList[ev.target.option].show = show;
     this._toggle = !this._toggle;
+  }
+
+  private _colorChanged(ev: CustomEvent): void {
+    if (!this._config) {
+      return;
+    }
+    const color = ev.detail.value;
+    this._config = { ...this._config, level_color: color };
+    fireEvent(this, 'config-changed', { config: this._config });
   }
 
   private _valueChanged(ev): void {
