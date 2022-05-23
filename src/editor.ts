@@ -168,7 +168,12 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     const tab = editorTabs[this._selectedTab];
 
     return this[tab.renderer] && tab.enabled
-      ? html` <div class="card-config">${this.renderToolbar()} ${this[tab.renderer]()}</div> `
+      ? html`
+          <div class="card-config">
+            ${this.renderToolbar()}
+            <div id="editor">${this[tab.renderer]()}</div>
+          </div>
+        `
       : html``;
   }
 
@@ -222,35 +227,33 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     if (!this.hass || !this._helpers) {
       return html``;
     }
-    const entities = Object.keys(this.hass.states);
 
     return html`
       <h3>${localize('editor.tab.entities.chose-entities')} (${localize('common.required')})</h3>
-      <div class="values">
-        <paper-dropdown-menu
-          label="${localize('editor.tab.entities.labels.level-entity')} (${localize('common.required')})"
-          @value-changed=${this._valueChanged}
-          .configValue=${'entity'}
-        >
-          <paper-listbox slot="dropdown-content" .selected=${entities.indexOf(this._entity)}>
-            ${entities.map((entity) => {
-              return html` <paper-item>${entity}</paper-item> `;
-            })}
-          </paper-listbox>
-        </paper-dropdown-menu>
-      </div>
-      <div class="values">
-        <paper-dropdown-menu
-          label="${localize('editor.tab.entities.labels.fill-entity')} (${localize('common.optional')})"
-          @value-changed=${this._valueChanged}
-          .configValue=${'fill_entity'}
-        >
-          <paper-listbox slot="dropdown-content" .selected=${entities.indexOf(this._fill_entity)}>
-            ${entities.map((entity) => {
-              return html` <paper-item>${entity}</paper-item> `;
-            })}
-          </paper-listbox>
-        </paper-dropdown-menu>
+      <div class="entities">
+        <div class="entity-row">
+          <ha-entity-picker
+            .hass=${this.hass}
+            .value=${this._config?.entity}
+            .label="${localize('editor.tab.entities.labels.level-entity')} (${localize('common.required')})"
+            .configValue=${'entity'}
+            .required=${true}
+            include-domains='["input_number","sensor"]'
+            @value-changed=${this._valueChanged}
+            allow-custom-entity
+          ></ha-entity-picker>
+        </div>
+        <div class="entity-row">
+          <ha-entity-picker
+            .hass=${this.hass}
+            .value=${this._config?.fill_entity}
+            .label="${localize('editor.tab.entities.labels.fill-entity')} (${localize('common.optional')})"
+            .configValue=${'fill_entity'}
+            include-domains='["input_boolean","switch", "sensor"]'
+            @value-changed=${this._valueChanged}
+            allow-custom-entity
+          ></ha-entity-picker>
+        </div>
       </div>
     `;
   }
@@ -391,7 +394,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   }
 
   private _valueChanged(ev): void {
-    if (!this._config || !this.hass) {
+    if (!this._config || !this.hass || ev.target.value === '') {
       return;
     }
     const target = ev.target;
@@ -406,7 +409,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       } else {
         this._config = {
           ...this._config,
-          [target.configValue]: target.checked !== undefined ? target.checked : target.value,
+          [target.configValue]: target.value,
         };
       }
     }
@@ -433,10 +436,17 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
         padding: 4px 0px;
         cursor: pointer;
       }
-      .row {
+      .entities {
         display: flex;
-        margin-bottom: -14px;
-        pointer-events: none;
+        flex-direction: column;
+      }
+      .entity-row {
+        display: flex;
+        margin-bottom: 14px;
+        flex-grow: 1;
+      }
+      .entity-row > * {
+        min-width: 100%;
       }
       .title {
         padding-left: 16px;
@@ -455,6 +465,10 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       }
       ha-formfield {
         padding-bottom: 8px;
+      }
+      #editor {
+        border: 1px solid var(--divider-color);
+        padding: 12px;
       }
     `;
   }
