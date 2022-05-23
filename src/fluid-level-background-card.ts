@@ -216,9 +216,18 @@ export class FluidLevelBackgroundCard extends LitElement {
   });
 
   private _handleAction(ev: ActionHandlerEvent): void {
-    if (this.hass && this.config && ev.detail.action) {
+    if (this.hass && this.config && ev.detail.action && this._hasActionSet(ev.detail.action)) {
       handleAction(this, this.hass, this.config, ev.detail.action);
     }
+  }
+
+  private _hasActionSet(event: string): boolean {
+    if (this.config && event) {
+      const configForAction = this.config[event + '_action'];
+      return configForAction !== undefined && configForAction !== 'none';
+    }
+
+    return false;
   }
 
   private _showWarning(warning: string): TemplateResult {
