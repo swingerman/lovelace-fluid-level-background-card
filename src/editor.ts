@@ -45,7 +45,7 @@ const editorTabs = [
     slug: 'actions',
     localizedLabel: localize('editor.tab.actions.title'),
     renderer: 'renderActionsTab',
-    enabled: false,
+    enabled: true,
   },
 ];
 
@@ -145,7 +145,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   }
 
   get _tap_action(): ActionConfig {
-    return this._config?.tap_action || { action: 'more-info' };
+    return this._config?.tap_action || { action: 'none' };
   }
 
   get _hold_action(): ActionConfig {
@@ -258,51 +258,30 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   }
 
   renderActionsTab(): TemplateResult {
+    const actions = ['more-info', 'toggle', 'navigate', 'url', 'call-service', 'none'];
     return html`
-      <div class="values">
-        <div class="option" @click=${this._toggleAction} .option=${'tap'}>
-          <div class="row">
-            <ha-icon .icon=${`mdi:${options.actions.options.tap.icon}`}></ha-icon>
-            <div class="title">${options.actions.options.tap.name}</div>
-          </div>
-          <div class="secondary">${options.actions.options.tap.secondary}</div>
-        </div>
-        ${options.actions.options.tap.show
-          ? html`
-              <div class="values">
-                <paper-item>Action Editors Coming Soon</paper-item>
-              </div>
-            `
-          : ''}
-        <div class="option" @click=${this._toggleAction} .option=${'hold'}>
-          <div class="row">
-            <ha-icon .icon=${`mdi:${options.actions.options.hold.icon}`}></ha-icon>
-            <div class="title">${options.actions.options.hold.name}</div>
-          </div>
-          <div class="secondary">${options.actions.options.hold.secondary}</div>
-        </div>
-        ${options.actions.options.hold.show
-          ? html`
-              <div class="values">
-                <paper-item>Action Editors Coming Soon</paper-item>
-              </div>
-            `
-          : ''}
-        <div class="option" @click=${this._toggleAction} .option=${'double_tap'}>
-          <div class="row">
-            <ha-icon .icon=${`mdi:${options.actions.options.double_tap.icon}`}></ha-icon>
-            <div class="title">${options.actions.options.double_tap.name}</div>
-          </div>
-          <div class="secondary">${options.actions.options.double_tap.secondary}</div>
-        </div>
-        ${options.actions.options.double_tap.show
-          ? html`
-              <div class="values">
-                <paper-item>Action Editors Coming Soon</paper-item>
-              </div>
-            `
-          : ''}
-      </div>
+      <hui-action-editor
+        .label="${this.hass?.localize('ui.panel.lovelace.editor.card.generic.tap_action')} (${this.hass?.localize(
+          'ui.panel.lovelace.editor.card.config.optional',
+        )})"
+        .hass=${this.hass}
+        .config=${this._tap_action}
+        .actions=${actions}
+        .configValue=${'tap_action'}
+        .tooltipText=${this.hass?.localize('ui.panel.lovelace.editor.card.button.default_action_help')}
+        @value-changed=${this._actionChanged}
+      ></hui-action-editor>
+      <hui-action-editor
+        .label="${this.hass?.localize('ui.panel.lovelace.editor.card.generic.hold_action')} (${this.hass?.localize(
+          'ui.panel.lovelace.editor.card.config.optional',
+        )})"
+        .hass=${this.hass}
+        .config=${this._hold_action}
+        .actions=${actions}
+        .configValue=${'hold_action'}
+        .tooltipText=${this.hass?.localize('ui.panel.lovelace.editor.card.button.default_action_help')}
+        @value-changed=${this._actionChanged}
+      ></hui-action-editor>
     `;
   }
 
@@ -408,6 +387,31 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       }
     }
     fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  private _actionChanged(ev): void {
+    if (!this._config || !this.hass) {
+      return;
+    }
+    const target = ev.target!;
+    const value = ev.detail.value;
+
+    if (this[`_${target.configValue}`] === value) {
+      return;
+    }
+    let newConfig;
+    if (target.configValue) {
+      if (value !== false && !value) {
+        newConfig = { ...this._config };
+        delete newConfig[target.configValue!];
+      } else {
+        newConfig = {
+          ...this._config,
+          [target.configValue!]: value,
+        };
+      }
+    }
+    fireEvent(this, 'config-changed', { config: newConfig });
   }
 
   private _handleSelectedCard(ev) {
