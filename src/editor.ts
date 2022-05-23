@@ -249,7 +249,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
             .value=${this._config?.fill_entity}
             .label="${localize('editor.tab.entities.labels.fill-entity')} (${localize('common.optional')})"
             .configValue=${'fill_entity'}
-            include-domains='["input_boolean","switch", "sensor"]'
+            include-domains='["input_boolean","switch", "sensor", "binary_sensor"]'
             @value-changed=${this._valueChanged}
             allow-custom-entity
           ></ha-entity-picker>
