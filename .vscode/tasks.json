@@ -7,6 +7,30 @@
 			"problemMatcher": [],
 			"label": "npm: start",
 			"detail": "rollup -c --watch"
-		}
+		},
+		{
+            "label": "Run Home Assistant on port 9123",
+            "type": "shell",
+            "command": "source ./manage/hacs; hacs-update-requirements;container start",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Home Assistant configuration against /config",
+            "type": "shell",
+            "command": "container check",
+            "problemMatcher": []
+        },
+        {
+            "label": "Upgrade Home Assistant to latest dev",
+            "type": "shell",
+            "command": "container install",
+            "problemMatcher": []
+        },
+        {
+            "label": "Install a specific version of Home Assistant",
+            "type": "shell",
+            "command": "container set-version",
+            "problemMatcher": []
+        }
 	]
 }

@@ -21,8 +21,16 @@
           "fill-entity": "Fill State Entity"
         }
       },
-      "actions": "Actions",
-      "appearance": "Appearance"
+      "actions": {
+        "title": "Actions"
+      },
+      "appearance": {
+        "title": "Appearance",
+        "choose-colors": "Choose Colors",
+        "labels": {
+          "level-color": "Level Color"
+        }
+      }
     }
   }
 }

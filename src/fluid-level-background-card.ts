@@ -20,7 +20,7 @@ import './fluid-background';
 
 import type { FluidLevelBackgroundCardConfig } from './types';
 import { actionHandler } from './action-handler-directive';
-import { CARD_VERSION } from './const';
+import { CARD_VERSION, LEVEL_COLOR } from './const';
 import { localize } from './localize/localize';
 import { getThemeBackgroundColor } from './utils/theme-parser';
 
@@ -62,6 +62,8 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @state() protected _fill_entity?: string;
 
+  @state() protected _level_color?: number[];
+
   @state() private config!: FluidLevelBackgroundCardConfig;
 
   private _darkModeLastValue!: boolean;
@@ -95,6 +97,7 @@ export class FluidLevelBackgroundCard extends LitElement {
 
     this._level_entity = config.entity;
     this._fill_entity = config.fill_entity;
+    this._level_color = config.level_color || LEVEL_COLOR;
   }
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
@@ -115,6 +118,10 @@ export class FluidLevelBackgroundCard extends LitElement {
     }
 
     if (name === '_fill_entity') {
+      super.requestUpdate(name, oldValue);
+    }
+
+    if (name === '_level_color') {
       super.requestUpdate(name, oldValue);
     }
 
@@ -262,6 +269,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       .size=${this.size}
       .value=${value}
       .backgroundColor=${this.backgroundColor}
+      .levelColor=${this._level_color || LEVEL_COLOR}
       .filling=${filling}
     ></fluid-background>`;
   }

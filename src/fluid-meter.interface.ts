@@ -53,6 +53,7 @@ export type FluidMeterInstance = {
   setDrawBubbles(draw: boolean);
   setColor(foreggroundColor: string, backgroundColor: string);
   setBackGroundColor(backgroundColor: string);
+  setLevelColor(levelColor: number[]);
   resizeCanvas(newSize: ElementSize);
   stop();
   start();

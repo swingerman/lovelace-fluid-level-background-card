@@ -1,5 +1,6 @@
 import { ElementSize } from './fluid-level-background-card';
 import { FluidMeterInstance, FluidMeterOptions, Layer, FluidMeterEnv, Bubble } from './fluid-meter.interface';
+import { rgbaToString } from './utils/color';
 
 export function FluidMeter(): FluidMeterInstance {
   let canvas;
@@ -454,6 +455,13 @@ export function FluidMeter(): FluidMeterInstance {
     },
     setBackGroundColor(backgroundColor: string) {
       options.backgroundColor = backgroundColor;
+    },
+    setLevelColor(levelColor: number[]) {
+      if (levelColor.length < 3) {
+        return;
+      }
+      foregroundFluidLayer.fillStyle = rgbaToString(levelColor, 1);
+      backgroundFluidLayer.fillStyle = rgbaToString(levelColor, 0.3);
     },
     resizeCanvas(size: ElementSize) {
       options.width = size.width;
