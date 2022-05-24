@@ -9,41 +9,29 @@ A card that wraps other card or cards and renders a fluid level background behin
 
 The fluid effect is an improved version of [@aarcorcaci](https://github.com/aarcoraci)'s [fluid-meter](https://github.com/aarcoraci/javascript-fluid-meter), improved and ported to typescript.
 
+<img style="border: 5px solid #767676;border-radius: 10px;box-sizing: border-box;" src="https://github.com/swingerman/lovelace-fluid-level-background-card/blob/master/docs/assets/grid-cards.gif?raw=true" alt="Demo">
 
-<img style="border: 5px solid #767676;border-radius: 10px;box-sizing: border-box;" src="https://github.com/swingerman/lovelace-fluid-level-background-card/blob/master/docs/assets/fluid-person-card.gif?raw=true" alt="Demo">
+### Example config
 
-*Note: the above card uses [card-mod](https://github.com/thomasloven/lovelace-card-mod) for extra styling of the person entity.*
-
-
-example without card-mod
 ```yaml
 type: custom:fluid-level-background-card
 card:
     type: glance
     entities:
-    - entity: person.xxx
+    - entity: person.john_doe
 entity: sensor.battery_level
-```
-
-To add custom styles to the card you wrapped consider using [card-mod](https://github.com/thomasloven/lovelace-card-mod).
-
-example with card-mod:
-```yaml
-type: custom:fluid-level-background-card
-card:
-    type: glance
-    entities:
-    - entity: person.xxx
-      style: |
-        state-badge { width: 60px; height: 60px }
-entity: sensor.battery_level
+fill_entity: binary_sensor.charging
+level_color:
+      - 68
+      - 115
+      - 159
 ```
 
 ## How To Install
 
 Install it using HACS:
 
-1. add custom repository: https://github.com/swingerman/lovelace-fluid-level-background-card
+1. add custom repository: <https://github.com/swingerman/lovelace-fluid-level-background-card>
 2. reload lvoelace
 
 ## How To Use
@@ -53,29 +41,13 @@ Note: This card is a wrapper. This means that it's designed to wrap other existi
 1. Add this card using the UI (serach for fluid level background card)
 2. Select the card you would like to render for your entities
 3. Select the level entity - this will control the level
-
-## Known Issues
-
-- Controlling click/tap actions is not yet configurable. Currently on tap the "level" entity's more info will trigger.
-- The editor UI is not so user friendly, the level entity selector is below the card type selector
-- You cannot change the color of the floud at this point
-- You cannot fine tune the fluid effect at this point
-
-## Planned Features
-
-- Level based colors
-- Change default color
-- Bubbles if level increases
-- Better editor UI
+4. select a fill state entity - this will enable bubbles while on
+5. set the dsired color for the fluid level
+6. set actions. Note: as thi card is a wrapper only set actions if you aim to interact with the level entity, otherwise set actions to none.
 
 ## Support
 
 Hey dude! Help me out for a couple of :beers: or a :coffee:!
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S6NC9BYVDDJMA&source=url)
-
+[![Donate](https://img.shields.io/badge/Donate-PayPal-yellowgreen?style=for-the-badge&logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S6NC9BYVDDJMA&source=url)
 [![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/swingerman)
-
-## Options
-
-TBD
