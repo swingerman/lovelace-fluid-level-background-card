@@ -1,0 +1,36 @@
+{
+  "common": {
+    "version": "Version",
+    "invalid_configuration": "Ogilltig konfiguration",
+    "show_warning": "Visa Varning",
+    "show_error": "Visa Fel",
+    "required": "Nödvändig",
+    "optional": "Valfritt"
+  },
+  "editor": {
+    "tab": {
+      "card": {
+        "title": "Kort*",
+        "chose-card": "Välj ett Kontrollpanelskort"
+      },
+      "entities": {
+        "title": "Enheter*",
+        "chose-entities": "Välj Enheter",
+        "labels": {
+          "level-entity": "Nivåenhet",
+          "fill-entity": "Fyllt Tillstånd Enhet"
+        }
+      },
+      "actions": {
+        "title": "Actions"
+      },
+      "appearance": {
+        "title": "Utseende",
+        "choose-colors": "Välj färger",
+        "labels": {
+          "level-color": "Nivåfärg"
+        }
+      }
+    }
+  }
+}
