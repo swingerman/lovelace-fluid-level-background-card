@@ -31,8 +31,8 @@ level_color:
 
 Install it using HACS:
 
-1. add custom repository: <https://github.com/swingerman/lovelace-fluid-level-background-card>
-2. reload lvoelace
+1. Add custom repository: <https://github.com/swingerman/lovelace-fluid-level-background-card>
+2. Reload lovelace
 
 ## How To Use
 
