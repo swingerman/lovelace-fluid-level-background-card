@@ -15,7 +15,7 @@
   "author": "Ian Richardson <iantrich@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@commitlint/config-conventional": "^17.2.0",
+    "@commitlint/config-conventional": "^17.3.0",
     "colortranslator": "^1.9.3",
     "custom-card-helpers": "^1.9.0",
     "home-assistant-js-websocket": "^8.0.0",
