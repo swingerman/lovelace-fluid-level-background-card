@@ -8,6 +8,7 @@ on:
 
 jobs:
   validate_hacs:
+    if: ${{ github.actor != 'dependabot[bot]' }}
     name: Valiate With HACS
     runs-on: 'ubuntu-latest'
     steps:

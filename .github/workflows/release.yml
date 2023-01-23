@@ -6,6 +6,7 @@ on:
 
 jobs:
   release:
+    if: ${{ github.actor != 'dependabot[bot]' }}
     name: Prepare release
     runs-on: ubuntu-latest
     steps:
