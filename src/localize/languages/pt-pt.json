@@ -1,0 +1,36 @@
+{
+  "common": {
+    "version": "Versão",
+    "invalid_configuration": "Configuração inválida",
+    "show_warning": "Mostrar aviso",
+    "show_error": "Mostrar erro",
+    "required": "Requerido",
+    "optional": "Opcional"
+  },
+  "editor": {
+    "tab": {
+      "card": {
+        "title": "Cartão*",
+        "chose-card": "Escolha um cartão de painel"
+      },
+      "entities": {
+        "title": "Entidades*",
+        "chose-entities": "Escolher Entidades",
+        "labels": {
+          "level-entity": "Entidade de Nível",
+          "fill-entity": "Preencher Entidade"
+        }
+      },
+      "actions": {
+        "title": "Ações"
+      },
+      "appearance": {
+        "title": "Aparência",
+        "choose-colors": "Escolha as cores",
+        "labels": {
+          "level-color": "Cor do Nível"
+        }
+      }
+    }
+  }
+}
