@@ -1,15 +1,15 @@
 import * as en from './languages/en.json';
 import * as nb from './languages/nb.json';
-import * as pt-BR from './languages/pt-BR.json';
-import * as pt-pt from './languages/pt-pt.json';
+import * as ptbr from './languages/ptbr.json';
+import * as ptpt from './languages/ptpt.json';
 import * as sv from './languages/sv.json';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const languages: any = {
   en: en,
   nb: nb,
-  pt-BR: pt-BR,
-  pt-pt: pt-pt,
+  ptbr: ptbr,
+  ptpt: ptpt,
   sv: sv,
 };
 
