@@ -50,7 +50,7 @@
     "rollup-plugin-typescript2": "^0.34.1",
     "rollup-plugin-uglify": "^6.0.4",
     "ts-lit-plugin": "^1.2.1",
-    "typescript": "^5.0.3"
+    "typescript": "^5.0.4"
   },
   "scripts": {
     "start": "rollup -c rollup.config.js --watch",
