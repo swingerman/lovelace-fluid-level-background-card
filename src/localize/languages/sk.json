@@ -1,0 +1,36 @@
+{
+  "common": {
+    "version": "Verzia",
+    "invalid_configuration": "Neplatná konfigurácia",
+    "show_warning": "Zobraziť upozornenie",
+    "show_error": "Zobraziť chybu",
+    "required": "Požadované",
+    "optional": "Voliteľné"
+  },
+  "editor": {
+    "tab": {
+      "card": {
+        "title": "Karta*",
+        "chose-card": "Vyberte kartu Dashboard Card"
+      },
+      "entities": {
+        "title": "Entity*",
+        "chose-entities": "Zvoliť entity",
+        "labels": {
+          "level-entity": "Entita úrovne",
+          "fill-entity": "Vyplňte entitu stavu"
+        }
+      },
+      "actions": {
+        "title": "Akcie"
+      },
+      "appearance": {
+        "title": "Vzhľad",
+        "choose-colors": "Vyberte farby",
+        "labels": {
+          "level-color": "Farba úrovne"
+        }
+      }
+    }
+  }
+}
