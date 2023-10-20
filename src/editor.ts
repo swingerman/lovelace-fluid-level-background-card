@@ -210,7 +210,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
             @config-changed=${this._handleConfigChanged}
             @GUImode-changed=${this._handleGUIModeChanged}
           ></hui-card-element-editor>
-          <mwc-button @click=${this._handleCardDropped}>Choose a differnt card</mwc-button>
+          <mwc-button @click=${this._handleCardDropped}>Choose a different card</mwc-button>
         `
       : html`
           <h3>${localize('editor.tab.card.chose-card')} (${localize('common.required')})</h3>
