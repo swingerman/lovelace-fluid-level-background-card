@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property } from 'lit-element';
 import { ElementSize } from './fluid-level-background-card';
@@ -19,7 +20,7 @@ export class FluidBackground extends LitElement {
   @property({ type: String })
   backgroundColor = 'rgb(28, 28, 28)';
 
-  @property({ type: String })
+  @property({ type: Array })
   levelColor = [0, 128, 0];
 
   @property({ type: Boolean })
@@ -94,6 +95,7 @@ export class FluidBackground extends LitElement {
   }
 
   private initFluidMeter(container: Element): void {
+    const maxSize = Math.max(this.size?.width as number, this.size?.height as number);
     const env: FluidMeterEnv = {
       targetContainer: container,
       fillPercentage: this.value,
@@ -103,8 +105,8 @@ export class FluidBackground extends LitElement {
         drawBubbles: this.filling,
         drawShadow: false,
         drawText: false,
-        size: Math.max(this.size?.width as number, this.size?.height as number),
-        levelOffset: this.size ? Math.abs((this.size?.width as number) - this.size?.height) : 0,
+        size: maxSize,
+        levelOffset: 0,
         width: this.size?.width,
         height: this.size?.height,
         borderWidth: 0,
@@ -142,5 +144,11 @@ export class FluidBackground extends LitElement {
         overflow: hidden;
       }
     `;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'fluid-background': FluidBackground;
   }
 }

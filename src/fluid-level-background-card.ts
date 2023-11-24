@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LitElement, html, TemplateResult, css, PropertyValues, CSSResult } from 'lit';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { customElement, property, state } from 'lit/decorators.js';
 import {
   HomeAssistant,
@@ -258,7 +260,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       return 0;
     }
 
-    const value = this.hass.states[entityId].state;
+    const value = this.hass.states[entityId]?.state || 0;
 
     if (typeof value === 'number') {
       return value;
