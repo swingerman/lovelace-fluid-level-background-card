@@ -373,7 +373,7 @@ export function FluidMeter(): FluidMeterInstance {
   }
 
   function getFluidAmount(): number {
-    return (currentFillPercentage * (getMeterRadius() - options.levelOffset * 0.5 - options.borderWidth * 2)) / 100;
+    return (currentFillPercentage * (options.height as number)) / 100;
   }
 
   function initOptions(envOptions: FluidMeterOptions): void {
@@ -466,8 +466,9 @@ export function FluidMeter(): FluidMeterInstance {
     resizeCanvas(size: ElementSize) {
       options.width = size.width;
       options.height = size.height;
+      // we choose the largest number to fill tha container with the meter
       options.size = Math.max(size.height, size.width);
-      options.levelOffset = Math.abs(size.width - size.height);
+
       if (canvas) {
         canvas.width = size.width;
         canvas.height = size.height;
