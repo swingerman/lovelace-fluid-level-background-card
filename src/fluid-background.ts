@@ -140,8 +140,6 @@ export class FluidBackground extends LitElement {
         left: 0;
         width: 100%;
         height: 100%;
-        border-radius: var(--ha-card-border-radius, 4px);
-        overflow: hidden;
       }
     `;
   }
