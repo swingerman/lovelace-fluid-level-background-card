@@ -1,5 +1,6 @@
 default_config:
 lovelace:
+  # mode: yaml
   resources:
     - url: http://127.0.0.1:5000/fluid-level-background-card.js
       type: module
