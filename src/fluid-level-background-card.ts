@@ -305,10 +305,9 @@ export class FluidLevelBackgroundCard extends LitElement {
       #container {
         position: relative;
         border-radius: var(--ha-card-border-radius, 12px);
-        box-shadow: var(--ha-card-box-shadow, 0 2px 4px 0 rgba(0, 0, 0, 0.14));
         border-style: solid;
         border-width: var(--ha-card-border-width, 1px);
-        border-color: var(--ha-card-border-color, var(--divider-color, #e0e0e0));
+        border-color: transparent;
         overflow: hidden;
       }
 
