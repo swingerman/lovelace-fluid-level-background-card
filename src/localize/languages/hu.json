@@ -1,0 +1,37 @@
+{
+  "common": {
+    "version": "Verzió",
+    "invalid_configuration": "Hibás konfiguráció",
+    "show_warning": "Jelezze a figyelmeztetéseket",
+    "show_error": "Jelezze a hibákat",
+    "required": "Kötelező",
+    "optional": "Opcionális"
+  },
+  "editor": {
+    "tab": {
+      "card": {
+        "title": "Kártya*",
+        "chose-card": "Válasszon kártyát"
+      },
+      "entities": {
+        "title": "Entitások*",
+        "chose-entities": "Válasszon entitásokat",
+        "labels": {
+          "level-entity": "Szint Entitás",
+          "fill-entity": "Töltés Entitás"
+        }
+      },
+      "actions": {
+        "title": "Akciók"
+      },
+      "appearance": {
+        "title": "Megjelenés",
+        "choose-colors": "Válasszon színeket",
+        "labels": {
+          "level-color": "Szint Színe",
+          "background-color": "Háttér Színe"
+        }
+      }
+    }
+  }
+}

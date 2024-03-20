@@ -28,7 +28,8 @@
         "title": "Aparência",
         "choose-colors": "Escolha as cores",
         "labels": {
-          "level-color": "Cor do Nível"
+          "level-color": "Cor do Nível",
+          "background-color": "Cor de fundo"
         }
       }
     }
