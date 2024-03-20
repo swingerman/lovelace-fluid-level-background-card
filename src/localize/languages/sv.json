@@ -28,7 +28,8 @@
         "title": "Utseende",
         "choose-colors": "Välj färger",
         "labels": {
-          "level-color": "Nivåfärg"
+          "level-color": "Nivåfärg",
+          "background-color": "Bakgrundsfärg"
         }
       }
     }

@@ -25,6 +25,10 @@ level_color:
       - 68
       - 115
       - 159
+background_color:
+      - 255
+      - 255
+      - 0
 ```
 
 ## How To Install
@@ -42,8 +46,9 @@ Note: This card is a wrapper. This means that it's designed to wrap other existi
 2. Select the card you would like to render for your entities
 3. Select the level entity - this will control the level
 4. select a fill state entity - this will enable bubbles while on
-5. set the dsired color for the fluid level
-6. set actions. Note: as this card is a wrapper only set actions if you aim to interact with the level entity, otherwise set actions to none.
+5. set the dsired color for the fluid leve
+6. set the desired color for the background
+7. set actions. Note: as this card is a wrapper only set actions if you aim to interact with the level entity, otherwise set actions to none.
 
 ## Support
 

@@ -28,7 +28,8 @@
         "title": "Appearance",
         "choose-colors": "Choose Colors",
         "labels": {
-          "level-color": "Level Color"
+          "level-color": "Level Color",
+          "background-color": "Background Color"
         }
       }
     }

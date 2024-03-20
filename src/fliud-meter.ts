@@ -453,8 +453,11 @@ export function FluidMeter(): FluidMeterInstance {
       backgroundFluidLayer.fillStyle = backgroundColor;
       foregroundFluidLayer.fillStyle = foreggroundColor;
     },
-    setBackGroundColor(backgroundColor: string) {
-      options.backgroundColor = backgroundColor;
+    setBackGroundColor(backgroundColor: number[]) {
+      if (backgroundColor.length < 3) {
+        return;
+      }
+      options.backgroundColor = rgbaToString(backgroundColor, 1);
     },
     setLevelColor(levelColor: number[]) {
       if (levelColor.length < 3) {
