@@ -22,9 +22,16 @@ import './fluid-background';
 
 import type { FluidLevelBackgroundCardConfig } from './types';
 import { actionHandler } from './action-handler-directive';
-import { CARD_VERSION, LEVEL_COLOR } from './const';
+import {
+  BACKGROUND_COLOR,
+  CARD_VERSION,
+  LEVEL_COLOR,
+  THEME_BACKGROUND_COLOR_VARIABLE,
+  THEME_PRIMARY_COLOR_VARIABLE,
+} from './const';
 import { localize } from './localize/localize';
-import { getThemeBackgroundColor } from './utils/theme-parser';
+import { getThemeColor } from './utils/theme-parser';
+import { parseCssColor } from './utils/color';
 
 export interface FluidThemes extends Themes {
   darkMode: boolean;
@@ -56,7 +63,10 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @property({ attribute: false }) public size!: ElementSize;
 
-  @property({ attribute: false }) public backgroundColor = getThemeBackgroundColor();
+  @property({ attribute: false }) public backgroundColor = getThemeColor(
+    THEME_BACKGROUND_COLOR_VARIABLE,
+    BACKGROUND_COLOR,
+  );
 
   @state() protected _card?: LovelaceCard;
 
@@ -101,8 +111,12 @@ export class FluidLevelBackgroundCard extends LitElement {
 
     this._level_entity = config.entity;
     this._fill_entity = config.fill_entity;
-    this._level_color = config.level_color || LEVEL_COLOR;
-    this._background_color = config.background_color || getThemeBackgroundColor();
+    this._level_color =
+      (config.level_color && parseCssColor(config.level_color)) ||
+      getThemeColor(THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR);
+    this._background_color =
+      (config.background_color && parseCssColor(config.background_color)) ||
+      getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
   }
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
@@ -158,7 +172,7 @@ export class FluidLevelBackgroundCard extends LitElement {
     }
     if (this._darkModeLastValue !== darkMode) {
       this._darkModeLastValue = darkMode;
-      this.backgroundColor = getThemeBackgroundColor();
+      this.backgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
       return true;
     }
     return hasConfigOrEntityChanged(this, changedProps, false);
@@ -175,7 +189,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       this._card.hass = this.hass;
     }
 
-    this.backgroundColor = getThemeBackgroundColor();
+    this.backgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
   }
 
   protected render(): TemplateResult | void {
