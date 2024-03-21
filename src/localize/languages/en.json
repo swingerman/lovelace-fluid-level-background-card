@@ -18,7 +18,9 @@
         "chose-entities": "Chose Entities",
         "labels": {
           "level-entity": "Level Entity",
-          "fill-entity": "Fill State Entity"
+          "fill-entity": "Fill State Entity",
+          "full-value": "Full Value",
+          "full-value-description": "The value when the card will be full."
         }
       },
       "actions": {

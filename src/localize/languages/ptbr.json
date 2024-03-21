@@ -18,7 +18,9 @@
         "chose-entities": "Escolher Entidades",
         "labels": {
           "level-entity": "Entidade de Nível",
-          "fill-entity": "Preencher Entidade Estadual"
+          "fill-entity": "Preencher Entidade Estadual",
+          "full-value": "Valor Completo",
+          "full-value-description": "O valor quando o cartão estará cheio."
         }
       },
       "actions": {

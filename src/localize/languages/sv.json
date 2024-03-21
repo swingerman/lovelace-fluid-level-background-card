@@ -18,7 +18,9 @@
         "chose-entities": "Välj Enheter",
         "labels": {
           "level-entity": "Nivåenhet",
-          "fill-entity": "Fyllt Tillstånd Enhet"
+          "fill-entity": "Fyllt Tillstånd Enhet",
+          "full-value": "Fullt Värde",
+          "full-value-description": "Värdet när kortet kommer att vara fullt."
         }
       },
       "actions": {

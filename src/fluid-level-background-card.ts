@@ -25,6 +25,7 @@ import { actionHandler } from './action-handler-directive';
 import {
   BACKGROUND_COLOR,
   CARD_VERSION,
+  FULL_VALUE,
   LEVEL_COLOR,
   THEME_BACKGROUND_COLOR_VARIABLE,
   THEME_PRIMARY_COLOR_VARIABLE,
@@ -78,6 +79,8 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @state() protected _level_color?: number[];
 
+  @state() protected _full_value: number = FULL_VALUE;
+
   @state() private config!: FluidLevelBackgroundCardConfig;
 
   private _darkModeLastValue!: boolean;
@@ -117,6 +120,7 @@ export class FluidLevelBackgroundCard extends LitElement {
     this._background_color =
       (config.background_color && parseCssColor(config.background_color)) ||
       getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
+    this._full_value = config.full_value ?? FULL_VALUE;
   }
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
@@ -145,6 +149,10 @@ export class FluidLevelBackgroundCard extends LitElement {
     }
 
     if (name === '_background_color') {
+      super.requestUpdate(name, oldValue);
+    }
+
+    if (name === '_full_value') {
       super.requestUpdate(name, oldValue);
     }
 
@@ -281,13 +289,19 @@ export class FluidLevelBackgroundCard extends LitElement {
       return 0;
     }
 
-    const value = this.hass.states[entityId]?.state || 0;
+    const entityValue = this.hass.states[entityId]?.state || 0;
+    let safeEntityValue = 0;
 
-    if (typeof value === 'number') {
-      return value;
+    if (typeof entityValue === 'number') {
+      safeEntityValue = entityValue;
     }
-    if (typeof value === 'string') {
-      return isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10);
+    if (typeof entityValue === 'string') {
+      safeEntityValue = isNaN(parseInt(entityValue, 10)) ? 0 : parseInt(entityValue, 10);
+    }
+
+    if (safeEntityValue > 0) {
+      // calcualte the percentage bsed on the full value
+      return (safeEntityValue / this._full_value) * 100;
     }
     return 0;
   }

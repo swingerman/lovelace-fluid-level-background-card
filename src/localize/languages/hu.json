@@ -18,7 +18,9 @@
         "chose-entities": "Válasszon entitásokat",
         "labels": {
           "level-entity": "Szint Entitás",
-          "fill-entity": "Töltés Entitás"
+          "fill-entity": "Töltés Entitás",
+          "full-value": "Teli Érték",
+          "full-value-description": "Az érték, amikor a kártya tele van"
         }
       },
       "actions": {

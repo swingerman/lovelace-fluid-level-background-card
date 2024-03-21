@@ -14,7 +14,13 @@ import {
 
 import { FluidLevelBackgroundCardConfig, GUIModeChangedEvent } from './types';
 import { localize } from './localize/localize';
-import { BACKGROUND_COLOR, LEVEL_COLOR, THEME_BACKGROUND_COLOR_VARIABLE, THEME_PRIMARY_COLOR_VARIABLE } from './const';
+import {
+  BACKGROUND_COLOR,
+  FULL_VALUE,
+  LEVEL_COLOR,
+  THEME_BACKGROUND_COLOR_VARIABLE,
+  THEME_PRIMARY_COLOR_VARIABLE,
+} from './const';
 import { getThemeColor } from './utils/theme-parser';
 
 export interface EditorTab {
@@ -158,6 +164,10 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return this._config?.double_tap_action || { action: 'none' };
   }
 
+  get _full_value(): number {
+    return this._config?.full_value ?? FULL_VALUE;
+  }
+
   private _lastUsedBackgroundColor: number[] | undefined;
   private _lastUsedLevelColor: number[] | undefined;
 
@@ -265,6 +275,17 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
             @value-changed=${this._valueChanged}
             allow-custom-entity
           ></ha-entity-picker>
+        </div>
+        <div class="entity-row">
+          <ha-textfield
+            type="number"
+            .label="${localize('editor.tab.entities.labels.full-value')} (${localize(
+              'editor.tab.entities.labels.full-value-description',
+            )})"
+            .configValue=${'full_value'}
+            .value=${this._full_value}
+            @change=${this._valueChanged}
+          ></ha-textfield>
         </div>
       </div>
     `;
