@@ -31,6 +31,23 @@ background_color:
       - 0
 ```
 
+### Supported Color Formats
+
+```yaml
+level_color: [68,115,159]
+level_color:
+      - 255
+      - 255
+      - 0
+level_color: red
+level_color: 'red'
+level_color: '#ff0000'
+level_color: var(--red-color)
+level_color: 'var(--red-color)'
+level_color: rgb(242,142,28) # or rgba()
+level_color: 'rgb(242,142,28)' # or rgba()
+```
+
 ## How To Install
 
 Install it using HACS:

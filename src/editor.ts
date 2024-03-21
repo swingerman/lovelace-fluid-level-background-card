@@ -14,8 +14,8 @@ import {
 
 import { FluidLevelBackgroundCardConfig, GUIModeChangedEvent } from './types';
 import { localize } from './localize/localize';
-import { LEVEL_COLOR } from './const';
-import { getThemeBackgroundColor } from './utils/theme-parser';
+import { BACKGROUND_COLOR, LEVEL_COLOR, THEME_BACKGROUND_COLOR_VARIABLE, THEME_PRIMARY_COLOR_VARIABLE } from './const';
+import { getThemeColor } from './utils/theme-parser';
 
 export interface EditorTab {
   slug: string;
@@ -158,6 +158,17 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return this._config?.double_tap_action || { action: 'none' };
   }
 
+  private _lastUsedBackgroundColor: number[] | undefined;
+  private _lastUsedLevelColor: number[] | undefined;
+
+  get usesLevelThemeColor(): boolean {
+    return this._config?.level_color === undefined;
+  }
+
+  get usesBackgroundThemeColor(): boolean {
+    return this._config?.background_color === undefined;
+  }
+
   protected render(): TemplateResult | void {
     if (!this.hass || !this._helpers) {
       return html``;
@@ -288,18 +299,23 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   }
 
   renderAppearanceTab(): TemplateResult {
-    const themeBackgroundColor = getThemeBackgroundColor();
+    const themePrimaryColor = getThemeColor(THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR);
+    const themeBackgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
+
     return html`
       <h3>${localize('editor.tab.appearance.choose-colors')}</h3>
-      <div class="entity-row">
+      <div class="form-row-dual">
         <ha-selector
           .hass=${this.hass}
           .selector=${{ color_rgb: {} }}
           .label=${localize('editor.tab.appearance.labels.level-color')}
-          .value=${this._config?.level_color ? this._config?.level_color : LEVEL_COLOR}
+          .value=${this._config?.level_color || themePrimaryColor}
           .configValue=${'level_color'}
           @value-changed=${this._levelColorChanged}
         ></ha-selector>
+        <ha-formfield label="Use Theme Color">
+          <ha-switch .checked=${this.usesLevelThemeColor} @change=${this._toggleLevelDefaultColor}> </ha-switch>
+        </ha-formfield>
       </div>
       <div class="form-row-dual">
         <ha-selector
@@ -311,18 +327,35 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
           @value-changed=${this._backgroundColorChanged}
         ></ha-selector>
         <ha-formfield label="Use Theme Color">
-          <ha-switch .checked=${!this._config?.background_color} @change=${this._toggleBackgroundDefaultColor}>
+          <ha-switch .checked=${this.usesBackgroundThemeColor} @change=${this._toggleBackgroundDefaultColor}>
           </ha-switch>
         </ha-formfield>
       </div>
     `;
   }
 
+  protected _toggleLevelDefaultColor(): void {
+    if (!this._config) {
+      return;
+    }
+
+    if (!this.usesLevelThemeColor) {
+      this._config = { ...this._config, level_color: undefined };
+    } else {
+      this._config = { ...this._config, level_color: this._lastUsedLevelColor };
+    }
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
   protected _toggleBackgroundDefaultColor(): void {
     if (!this._config) {
       return;
     }
-    this._config = { ...this._config, background_color: undefined };
+    if (!this.usesBackgroundThemeColor) {
+      this._config = { ...this._config, background_color: undefined };
+    } else {
+      this._config = { ...this._config, background_color: this._lastUsedBackgroundColor };
+    }
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
@@ -389,6 +422,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       return;
     }
     const color = ev.detail.value;
+    this._lastUsedLevelColor = color;
     this._config = { ...this._config, level_color: color };
     fireEvent(this, 'config-changed', { config: this._config });
   }
@@ -398,6 +432,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       return;
     }
     const color = ev.detail.value;
+    this._lastUsedBackgroundColor = color;
     this._config = { ...this._config, background_color: color };
     fireEvent(this, 'config-changed', { config: this._config });
   }
