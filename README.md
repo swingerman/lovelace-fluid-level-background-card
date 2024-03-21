@@ -21,6 +21,7 @@ card:
     - entity: person.john_doe
 entity: sensor.battery_level
 fill_entity: binary_sensor.charging
+full_value: 100
 level_color:
       - 68
       - 115
@@ -66,6 +67,10 @@ Note: This card is a wrapper. This means that it's designed to wrap other existi
 5. set the dsired color for the fluid leve
 6. set the desired color for the background
 7. set actions. Note: as this card is a wrapper only set actions if you aim to interact with the level entity, otherwise set actions to none.
+
+## Use sensor value instead percentage
+
+If you want to use a sensor value instead of a percentage, you can use the `full_value` property to set the maximum value of the sensor. The card will then calculate the percentage based on the sensor value and the `full_value` property.
 
 ## Support
 
