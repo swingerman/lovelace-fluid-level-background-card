@@ -5,6 +5,7 @@ import { ElementSize } from './fluid-level-background-card';
 import { FluidMeterEnv } from './fluid-meter.interface';
 import { FluidMeter } from './fliud-meter';
 import { rgbaToString } from './utils/color';
+import { BACKGROUND_COLOR, LEVEL_COLOR } from './const';
 
 @customElement('fluid-background')
 export class FluidBackground extends LitElement {
@@ -18,10 +19,10 @@ export class FluidBackground extends LitElement {
   value!: number;
 
   @property({ type: Array })
-  backgroundColor = [28, 28, 28];
+  backgroundColor = BACKGROUND_COLOR;
 
   @property({ type: Array })
-  levelColor = [0, 128, 0];
+  levelColor = LEVEL_COLOR;
 
   @property({ type: Boolean })
   filling = false;

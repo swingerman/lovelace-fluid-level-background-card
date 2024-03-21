@@ -18,7 +18,9 @@
         "chose-entities": "Velg Enheter",
         "labels": {
           "level-entity": "Nivå Enheter",
-          "fill-entity": "Fyll Enheter"
+          "fill-entity": "Fyll Enheter",
+          "full-value": "Fullverdi",
+          "full-value-description": "Verdien når kortet vil være fullt."
         }
       },
       "actions": {
