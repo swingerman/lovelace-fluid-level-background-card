@@ -155,6 +155,14 @@ export function FluidMeter(): FluidMeterInstance {
   }
 
   function drawMeterBackground() {
+    const arcX = options.size * 0.5;
+    const arcY = options.size * 0.5;
+    const arcRadius = getMeterRadius() - options.borderWidth;
+
+    if (arcX < 0 || arcY < 0 || arcRadius < 0) {
+      return;
+    }
+
     if (context) {
       context.save();
       context.fillStyle = options.backgroundColor;
