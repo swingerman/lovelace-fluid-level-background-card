@@ -304,6 +304,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
 
     return html`
       <h3>${localize('editor.tab.appearance.choose-colors')}</h3>
+      <p>${localize('editor.tab.appearance.labels.color-description')}</p>
       <div class="form-row-dual">
         <ha-selector
           .hass=${this.hass}
@@ -313,7 +314,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
           .configValue=${'level_color'}
           @value-changed=${this._levelColorChanged}
         ></ha-selector>
-        <ha-formfield label="Use Theme Color">
+        <ha-formfield label=${localize('editor.tab.appearance.labels.use-theme-color')}>
           <ha-switch .checked=${this.usesLevelThemeColor} @change=${this._toggleLevelDefaultColor}> </ha-switch>
         </ha-formfield>
       </div>
@@ -326,7 +327,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
           .configValue=${'background_color'}
           @value-changed=${this._backgroundColorChanged}
         ></ha-selector>
-        <ha-formfield label="Use Theme Color">
+        <ha-formfield label=${localize('editor.tab.appearance.labels.use-theme-color')}>
           <ha-switch .checked=${this.usesBackgroundThemeColor} @change=${this._toggleBackgroundDefaultColor}>
           </ha-switch>
         </ha-formfield>

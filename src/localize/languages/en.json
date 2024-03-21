@@ -29,7 +29,9 @@
         "choose-colors": "Choose Colors",
         "labels": {
           "level-color": "Level Color",
-          "background-color": "Background Color"
+          "background-color": "Background Color",
+          "use-theme-color": "Use Theme Color",
+          "color-description": "Set the colors you like for the card. If you want to use the theme colors, just check the box. Theme colors are handy for light/dark mode."
         }
       }
     }
