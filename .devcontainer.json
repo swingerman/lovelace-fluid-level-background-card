@@ -1,14 +1,21 @@
 // See https://aka.ms/vscode-remote/devcontainer.json for format details.
 {
   "name": "Fluid Level Background Card",
-  "image": "ghcr.io/ludeeus/devcontainer/generic:latest",
+  "image": "mcr.microsoft.com/devcontainers/python:dev-3.12-bookworm",
   "context": "..",
-  "appPort": ["5000:5000", "9123:8123"],
-  "postCreateCommand": "apt get update && sudo apt install -y libpcap0.8 && npm install",
-  "runArgs": [
-    "-v",
-    "${env:HOME}${env:USERPROFILE}/.ssh:/tmp/.ssh" // This is added so you can push from inside the container
-  ],
+  "postCreateCommand": "scripts/setup",
+  "appPort": ["5000:5000"],
+  "forwardPorts": [8123, 5000],
+  "portsAttributes": {
+    "8123": {
+      "label": "Home Assistant",
+      "onAutoForward": "notify"
+    },
+    "5000": {
+      "label": "Dev build",
+      "onAutoForward": "openBrowser"
+    }
+  },
   "extensions": [
     "github.vscode-pull-request-github",
     "eamodio.gitlens",

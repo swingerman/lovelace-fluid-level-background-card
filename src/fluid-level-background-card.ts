@@ -22,9 +22,17 @@ import './fluid-background';
 
 import type { FluidLevelBackgroundCardConfig } from './types';
 import { actionHandler } from './action-handler-directive';
-import { CARD_VERSION, LEVEL_COLOR } from './const';
+import {
+  BACKGROUND_COLOR,
+  CARD_VERSION,
+  FULL_VALUE,
+  LEVEL_COLOR,
+  THEME_BACKGROUND_COLOR_VARIABLE,
+  THEME_PRIMARY_COLOR_VARIABLE,
+} from './const';
 import { localize } from './localize/localize';
-import { getThemeBackgroundColor } from './utils/theme-parser';
+import { getThemeColor } from './utils/theme-parser';
+import { parseCssColor } from './utils/color';
 
 export interface FluidThemes extends Themes {
   darkMode: boolean;
@@ -56,7 +64,10 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @property({ attribute: false }) public size!: ElementSize;
 
-  @property({ attribute: false }) public backgroundColor = getThemeBackgroundColor();
+  @property({ attribute: false }) public backgroundColor = getThemeColor(
+    THEME_BACKGROUND_COLOR_VARIABLE,
+    BACKGROUND_COLOR,
+  );
 
   @state() protected _card?: LovelaceCard;
 
@@ -64,7 +75,11 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @state() protected _fill_entity?: string;
 
+  @state() protected _background_color?: number[];
+
   @state() protected _level_color?: number[];
+
+  @state() protected _full_value: number = FULL_VALUE;
 
   @state() private config!: FluidLevelBackgroundCardConfig;
 
@@ -99,7 +114,13 @@ export class FluidLevelBackgroundCard extends LitElement {
 
     this._level_entity = config.entity;
     this._fill_entity = config.fill_entity;
-    this._level_color = config.level_color || LEVEL_COLOR;
+    this._level_color =
+      (config.level_color && parseCssColor(config.level_color)) ||
+      getThemeColor(THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR);
+    this._background_color =
+      (config.background_color && parseCssColor(config.background_color)) ||
+      getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
+    this._full_value = config.full_value ?? FULL_VALUE;
   }
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
@@ -127,6 +148,14 @@ export class FluidLevelBackgroundCard extends LitElement {
       super.requestUpdate(name, oldValue);
     }
 
+    if (name === '_background_color') {
+      super.requestUpdate(name, oldValue);
+    }
+
+    if (name === '_full_value') {
+      super.requestUpdate(name, oldValue);
+    }
+
     if (name === 'config') {
       super.requestUpdate(name, oldValue);
     }
@@ -151,7 +180,7 @@ export class FluidLevelBackgroundCard extends LitElement {
     }
     if (this._darkModeLastValue !== darkMode) {
       this._darkModeLastValue = darkMode;
-      this.backgroundColor = getThemeBackgroundColor();
+      this.backgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
       return true;
     }
     return hasConfigOrEntityChanged(this, changedProps, false);
@@ -168,7 +197,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       this._card.hass = this.hass;
     }
 
-    this.backgroundColor = getThemeBackgroundColor();
+    this.backgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
   }
 
   protected render(): TemplateResult | void {
@@ -260,13 +289,19 @@ export class FluidLevelBackgroundCard extends LitElement {
       return 0;
     }
 
-    const value = this.hass.states[entityId]?.state || 0;
+    const entityValue = this.hass.states[entityId]?.state || 0;
+    let safeEntityValue = 0;
 
-    if (typeof value === 'number') {
-      return value;
+    if (typeof entityValue === 'number') {
+      safeEntityValue = entityValue;
     }
-    if (typeof value === 'string') {
-      return isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10);
+    if (typeof entityValue === 'string') {
+      safeEntityValue = isNaN(parseInt(entityValue, 10)) ? 0 : parseInt(entityValue, 10);
+    }
+
+    if (safeEntityValue > 0) {
+      // calcualte the percentage bsed on the full value
+      return (safeEntityValue / this._full_value) * 100;
     }
     return 0;
   }
@@ -281,7 +316,7 @@ export class FluidLevelBackgroundCard extends LitElement {
     return html` <fluid-background
       .size=${this.size}
       .value=${value}
-      .backgroundColor=${this.backgroundColor}
+      .backgroundColor=${this._background_color || this.backgroundColor}
       .levelColor=${this._level_color || LEVEL_COLOR}
       .filling=${filling}
     ></fluid-background>`;
@@ -304,13 +339,20 @@ export class FluidLevelBackgroundCard extends LitElement {
     return css`
       #container {
         position: relative;
-        border-radius: var(--ha-card-border-radius, 4px);
-        box-shadow: var(--ha-card-box-shadow, 0 2px 4px 0 rgba(0, 0, 0, 0.14));
+        border-radius: var(--ha-card-border-radius, 12px);
+        border-style: solid;
+        border-width: var(--ha-card-border-width, 1px);
+        border-color: transparent;
+        overflow: hidden;
+      }
+
+      .edit-mode #container {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
       }
 
       ha-card {
-        position: relative;
-        overflow: hidden;
+        border: none;
       }
     `;
   }

@@ -18,7 +18,9 @@
         "chose-entities": "Escolher Entidades",
         "labels": {
           "level-entity": "Entidade de Nível",
-          "fill-entity": "Preencher Entidade"
+          "fill-entity": "Preencher Entidade",
+          "full-value": "Valor Completo",
+          "full-value-description": "O valor quando o cartão estará cheio."
         }
       },
       "actions": {
@@ -28,7 +30,10 @@
         "title": "Aparência",
         "choose-colors": "Escolha as cores",
         "labels": {
-          "level-color": "Cor do Nível"
+          "level-color": "Cor do Nível",
+          "background-color": "Cor de fundo",
+          "use-theme-color": "Usar cor do tema",
+          "color-description": "Defina as cores que você gosta para o cartão. Se você quiser usar as cores do tema, basta marcar a caixa. As cores do tema são úteis para o modo claro/escuro."
         }
       }
     }

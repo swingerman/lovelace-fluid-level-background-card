@@ -134,7 +134,9 @@ export interface FluidLevelBackgroundCardConfig extends LovelaceCardConfig {
   test_gui?: boolean;
   entity?: string;
   fill_entity?: string;
-  level_color?: number[];
+  full_value?: number;
+  background_color?: number[] | string;
+  level_color?: number[] | string;
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
   double_tap_action?: ActionConfig;
