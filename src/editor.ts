@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { customElement, property, state } from 'lit/decorators.js';
 import {
   HomeAssistant,
@@ -13,7 +14,14 @@ import {
 
 import { FluidLevelBackgroundCardConfig, GUIModeChangedEvent } from './types';
 import { localize } from './localize/localize';
-import { LEVEL_COLOR } from './const';
+import {
+  BACKGROUND_COLOR,
+  FULL_VALUE,
+  LEVEL_COLOR,
+  THEME_BACKGROUND_COLOR_VARIABLE,
+  THEME_PRIMARY_COLOR_VARIABLE,
+} from './const';
+import { getThemeColor } from './utils/theme-parser';
 
 export interface EditorTab {
   slug: string;
@@ -156,6 +164,21 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return this._config?.double_tap_action || { action: 'none' };
   }
 
+  get _full_value(): number {
+    return this._config?.full_value ?? FULL_VALUE;
+  }
+
+  private _lastUsedBackgroundColor: number[] | undefined;
+  private _lastUsedLevelColor: number[] | undefined;
+
+  get usesLevelThemeColor(): boolean {
+    return this._config?.level_color === undefined;
+  }
+
+  get usesBackgroundThemeColor(): boolean {
+    return this._config?.background_color === undefined;
+  }
+
   protected render(): TemplateResult | void {
     if (!this.hass || !this._helpers) {
       return html``;
@@ -253,6 +276,17 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
             allow-custom-entity
           ></ha-entity-picker>
         </div>
+        <div class="entity-row">
+          <ha-textfield
+            type="number"
+            .label="${localize('editor.tab.entities.labels.full-value')} (${localize(
+              'editor.tab.entities.labels.full-value-description',
+            )})"
+            .configValue=${'full_value'}
+            .value=${this._full_value}
+            @change=${this._valueChanged}
+          ></ha-textfield>
+        </div>
       </div>
     `;
   }
@@ -286,17 +320,65 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   }
 
   renderAppearanceTab(): TemplateResult {
+    const themePrimaryColor = getThemeColor(THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR);
+    const themeBackgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
+
     return html`
       <h3>${localize('editor.tab.appearance.choose-colors')}</h3>
-      <ha-selector
-        .hass=${this.hass}
-        .selector=${{ color_rgb: {} }}
-        .label=${localize('editor.tab.appearance.labels.level-color')}
-        .value=${this._config?.level_color ? this._config?.level_color : LEVEL_COLOR}
-        .configValue=${'level_color'}
-        @value-changed=${this._colorChanged}
-      ></ha-selector>
+      <p>${localize('editor.tab.appearance.labels.color-description')}</p>
+      <div class="form-row-dual">
+        <ha-selector
+          .hass=${this.hass}
+          .selector=${{ color_rgb: {} }}
+          .label=${localize('editor.tab.appearance.labels.level-color')}
+          .value=${this._config?.level_color || themePrimaryColor}
+          .configValue=${'level_color'}
+          @value-changed=${this._levelColorChanged}
+        ></ha-selector>
+        <ha-formfield label=${localize('editor.tab.appearance.labels.use-theme-color')}>
+          <ha-switch .checked=${this.usesLevelThemeColor} @change=${this._toggleLevelDefaultColor}> </ha-switch>
+        </ha-formfield>
+      </div>
+      <div class="form-row-dual">
+        <ha-selector
+          .hass=${this.hass}
+          .selector=${{ color_rgb: {} }}
+          .label=${localize('editor.tab.appearance.labels.background-color')}
+          .value=${this._config?.background_color || themeBackgroundColor}
+          .configValue=${'background_color'}
+          @value-changed=${this._backgroundColorChanged}
+        ></ha-selector>
+        <ha-formfield label=${localize('editor.tab.appearance.labels.use-theme-color')}>
+          <ha-switch .checked=${this.usesBackgroundThemeColor} @change=${this._toggleBackgroundDefaultColor}>
+          </ha-switch>
+        </ha-formfield>
+      </div>
     `;
+  }
+
+  protected _toggleLevelDefaultColor(): void {
+    if (!this._config) {
+      return;
+    }
+
+    if (!this.usesLevelThemeColor) {
+      this._config = { ...this._config, level_color: undefined };
+    } else {
+      this._config = { ...this._config, level_color: this._lastUsedLevelColor };
+    }
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _toggleBackgroundDefaultColor(): void {
+    if (!this._config) {
+      return;
+    }
+    if (!this.usesBackgroundThemeColor) {
+      this._config = { ...this._config, background_color: undefined };
+    } else {
+      this._config = { ...this._config, background_color: this._lastUsedBackgroundColor };
+    }
+    fireEvent(this, 'config-changed', { config: this._config });
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -357,12 +439,23 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     this._toggle = !this._toggle;
   }
 
-  private _colorChanged(ev: CustomEvent): void {
+  private _levelColorChanged(ev: CustomEvent): void {
     if (!this._config) {
       return;
     }
     const color = ev.detail.value;
+    this._lastUsedLevelColor = color;
     this._config = { ...this._config, level_color: color };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  private _backgroundColorChanged(ev: CustomEvent): void {
+    if (!this._config) {
+      return;
+    }
+    const color = ev.detail.value;
+    this._lastUsedBackgroundColor = color;
+    this._config = { ...this._config, background_color: color };
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
@@ -445,6 +538,14 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       }
       .entity-row > * {
         min-width: 100%;
+      }
+      .form-row-dual {
+        margin-bottom: 14px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+      }
+      .form-row-dual > :last-child {
+        margin-inline: 8px;
       }
       .title {
         padding-left: 16px;

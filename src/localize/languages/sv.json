@@ -18,7 +18,9 @@
         "chose-entities": "Välj Enheter",
         "labels": {
           "level-entity": "Nivåenhet",
-          "fill-entity": "Fyllt Tillstånd Enhet"
+          "fill-entity": "Fyllt Tillstånd Enhet",
+          "full-value": "Fullt Värde",
+          "full-value-description": "Värdet när kortet kommer att vara fullt."
         }
       },
       "actions": {
@@ -28,7 +30,10 @@
         "title": "Utseende",
         "choose-colors": "Välj färger",
         "labels": {
-          "level-color": "Nivåfärg"
+          "level-color": "Nivåfärg",
+          "background-color": "Bakgrundsfärg",
+          "use-theme-color": "Använd Temafärg",
+          "color-description": "Ställ in de färger du gillar för kortet. Om du vill använda temafärgerna, kryssa bara i rutan. Temafärger är praktiska för ljus/mörkt läge."
         }
       }
     }
