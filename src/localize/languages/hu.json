@@ -16,11 +16,13 @@
       "entities": {
         "title": "Entitások*",
         "chose-entities": "Válasszon entitásokat",
+        "choose-severity": "Válasszon súlyosságot",
         "labels": {
           "level-entity": "Szint Entitás",
           "fill-entity": "Töltés Entitás",
           "full-value": "Teli Érték",
-          "full-value-description": "Az érték, amikor a kártya tele van"
+          "full-value-description": "Az érték, amikor a kártya tele van",
+          "use-severity": "Használja a súlyosságot"
         }
       },
       "actions": {

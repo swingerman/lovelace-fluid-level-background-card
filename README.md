@@ -72,6 +72,23 @@ Note: This card is a wrapper. This means that it's designed to wrap other existi
 
 If you want to use a sensor value instead of a percentage, you can use the `full_value` property to set the maximum value of the sensor. The card will then calculate the percentage based on the sensor value and the `full_value` property.
 
+## Severity
+
+You can set the severity of the fluid level by using the `severity` property. The severity is a list of objects with the following properties:
+
+- `value`: The level at which the severity should be applied
+- `color`: The color of the severity. use can use any of the [supported color formats](#supported-color-formats)
+
+```yaml
+severity:
+  - value: 20
+    color: red
+  - value: 50
+    color: yellow
+  - value: 80
+    color: green
+```
+
 ## Support
 
 Hey dude! Help me out for a couple of :beers: or a :coffee:!
