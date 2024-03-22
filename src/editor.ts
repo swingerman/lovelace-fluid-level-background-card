@@ -12,7 +12,7 @@ import {
   LovelaceCardConfig,
 } from 'custom-card-helpers';
 
-import { FluidLevelBackgroundCardConfig, GUIModeChangedEvent } from './types';
+import { FluidLevelBackgroundCardConfig, GUIModeChangedEvent, Severity } from './types';
 import { localize } from './localize/localize';
 import {
   BACKGROUND_COLOR,
@@ -22,6 +22,8 @@ import {
   THEME_PRIMARY_COLOR_VARIABLE,
 } from './const';
 import { getThemeColor } from './utils/theme-parser';
+import { parseCssColor } from './utils/color';
+import { mdiMinus, mdiPlus } from '@mdi/js';
 
 export interface EditorTab {
   slug: string;
@@ -166,6 +168,10 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
 
   get _full_value(): number {
     return this._config?.full_value ?? FULL_VALUE;
+  }
+
+  get _severity(): Severity[] {
+    return this._config?.severity || [];
   }
 
   private _lastUsedBackgroundColor: number[] | undefined;
@@ -353,6 +359,56 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
           </ha-switch>
         </ha-formfield>
       </div>
+      <ha-formfield label=${localize('editor.tab.appearance.labels.use-severity')}>
+        <ha-switch .checked=${this._severity.length > 0} @change=${this._toggleSeverity}> </ha-switch>
+      </ha-formfield>
+      ${this.severitySection()}
+    `;
+  }
+
+  severitySection(): TemplateResult {
+    if (this._severity.length > 0) {
+      return html`
+        <h3>${localize('editor.tab.appearance.choose-severity')}</h3>
+        <ha-icon-button
+          .label=${this.hass?.localize('ui.common.add') || 'Add'}
+          .path=${mdiPlus}
+          @click=${this._addSeverity}
+        ></ha-icon-button>
+        ${this._severity.map((severity) => this.severityItem(severity))}
+      `;
+    }
+    return html``;
+  }
+
+  severityItem(severity: Severity): TemplateResult {
+    const severityColor = parseCssColor(severity.color);
+    const index = this._severity.indexOf(severity);
+    return html`
+      <div class="form-row-tripple">
+        <ha-selector
+          .hass=${this.hass}
+          .selector=${{ color_rgb: {} }}
+          .value=${severityColor}
+          .index=${index}
+          @value-changed=${this._severityColorChanged}
+        ></ha-selector>
+
+        <ha-textfield
+          type="number"
+          .configValue=${'full_value'}
+          .value=${severity.value}
+          .index=${index}
+          @change=${this._severityValueChanged}
+        ></ha-textfield>
+
+        <ha-icon-button
+          .label=${this.hass?.localize('ui.common.remove') || 'Remove'}
+          .path=${mdiMinus}
+          .index=${index}
+          @click=${this._removeSeverity}
+        ></ha-icon-button>
+      </div>
     `;
   }
 
@@ -379,6 +435,72 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       this._config = { ...this._config, background_color: this._lastUsedBackgroundColor };
     }
     fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _toggleSeverity(): void {
+    if (!this._config) {
+      return;
+    }
+    if (this._severity.length > 0) {
+      this._config = { ...this._config, severity: [] };
+    } else {
+      this._config = { ...this._config, severity: [{ color: '#FF0000', value: 0 }] };
+    }
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _addSeverity(): void {
+    if (!this._config) {
+      return;
+    }
+    this._config = { ...this._config, severity: [...this._severity, { color: '#FF0000', value: 0 }] };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _removeSeverity(ev): void {
+    if (!this._config) {
+      return;
+    }
+    const [index] = this._getSeverityItemFormEvent(ev);
+
+    this._config = { ...this._config, severity: this._severity.filter((_, i) => i !== index) };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _severityColorChanged(ev): void {
+    if (!this._config) {
+      return;
+    }
+    let severityItem = this._severity[ev.target.index];
+    const color = ev.detail.value;
+    const severity = [...this._severity];
+
+    severityItem = { ...severityItem, color };
+    severity[ev.target.index] = severityItem;
+
+    this._config = { ...this._config, severity };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _severityValueChanged(ev): void {
+    if (!this._config) {
+      return;
+    }
+    const index = ev.target.index;
+    const value = ev.target.value;
+    let severityItem = this._severity[index];
+    const severity = [...this._severity];
+
+    severityItem = { ...severityItem, value: parseFloat(value) };
+    severity[index] = severityItem;
+
+    this._config = { ...this._config, severity };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  private _getSeverityItemFormEvent(ev): [number, any, Severity] {
+    const index = ev.target.index;
+    return [index, ev.target.value, this._severity[index]];
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -545,6 +667,14 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
         grid-template-columns: 1fr auto;
       }
       .form-row-dual > :last-child {
+        margin-inline: 8px;
+      }
+      .form-row-tripple {
+        margin-bottom: 14px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 48px;
+      }
+      .form-row-tripple > :not(:first-child) {
         margin-inline: 8px;
       }
       .title {

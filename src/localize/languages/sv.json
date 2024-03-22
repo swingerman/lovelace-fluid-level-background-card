@@ -29,11 +29,13 @@
       "appearance": {
         "title": "Utseende",
         "choose-colors": "Välj färger",
+        "choose-severity": "Välj allvarlighetsgrad",
         "labels": {
           "level-color": "Nivåfärg",
           "background-color": "Bakgrundsfärg",
           "use-theme-color": "Använd Temafärg",
-          "color-description": "Ställ in de färger du gillar för kortet. Om du vill använda temafärgerna, kryssa bara i rutan. Temafärger är praktiska för ljus/mörkt läge."
+          "color-description": "Ställ in de färger du gillar för kortet. Om du vill använda temafärgerna, kryssa bara i rutan. Temafärger är praktiska för ljus/mörkt läge.",
+          "use-severity": "Använd allvarlighetsgrad"
         }
       }
     }

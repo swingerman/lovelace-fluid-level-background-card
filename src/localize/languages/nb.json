@@ -29,11 +29,13 @@
       "appearance": {
         "title": "Utseende",
         "choose-colors": "Velg Farger",
+        "choose-severity": "Velg Alvorlighetsgrad",
         "labels": {
           "level-color": "Nivå Farge",
           "background-color": "Bakgrunnsfarge",
           "use-theme-color": "Bruk Tema Farge",
-          "color-description": "Sett fargene du liker for kortet. Hvis du vil bruke temafargene, bare merk av i boksen. Temafarger er hendige for lys/mørk modus."
+          "color-description": "Sett fargene du liker for kortet. Hvis du vil bruke temafargene, bare merk av i boksen. Temafarger er hendige for lys/mørk modus.",
+          "use-severity": "Bruk Alvorlighetsgrad"
         }
       }
     }

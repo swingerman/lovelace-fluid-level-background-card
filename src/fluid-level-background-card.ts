@@ -20,7 +20,7 @@ import {
 import './editor';
 import './fluid-background';
 
-import type { FluidLevelBackgroundCardConfig } from './types';
+import type { FluidLevelBackgroundCardConfig, Severity } from './types';
 import { actionHandler } from './action-handler-directive';
 import {
   BACKGROUND_COLOR,
@@ -81,6 +81,8 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @state() protected _full_value: number = FULL_VALUE;
 
+  @state() protected _severity: Severity[] = [];
+
   @state() private config!: FluidLevelBackgroundCardConfig;
 
   private _darkModeLastValue!: boolean;
@@ -121,6 +123,8 @@ export class FluidLevelBackgroundCard extends LitElement {
       (config.background_color && parseCssColor(config.background_color)) ||
       getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
     this._full_value = config.full_value ?? FULL_VALUE;
+    // set severity from the config sorted by value
+    this._severity = config.severity ? [...config.severity].sort((a, b) => b.value - a.value) : [];
   }
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
@@ -153,6 +157,10 @@ export class FluidLevelBackgroundCard extends LitElement {
     }
 
     if (name === '_full_value') {
+      super.requestUpdate(name, oldValue);
+    }
+
+    if (name === '_severity') {
       super.requestUpdate(name, oldValue);
     }
 
@@ -308,6 +316,9 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   private makeFluidBackground(): TemplateResult {
     const value = this.getSafeLevelValue(this._level_entity);
+    const severityColor = this._severity.length > 0 ? this._severity.find((s) => s.value <= value)?.color : undefined;
+    const levelColor = severityColor ? parseCssColor(severityColor) : this._level_color;
+
     const filling =
       this._fill_entity && this.hass.states[this._fill_entity]
         ? this.hass.states[this._fill_entity].state === 'on'
@@ -317,7 +328,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       .size=${this.size}
       .value=${value}
       .backgroundColor=${this._background_color || this.backgroundColor}
-      .levelColor=${this._level_color || LEVEL_COLOR}
+      .levelColor=${levelColor || LEVEL_COLOR}
       .filling=${filling}
     ></fluid-background>`;
   }
