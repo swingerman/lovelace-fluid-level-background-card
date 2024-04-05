@@ -155,6 +155,14 @@ export function FluidMeter(): FluidMeterInstance {
   }
 
   function drawMeterBackground() {
+    const arcX = options.size * 0.5;
+    const arcY = options.size * 0.5;
+    const arcRadius = getMeterRadius() - options.borderWidth;
+
+    if (arcX < 0 || arcY < 0 || arcRadius < 0) {
+      return;
+    }
+
     if (context) {
       context.save();
       context.fillStyle = options.backgroundColor;
@@ -453,8 +461,11 @@ export function FluidMeter(): FluidMeterInstance {
       backgroundFluidLayer.fillStyle = backgroundColor;
       foregroundFluidLayer.fillStyle = foreggroundColor;
     },
-    setBackGroundColor(backgroundColor: string) {
-      options.backgroundColor = backgroundColor;
+    setBackGroundColor(backgroundColor: number[]) {
+      if (backgroundColor.length < 3) {
+        return;
+      }
+      options.backgroundColor = rgbaToString(backgroundColor, 1);
     },
     setLevelColor(levelColor: number[]) {
       if (levelColor.length < 3) {

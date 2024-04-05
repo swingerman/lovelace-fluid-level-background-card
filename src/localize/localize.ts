@@ -4,6 +4,7 @@ import * as ptbr from './languages/ptbr.json';
 import * as ptpt from './languages/ptpt.json';
 import * as sk from './languages/sk.json';
 import * as sv from './languages/sv.json';
+import * as hu from './languages/hu.json';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const languages: any = {
@@ -13,6 +14,7 @@ const languages: any = {
   ptpt: ptpt,
   sk: sk,
   sv: sv,
+  hu: hu,
 };
 
 export function localize(string: string, search = '', replace = ''): string {

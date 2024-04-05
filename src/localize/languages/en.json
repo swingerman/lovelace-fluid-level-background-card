@@ -18,7 +18,9 @@
         "chose-entities": "Chose Entities",
         "labels": {
           "level-entity": "Level Entity",
-          "fill-entity": "Fill State Entity"
+          "fill-entity": "Fill State Entity",
+          "full-value": "Full Value",
+          "full-value-description": "The value when the card will be full."
         }
       },
       "actions": {
@@ -27,8 +29,13 @@
       "appearance": {
         "title": "Appearance",
         "choose-colors": "Choose Colors",
+        "choose-severity": "Choose Severity",
         "labels": {
-          "level-color": "Level Color"
+          "level-color": "Level Color",
+          "background-color": "Background Color",
+          "use-theme-color": "Use Theme Color",
+          "color-description": "Set the colors you like for the card. If you want to use the theme colors, just check the box. Theme colors are handy for light/dark mode.",
+          "use-severity": "Use Severity"
         }
       }
     }

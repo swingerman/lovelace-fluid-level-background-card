@@ -5,6 +5,7 @@ import { ElementSize } from './fluid-level-background-card';
 import { FluidMeterEnv } from './fluid-meter.interface';
 import { FluidMeter } from './fliud-meter';
 import { rgbaToString } from './utils/color';
+import { BACKGROUND_COLOR, LEVEL_COLOR } from './const';
 
 @customElement('fluid-background')
 export class FluidBackground extends LitElement {
@@ -17,11 +18,11 @@ export class FluidBackground extends LitElement {
   @property({ type: Number })
   value!: number;
 
-  @property({ type: String })
-  backgroundColor = 'rgb(28, 28, 28)';
+  @property({ type: Array })
+  backgroundColor = BACKGROUND_COLOR;
 
   @property({ type: Array })
-  levelColor = [0, 128, 0];
+  levelColor = LEVEL_COLOR;
 
   @property({ type: Boolean })
   filling = false;
@@ -64,8 +65,8 @@ export class FluidBackground extends LitElement {
     }
   }
 
-  private setBackgroundColor(backgroundColor: string): void {
-    if (this.fm) {
+  private setBackgroundColor(backgroundColor: number[]): void {
+    if (this.fm && backgroundColor) {
       this.fm.setBackGroundColor(backgroundColor);
     }
   }
@@ -110,7 +111,7 @@ export class FluidBackground extends LitElement {
         width: this.size?.width,
         height: this.size?.height,
         borderWidth: 0,
-        backgroundColor: this.backgroundColor,
+        backgroundColor: rgbaToString(this.backgroundColor, 1),
         foregroundColor: 'rgba(28, 28, 28,.5)',
         foregroundFluidLayer: {
           fillStyle: rgbaToString(this.levelColor, 1),
@@ -140,8 +141,6 @@ export class FluidBackground extends LitElement {
         left: 0;
         width: 100%;
         height: 100%;
-        border-radius: var(--ha-card-border-radius, 4px);
-        overflow: hidden;
       }
     `;
   }

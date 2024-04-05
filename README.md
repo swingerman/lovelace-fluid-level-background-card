@@ -21,10 +21,32 @@ card:
     - entity: person.john_doe
 entity: sensor.battery_level
 fill_entity: binary_sensor.charging
+full_value: 100
 level_color:
       - 68
       - 115
       - 159
+background_color:
+      - 255
+      - 255
+      - 0
+```
+
+### Supported Color Formats
+
+```yaml
+level_color: [68,115,159]
+level_color:
+      - 255
+      - 255
+      - 0
+level_color: red
+level_color: 'red'
+level_color: '#ff0000'
+level_color: var(--red-color)
+level_color: 'var(--red-color)'
+level_color: rgb(242,142,28) # or rgba()
+level_color: 'rgb(242,142,28)' # or rgba()
 ```
 
 ## How To Install
@@ -42,8 +64,30 @@ Note: This card is a wrapper. This means that it's designed to wrap other existi
 2. Select the card you would like to render for your entities
 3. Select the level entity - this will control the level
 4. select a fill state entity - this will enable bubbles while on
-5. set the dsired color for the fluid level
-6. set actions. Note: as this card is a wrapper only set actions if you aim to interact with the level entity, otherwise set actions to none.
+5. set the dsired color for the fluid leve
+6. set the desired color for the background
+7. set actions. Note: as this card is a wrapper only set actions if you aim to interact with the level entity, otherwise set actions to none.
+
+## Use sensor value instead percentage
+
+If you want to use a sensor value instead of a percentage, you can use the `full_value` property to set the maximum value of the sensor. The card will then calculate the percentage based on the sensor value and the `full_value` property.
+
+## Severity
+
+You can set the severity of the fluid level by using the `severity` property. The severity is a list of objects with the following properties:
+
+- `value`: The level at which the severity should be applied
+- `color`: The color of the severity. use can use any of the [supported color formats](#supported-color-formats)
+
+```yaml
+severity:
+  - value: 20
+    color: red
+  - value: 50
+    color: yellow
+  - value: 80
+    color: green
+```
 
 ## Support
 
