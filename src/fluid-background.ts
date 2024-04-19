@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement, property } from 'lit-element';
 import { ElementSize } from './fluid-level-background-card';
 import { FluidMeterEnv } from './fluid-meter.interface';
 import { FluidMeter } from './fliud-meter';
 import { rgbaToString } from './utils/color';
 import { BACKGROUND_COLOR, LEVEL_COLOR } from './const';
+import { customElement, property } from 'lit/decorators.js';
 
 @customElement('fluid-background')
 export class FluidBackground extends LitElement {
