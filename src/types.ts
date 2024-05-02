@@ -1,11 +1,5 @@
-import {
-  ActionConfig,
-  EntityConfig,
-  HomeAssistant,
-  LovelaceCard,
-  LovelaceCardConfig,
-  LovelaceCardEditor,
-} from 'custom-card-helpers';
+import { ActionConfig, EntityConfig, HomeAssistant, LovelaceCardEditor } from 'custom-card-helpers';
+import { LovelaceCard, LovelaceCardConfig } from './lovelace-types';
 
 declare global {
   interface HTMLElementTagNameMap {

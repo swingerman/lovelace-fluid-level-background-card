@@ -9,7 +9,6 @@ import {
   ActionConfig,
   LovelaceConfig,
   HASSDomEvent,
-  LovelaceCardConfig,
 } from 'custom-card-helpers';
 
 import { FluidLevelBackgroundCardConfig, GUIModeChangedEvent, Severity } from './types';
@@ -24,6 +23,7 @@ import {
 import { getThemeColor } from './utils/theme-parser';
 import { parseCssColor } from './utils/color';
 import { mdiMinus, mdiPlus } from '@mdi/js';
+import { LovelaceCardConfig } from './lovelace-types';
 
 export interface EditorTab {
   slug: string;
