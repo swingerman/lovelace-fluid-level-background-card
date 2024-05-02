@@ -11,8 +11,6 @@ import {
   handleAction,
   LovelaceCardEditor,
   getLovelace,
-  LovelaceCard,
-  LovelaceCardConfig,
   createThing,
   Themes,
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types. https://github.com/custom-cards/custom-card-helpers
@@ -33,6 +31,7 @@ import {
 import { localize } from './localize/localize';
 import { getThemeColor } from './utils/theme-parser';
 import { parseCssColor } from './utils/color';
+import { LovelaceCard, LovelaceCardConfig } from './lovelace-types';
 
 export interface FluidThemes extends Themes {
   darkMode: boolean;
@@ -69,7 +68,8 @@ export class FluidLevelBackgroundCard extends LitElement {
     BACKGROUND_COLOR,
   );
 
-  @state() protected _card?: LovelaceCard;
+  @state() protected _card?: LovelaceCardConfig;
+  @state() protected _cardElement?: LovelaceCard;
 
   @state() protected _level_entity?: string;
 
@@ -111,7 +111,7 @@ export class FluidLevelBackgroundCard extends LitElement {
     };
 
     if (config.card) {
-      this._card = this._createCardElement(config.card);
+      this._card = config.card;
     }
 
     this._level_entity = config.entity;
@@ -197,12 +197,12 @@ export class FluidLevelBackgroundCard extends LitElement {
   protected updated(changedProps: PropertyValues): void {
     super.updated(changedProps);
 
-    if (!this._card || (!changedProps.has('hass') && !changedProps.has('editMode'))) {
+    if (!this._cardElement || (!changedProps.has('hass') && !changedProps.has('editMode'))) {
       return;
     }
 
     if (this.hass) {
-      this._card.hass = this.hass;
+      this._cardElement.hass = this.hass;
     }
 
     this.backgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
@@ -334,6 +334,10 @@ export class FluidLevelBackgroundCard extends LitElement {
   }
 
   private makeEntityCard(): TemplateResult {
+    if (!this._card) {
+      return html``;
+    }
+    this._cardElement = this._createCardElement(this._card);
     return html` <ha-card
       @action=${this._handleAction}
       .actionHandler=${actionHandler({
@@ -342,7 +346,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       })}
       tabindex="0"
       .label=${`FluidProgressBar: ${this._level_entity || 'No Entity Defined'}`}
-      >${this._card}</ha-card
+      >${this._cardElement}</ha-card
     >`;
   }
 
