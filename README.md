@@ -45,9 +45,11 @@ level_color: 'red'
 level_color: '#ff0000'
 level_color: var(--red-color)
 level_color: 'var(--red-color)'
-level_color: rgb(242,142,28) # or rgba()
-level_color: 'rgb(242,142,28)' # or rgba()
+level_color: rgb(242,142,28)
+level_color: 'rgb(242,142,28)'
 ```
+
+Note: rgba values are not supported. The alpha chanel will be ignored.
 
 ## How To Install
 
