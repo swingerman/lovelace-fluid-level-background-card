@@ -13,6 +13,7 @@ import {
   getLovelace,
   createThing,
   Themes,
+  fireEvent,
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types. https://github.com/custom-cards/custom-card-helpers
 
 import './editor';
@@ -68,8 +69,7 @@ export class FluidLevelBackgroundCard extends LitElement {
     BACKGROUND_COLOR,
   );
 
-  @state() protected _card?: LovelaceCardConfig;
-  @state() protected _cardElement?: LovelaceCard;
+  @state() protected _card?: LovelaceCard;
 
   @state() protected _level_entity?: string;
 
@@ -111,7 +111,7 @@ export class FluidLevelBackgroundCard extends LitElement {
     };
 
     if (config.card) {
-      this._card = config.card;
+      this._card = this._createCardElement(config.card);
     }
 
     this._level_entity = config.entity;
@@ -127,7 +127,17 @@ export class FluidLevelBackgroundCard extends LitElement {
     this._severity = config.severity ? [...config.severity].sort((a, b) => b.value - a.value) : [];
   }
 
+  onRebuildView(thing?: any): void {
+    console.log('onRebuildView', thing);
+  }
+
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
+    console.log('requestUpdate', name);
+
+    if (name === '_card' && this.config.card) {
+      super.requestUpdate(name, oldValue);
+    }
+
     if (name === 'hass' && this.config.entity) {
       super.requestUpdate(name, oldValue);
     }
@@ -197,12 +207,12 @@ export class FluidLevelBackgroundCard extends LitElement {
   protected updated(changedProps: PropertyValues): void {
     super.updated(changedProps);
 
-    if (!this._cardElement || (!changedProps.has('hass') && !changedProps.has('editMode'))) {
+    if (!this._card || (!changedProps.has('hass') && !changedProps.has('editMode'))) {
       return;
     }
 
     if (this.hass) {
-      this._cardElement.hass = this.hass;
+      this._card.hass = this.hass;
     }
 
     this.backgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
@@ -227,6 +237,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       <div id="container">
         ${this.makeFluidBackground()}
         ${this.makeEntityCard()}
+        @rebuild-view=${this.onRebuildView}
       </div>
       <style>
         ha-card, ha-card > * {
@@ -285,11 +296,57 @@ export class FluidLevelBackgroundCard extends LitElement {
   }
 
   private _createCardElement(cardConfig: LovelaceCardConfig) {
-    const element = createThing(cardConfig) as LovelaceCard;
+    // console.log('createThing', cardConfig.type);
+    // if (cardConfig?.type == 'gauge') {
+    //   const tag = `hui-${cardConfig.type}-card`;
+    //   const element = document.createElement(tag) as LovelaceCard;
+    //   customElements.whenDefined(tag).then(() => {
+    //     try {
+    //       customElements.upgrade(element);
+    //       element.setConfig(cardConfig);
+    //     } catch (err: any) {
+    //       // We let it rebuild and the error wil be handled by _createElement
+    //       fireEvent(element, 'll-rebuild');
+    //     }
+    //   });
+
+    //   element.addEventListener(
+    //     'rebuild-view',
+    //     //'ll-rebuild',
+    //     (ev) => {
+    //       ev.stopPropagation();
+    //       this.rebuildCard();
+    //     },
+    //     { once: true },
+    //   );
+
+    //   try {
+    //     element.setConfig(cardConfig);
+    //   } catch (error) {
+    //     console.error(tag, error);
+    //     //element.setConfig({ type: 'error', error });
+    //   }
+
+    //   if (this.hass) {
+    //     element.hass = this.hass;
+    //   }
+    //   return element;
+    // }
+    //const containerElement = document.createElement('hui-vertical-stack-card');
+    //const element = createThing(cardConfig) as LovelaceCard;
+    const parentConfig = { type: 'vertical-stack', cards: [cardConfig] };
+    const element = createThing(parentConfig) as LovelaceCard;
     if (this.hass) {
       element.hass = this.hass;
     }
+
     return element;
+  }
+
+  private rebuildCard(): void {
+    if (this.config.card) {
+      this._card = this._createCardElement(this.config.card);
+    }
   }
 
   private getSafeLevelValue(entityId: string | undefined): number {
@@ -335,9 +392,9 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   private makeEntityCard(): TemplateResult {
     if (!this._card) {
+      console.log('No card defined');
       return html``;
     }
-    this._cardElement = this._createCardElement(this._card);
     return html` <ha-card
       @action=${this._handleAction}
       .actionHandler=${actionHandler({
@@ -346,7 +403,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       })}
       tabindex="0"
       .label=${`FluidProgressBar: ${this._level_entity || 'No Entity Defined'}`}
-      >${this._cardElement}</ha-card
+      >${this._card}</ha-card
     >`;
   }
 
