@@ -43,6 +43,13 @@ declare global {
   }
 }
 
+// define loadCardHelpers on window object
+declare global {
+  interface Window {
+    loadCardHelpers: () => Promise<any>;
+  }
+}
+
 /* eslint no-console: 0 */
 console.info(
   `%c  fluid-level-background-card \n%c  ${localize('common.version')} ${CARD_VERSION}    `,
@@ -132,10 +139,6 @@ export class FluidLevelBackgroundCard extends LitElement {
         this._severity = config.severity ? [...config.severity].sort((a, b) => b.value - a.value) : [];
       });
     }
-  }
-
-  onRebuildView(thing?: any): void {
-    console.log('onRebuildView', thing);
   }
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
@@ -264,7 +267,6 @@ export class FluidLevelBackgroundCard extends LitElement {
       <div id="container">
         ${this.makeFluidBackground()}
         ${this.makeEntityCard()}
-        @rebuild-view=${this.onRebuildView}
       </div>
       <style>
         ha-card, ha-card > * {
