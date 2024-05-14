@@ -11,9 +11,6 @@ import {
   handleAction,
   LovelaceCardEditor,
   getLovelace,
-  LovelaceCard,
-  LovelaceCardConfig,
-  createThing,
   Themes,
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types. https://github.com/custom-cards/custom-card-helpers
 
@@ -33,9 +30,24 @@ import {
 import { localize } from './localize/localize';
 import { getThemeColor } from './utils/theme-parser';
 import { parseCssColor } from './utils/color';
+import { LovelaceCard, LovelaceCardConfig } from './lovelace-types';
 
 export interface FluidThemes extends Themes {
   darkMode: boolean;
+}
+
+// define loadCardHelpers on window object
+declare global {
+  interface Window {
+    loadCardHelpers: () => Promise<any>;
+  }
+}
+
+// define loadCardHelpers on window object
+declare global {
+  interface Window {
+    loadCardHelpers: () => Promise<any>;
+  }
 }
 
 /* eslint no-console: 0 */
@@ -111,23 +123,29 @@ export class FluidLevelBackgroundCard extends LitElement {
     };
 
     if (config.card) {
-      this._card = this._createCardElement(config.card);
-    }
+      window.loadCardHelpers().then(({ createCardElement }) => {
+        this._card = this._createCardElement(createCardElement, config.card);
 
-    this._level_entity = config.entity;
-    this._fill_entity = config.fill_entity;
-    this._level_color =
-      (config.level_color && parseCssColor(config.level_color)) ||
-      getThemeColor(THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR);
-    this._background_color =
-      (config.background_color && parseCssColor(config.background_color)) ||
-      getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
-    this._full_value = config.full_value ?? FULL_VALUE;
-    // set severity from the config sorted by value
-    this._severity = config.severity ? [...config.severity].sort((a, b) => b.value - a.value) : [];
+        this._level_entity = config.entity;
+        this._fill_entity = config.fill_entity;
+        this._level_color =
+          (config.level_color && parseCssColor(config.level_color)) ||
+          getThemeColor(THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR);
+        this._background_color =
+          (config.background_color && parseCssColor(config.background_color)) ||
+          getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
+        this._full_value = config.full_value ?? FULL_VALUE;
+        // set severity from the config sorted by value
+        this._severity = config.severity ? [...config.severity].sort((a, b) => b.value - a.value) : [];
+      });
+    }
   }
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
+    if (name === '_card' && this.config.card) {
+      super.requestUpdate(name, oldValue);
+    }
+
     if (name === 'hass' && this.config.entity) {
       super.requestUpdate(name, oldValue);
     }
@@ -166,6 +184,29 @@ export class FluidLevelBackgroundCard extends LitElement {
 
     if (name === 'config') {
       super.requestUpdate(name, oldValue);
+    }
+  }
+
+  private _createCardElement(createCardElement: any, cardConfig?: LovelaceCardConfig) {
+    const element = createCardElement(cardConfig) as LovelaceCard;
+    if (this.hass) {
+      element.hass = this.hass;
+    }
+    element.addEventListener(
+      'll-rebuild',
+      (ev) => {
+        ev.stopPropagation();
+        this._rebuildCard(createCardElement, cardConfig);
+      },
+      { once: true },
+    );
+    return element;
+  }
+
+  private _rebuildCard(createCardElement: any, config?: LovelaceCardConfig): void {
+    this._card = this._createCardElement(createCardElement, config);
+    if (this.lastChild) {
+      this.replaceChild(this._card, this.lastChild);
     }
   }
 
@@ -213,7 +254,6 @@ export class FluidLevelBackgroundCard extends LitElement {
       return html``;
     }
 
-    // TODO Check for stateObj or other necessary things and render a warning if missing
     if (this.config.show_warning) {
       return this._showWarning(localize('common.show_warning'));
     }
@@ -284,14 +324,6 @@ export class FluidLevelBackgroundCard extends LitElement {
     return html` ${errorCard} `;
   }
 
-  private _createCardElement(cardConfig: LovelaceCardConfig) {
-    const element = createThing(cardConfig) as LovelaceCard;
-    if (this.hass) {
-      element.hass = this.hass;
-    }
-    return element;
-  }
-
   private getSafeLevelValue(entityId: string | undefined): number {
     if (!entityId) {
       return 0;
@@ -334,6 +366,9 @@ export class FluidLevelBackgroundCard extends LitElement {
   }
 
   private makeEntityCard(): TemplateResult {
+    if (!this._card) {
+      return html``;
+    }
     return html` <ha-card
       @action=${this._handleAction}
       .actionHandler=${actionHandler({
