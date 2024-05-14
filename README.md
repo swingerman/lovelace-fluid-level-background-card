@@ -1,7 +1,7 @@
 # Lovelace Fluid Level Background Card by [@swingerman](https://www.github.com/swingerman)
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/swingerman/lovelace-fluid-level-background-card) ![GitHub release (latest by date)](https://img.shields.io/github/downloads/swingerman/lovelace-fluid-level-background-card/total?style=for-the-badge)
-![Release](https://img.shields.io/github/v/release/swingerman/ha-dual-smart-thermostat?style=for-the-badge)
+![Release](https://img.shields.io/github/v/release/swingerman/lovelace-fluid-level-background-card?style=for-the-badge)
 
 A card that wraps other card or cards and renders a fluid level background behind them. The fluid level is controlled by a sensor entity and the background color can be set to any color. The card is designed to be used with any other card, including grid and stack cards.
 
