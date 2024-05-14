@@ -1,6 +1,6 @@
 {
   "name": "fluid-level-background-card",
-  "version": "0.0.1",
+  "version": "0.1.6",
   "description": "Lovelace fluid-level-background-card",
   "keywords": [
     "home-assistant",
@@ -19,12 +19,12 @@
     "@mdi/js": "^7.4.47",
     "colortranslator": "^4.0.0",
     "custom-card-helpers": "^1.9.0",
-    "home-assistant-js-websocket": "^9.1.0",
+    "home-assistant-js-websocket": "^9.3.0",
     "lit": "^2.8.0",
     "rollup-plugin-sourcemaps": "^0.6.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.7",
+    "@babel/core": "^7.24.5",
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/plugin-proposal-decorators": "^7.24.1",
     "@digitalroute/cz-conventional-changelog-for-jira": "^8.0.1",
