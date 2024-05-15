@@ -21,12 +21,12 @@ import type { FluidLevelBackgroundCardConfig, Severity } from './types';
 import { actionHandler } from './action-handler-directive';
 import {
   BACKGROUND_COLOR,
-  CARD_VERSION,
   FULL_VALUE,
   LEVEL_COLOR,
   THEME_BACKGROUND_COLOR_VARIABLE,
   THEME_PRIMARY_COLOR_VARIABLE,
 } from './const';
+import pjson from '../package.json';
 import { localize } from './localize/localize';
 import { getThemeColor } from './utils/theme-parser';
 import { parseCssColor } from './utils/color';
@@ -52,7 +52,7 @@ declare global {
 
 /* eslint no-console: 0 */
 console.info(
-  `%c  fluid-level-background-card \n%c  ${localize('common.version')} ${CARD_VERSION}    `,
+  `%c  fluid-level-background-card \n%c  ${localize('common.version')} ${pjson.version}    `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
