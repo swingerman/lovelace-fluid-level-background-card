@@ -44,20 +44,23 @@ level_color:
       - 68
       - 115
       - 159
+      - 1
 background_color:
       - 255
       - 255
       - 0
+      - 1
 ```
 
 ### Supported Color Formats
 
 ```yaml
-level_color: [68,115,159]
+level_color: [68,115,159,1]
 level_color:
       - 255
       - 255
       - 0
+      - 1
 level_color: red
 level_color: 'red'
 level_color: '#ff0000'
@@ -65,9 +68,11 @@ level_color: var(--red-color)
 level_color: 'var(--red-color)'
 level_color: rgb(242,142,28)
 level_color: 'rgb(242,142,28)'
+level_color: rgba(242,142,28,1)
+level_color: 'rgba(242,142,28,1)'
 ```
 
-Note: rgba values are not supported. The alpha chanel will be ignored.
+Note: RGBA alpha channel can be set only in the yaml configuration.
 
 ## How To Install
 
