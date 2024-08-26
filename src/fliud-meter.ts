@@ -465,14 +465,18 @@ export function FluidMeter(): FluidMeterInstance {
       if (backgroundColor.length < 3) {
         return;
       }
-      options.backgroundColor = rgbaToString(backgroundColor, 1);
+      const alpha = backgroundColor.length > 3 ? backgroundColor[3] : 1;
+      options.backgroundColor = rgbaToString(backgroundColor, alpha);
     },
     setLevelColor(levelColor: number[]) {
       if (levelColor.length < 3) {
         return;
       }
-      foregroundFluidLayer.fillStyle = rgbaToString(levelColor, 1);
-      backgroundFluidLayer.fillStyle = rgbaToString(levelColor, 0.3);
+      const alpha = levelColor.length > 3 ? levelColor[3] : 1;
+      const backgroundAlpha = alpha * 0.3;
+
+      foregroundFluidLayer.fillStyle = rgbaToString(levelColor, alpha);
+      backgroundFluidLayer.fillStyle = rgbaToString(levelColor, backgroundAlpha);
     },
     resizeCanvas(size: ElementSize) {
       options.width = size.width;
