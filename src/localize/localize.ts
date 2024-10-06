@@ -2,6 +2,7 @@ import * as en from './languages/en.json';
 import * as nb from './languages/nb.json';
 import * as ptbr from './languages/ptbr.json';
 import * as ptpt from './languages/ptpt.json';
+import * as sk from './languages/sk.json';
 import * as sv from './languages/sv.json';
 import * as hu from './languages/hu.json';
 
@@ -11,6 +12,7 @@ const languages: any = {
   nb: nb,
   ptbr: ptbr,
   ptpt: ptpt,
+  sk: sk,
   sv: sv,
   hu: hu,
 };
