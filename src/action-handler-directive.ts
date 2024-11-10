@@ -167,7 +167,7 @@ customElements.define('action-handler-fluid-level-background-card', ActionHandle
 
 const getActionHandler = (): ActionHandler => {
   const body = document.body;
-  if (body.querySelector('action-handler-sbar')) {
+  if (body.querySelector('action-handler-fluid-level-background-card')) {
     return body.querySelector('action-handler-fluid-level-background-card') as ActionHandler;
   }
 
