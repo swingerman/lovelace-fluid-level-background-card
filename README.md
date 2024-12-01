@@ -7,6 +7,9 @@ A card that wraps other card or cards and renders a fluid level background behin
 
 <img style="border: 5px solid #767676;border-radius: 10px;box-sizing: border-box;" src="https://github.com/swingerman/lovelace-fluid-level-background-card/blob/master/docs/assets/grid-cards.gif?raw=true" alt="Demo">
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=swingerman&repository=lovelace-fluid-level-background-card&category=Plugin)
+
+
 ## Configurable options
 
 Options can be cofigured in the UI or in the card configuration. The following options are available:
