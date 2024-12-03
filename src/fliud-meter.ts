@@ -155,6 +155,14 @@ export function FluidMeter(): FluidMeterInstance {
   }
 
   function drawMeterBackground() {
+    const arcX = options.size * 0.5;
+    const arcY = options.size * 0.5;
+    const arcRadius = getMeterRadius() - options.borderWidth;
+
+    if (arcX < 0 || arcY < 0 || arcRadius < 0) {
+      return;
+    }
+
     if (context) {
       context.save();
       context.fillStyle = options.backgroundColor;
@@ -373,7 +381,7 @@ export function FluidMeter(): FluidMeterInstance {
   }
 
   function getFluidAmount(): number {
-    return (currentFillPercentage * (getMeterRadius() - options.levelOffset * 0.5 - options.borderWidth * 2)) / 100;
+    return (currentFillPercentage * (options.height as number)) / 100;
   }
 
   function initOptions(envOptions: FluidMeterOptions): void {
@@ -453,21 +461,29 @@ export function FluidMeter(): FluidMeterInstance {
       backgroundFluidLayer.fillStyle = backgroundColor;
       foregroundFluidLayer.fillStyle = foreggroundColor;
     },
-    setBackGroundColor(backgroundColor: string) {
-      options.backgroundColor = backgroundColor;
+    setBackGroundColor(backgroundColor: number[]) {
+      if (backgroundColor.length < 3) {
+        return;
+      }
+      const alpha = backgroundColor.length > 3 ? backgroundColor[3] : 1;
+      options.backgroundColor = rgbaToString(backgroundColor, alpha);
     },
     setLevelColor(levelColor: number[]) {
       if (levelColor.length < 3) {
         return;
       }
-      foregroundFluidLayer.fillStyle = rgbaToString(levelColor, 1);
-      backgroundFluidLayer.fillStyle = rgbaToString(levelColor, 0.3);
+      const alpha = levelColor.length > 3 ? levelColor[3] : 1;
+      const backgroundAlpha = alpha * 0.3;
+
+      foregroundFluidLayer.fillStyle = rgbaToString(levelColor, alpha);
+      backgroundFluidLayer.fillStyle = rgbaToString(levelColor, backgroundAlpha);
     },
     resizeCanvas(size: ElementSize) {
       options.width = size.width;
       options.height = size.height;
+      // we choose the largest number to fill tha container with the meter
       options.size = Math.max(size.height, size.width);
-      options.levelOffset = Math.abs(size.width - size.height);
+
       if (canvas) {
         canvas.width = size.width;
         canvas.height = size.height;

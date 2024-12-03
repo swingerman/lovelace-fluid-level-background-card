@@ -2,6 +2,42 @@
   "common": {
     "version": "Versjon",
     "invalid_configuration": "Ikke gyldig konfiguration",
-    "show_warning": "Vis advarsel"
+    "show_warning": "Vis advarsel",
+    "show_error": "Vis feil",
+    "required": "Påkrevd",
+    "optional": "Valgfri"
+  },
+  "editor": {
+    "tab": {
+      "card": {
+        "title": "Kort",
+        "chose-card": "Velg Kort"
+      },
+      "entities": {
+        "title": "Enheter",
+        "chose-entities": "Velg Enheter",
+        "labels": {
+          "level-entity": "Nivå Enheter",
+          "fill-entity": "Fyll Enheter",
+          "full-value": "Fullverdi",
+          "full-value-description": "Verdien når kortet vil være fullt."
+        }
+      },
+      "actions": {
+        "title": "Handlinger"
+      },
+      "appearance": {
+        "title": "Utseende",
+        "choose-colors": "Velg Farger",
+        "choose-severity": "Velg Alvorlighetsgrad",
+        "labels": {
+          "level-color": "Nivå Farge",
+          "background-color": "Bakgrunnsfarge",
+          "use-theme-color": "Bruk Tema Farge",
+          "color-description": "Sett fargene du liker for kortet. Hvis du vil bruke temafargene, bare merk av i boksen. Temafarger er hendige for lys/mørk modus.",
+          "use-severity": "Bruk Alvorlighetsgrad"
+        }
+      }
+    }
   }
 }

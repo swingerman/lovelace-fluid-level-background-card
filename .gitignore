@@ -3,3 +3,8 @@
 #package-lock.json
 /dist
 src/.eslintcache
+
+# Home Assistant configuration
+config/*
+!config/configuration.yaml
+!config/ui-lovelace.yaml

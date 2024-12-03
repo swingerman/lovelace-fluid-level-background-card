@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LitElement, html, TemplateResult, css, PropertyValues, CSSResult } from 'lit';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { customElement, property, state } from 'lit/decorators.js';
 import {
   HomeAssistant,
@@ -9,28 +11,48 @@ import {
   handleAction,
   LovelaceCardEditor,
   getLovelace,
-  LovelaceCard,
-  LovelaceCardConfig,
-  createThing,
   Themes,
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types. https://github.com/custom-cards/custom-card-helpers
 
 import './editor';
 import './fluid-background';
 
-import type { FluidLevelBackgroundCardConfig } from './types';
+import type { FluidLevelBackgroundCardConfig, Severity } from './types';
 import { actionHandler } from './action-handler-directive';
-import { CARD_VERSION, LEVEL_COLOR } from './const';
+import {
+  BACKGROUND_COLOR,
+  FULL_VALUE,
+  LEVEL_COLOR,
+  THEME_BACKGROUND_COLOR_VARIABLE,
+  THEME_PRIMARY_COLOR_VARIABLE,
+} from './const';
+import pjson from '../package.json';
 import { localize } from './localize/localize';
-import { getThemeBackgroundColor } from './utils/theme-parser';
+import { getThemeColor } from './utils/theme-parser';
+import { parseCssColor } from './utils/color';
+import { LovelaceCard, LovelaceCardConfig } from './lovelace-types';
 
 export interface FluidThemes extends Themes {
   darkMode: boolean;
 }
 
+// define loadCardHelpers on window object
+declare global {
+  interface Window {
+    loadCardHelpers: () => Promise<any>;
+  }
+}
+
+// define loadCardHelpers on window object
+declare global {
+  interface Window {
+    loadCardHelpers: () => Promise<any>;
+  }
+}
+
 /* eslint no-console: 0 */
 console.info(
-  `%c  fluid-level-background-card \n%c  ${localize('common.version')} ${CARD_VERSION}    `,
+  `%c  fluid-level-background-card \n%c  ${localize('common.version')} ${pjson.version}    `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
@@ -54,7 +76,10 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @property({ attribute: false }) public size!: ElementSize;
 
-  @property({ attribute: false }) public backgroundColor = getThemeBackgroundColor();
+  @property({ attribute: false }) public backgroundColor = getThemeColor(
+    THEME_BACKGROUND_COLOR_VARIABLE,
+    BACKGROUND_COLOR,
+  );
 
   @state() protected _card?: LovelaceCard;
 
@@ -62,7 +87,13 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @state() protected _fill_entity?: string;
 
+  @state() protected _background_color?: number[];
+
   @state() protected _level_color?: number[];
+
+  @state() protected _full_value: number = FULL_VALUE;
+
+  @state() protected _severity: Severity[] = [];
 
   @state() private config!: FluidLevelBackgroundCardConfig;
 
@@ -92,15 +123,29 @@ export class FluidLevelBackgroundCard extends LitElement {
     };
 
     if (config.card) {
-      this._card = this._createCardElement(config.card);
-    }
+      window.loadCardHelpers().then(({ createCardElement }) => {
+        this._card = this._createCardElement(createCardElement, config.card);
 
-    this._level_entity = config.entity;
-    this._fill_entity = config.fill_entity;
-    this._level_color = config.level_color || LEVEL_COLOR;
+        this._level_entity = config.entity;
+        this._fill_entity = config.fill_entity;
+        this._level_color =
+          (config.level_color && parseCssColor(config.level_color)) ||
+          getThemeColor(THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR);
+        this._background_color =
+          (config.background_color && parseCssColor(config.background_color)) ||
+          getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
+        this._full_value = config.full_value ?? FULL_VALUE;
+        // set severity from the config sorted by value
+        this._severity = config.severity ? [...config.severity].sort((a, b) => b.value - a.value) : [];
+      });
+    }
   }
 
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
+    if (name === '_card' && this.config.card) {
+      super.requestUpdate(name, oldValue);
+    }
+
     if (name === 'hass' && this.config.entity) {
       super.requestUpdate(name, oldValue);
     }
@@ -125,8 +170,43 @@ export class FluidLevelBackgroundCard extends LitElement {
       super.requestUpdate(name, oldValue);
     }
 
+    if (name === '_background_color') {
+      super.requestUpdate(name, oldValue);
+    }
+
+    if (name === '_full_value') {
+      super.requestUpdate(name, oldValue);
+    }
+
+    if (name === '_severity') {
+      super.requestUpdate(name, oldValue);
+    }
+
     if (name === 'config') {
       super.requestUpdate(name, oldValue);
+    }
+  }
+
+  private _createCardElement(createCardElement: any, cardConfig?: LovelaceCardConfig) {
+    const element = createCardElement(cardConfig) as LovelaceCard;
+    if (this.hass) {
+      element.hass = this.hass;
+    }
+    element.addEventListener(
+      'll-rebuild',
+      (ev) => {
+        ev.stopPropagation();
+        this._rebuildCard(createCardElement, cardConfig);
+      },
+      { once: true },
+    );
+    return element;
+  }
+
+  private _rebuildCard(createCardElement: any, config?: LovelaceCardConfig): void {
+    this._card = this._createCardElement(createCardElement, config);
+    if (this.lastChild) {
+      this.replaceChild(this._card, this.lastChild);
     }
   }
 
@@ -149,7 +229,7 @@ export class FluidLevelBackgroundCard extends LitElement {
     }
     if (this._darkModeLastValue !== darkMode) {
       this._darkModeLastValue = darkMode;
-      this.backgroundColor = getThemeBackgroundColor();
+      this.backgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
       return true;
     }
     return hasConfigOrEntityChanged(this, changedProps, false);
@@ -166,7 +246,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       this._card.hass = this.hass;
     }
 
-    this.backgroundColor = getThemeBackgroundColor();
+    this.backgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
   }
 
   protected render(): TemplateResult | void {
@@ -174,7 +254,6 @@ export class FluidLevelBackgroundCard extends LitElement {
       return html``;
     }
 
-    // TODO Check for stateObj or other necessary things and render a warning if missing
     if (this.config.show_warning) {
       return this._showWarning(localize('common.show_warning'));
     }
@@ -245,32 +324,33 @@ export class FluidLevelBackgroundCard extends LitElement {
     return html` ${errorCard} `;
   }
 
-  private _createCardElement(cardConfig: LovelaceCardConfig) {
-    const element = createThing(cardConfig) as LovelaceCard;
-    if (this.hass) {
-      element.hass = this.hass;
-    }
-    return element;
-  }
-
   private getSafeLevelValue(entityId: string | undefined): number {
     if (!entityId) {
       return 0;
     }
 
-    const value = this.hass.states[entityId].state;
+    const entityValue = this.hass.states[entityId]?.state || 0;
+    let safeEntityValue = 0;
 
-    if (typeof value === 'number') {
-      return value;
+    if (typeof entityValue === 'number') {
+      safeEntityValue = entityValue;
     }
-    if (typeof value === 'string') {
-      return isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10);
+    if (typeof entityValue === 'string') {
+      safeEntityValue = isNaN(parseInt(entityValue, 10)) ? 0 : parseInt(entityValue, 10);
+    }
+
+    if (safeEntityValue > 0) {
+      // calcualte the percentage bsed on the full value
+      return (safeEntityValue / this._full_value) * 100;
     }
     return 0;
   }
 
   private makeFluidBackground(): TemplateResult {
     const value = this.getSafeLevelValue(this._level_entity);
+    const severityColor = this._severity.length > 0 ? this._severity.find((s) => s.value <= value)?.color : undefined;
+    const levelColor = severityColor ? parseCssColor(severityColor) : this._level_color;
+
     const filling =
       this._fill_entity && this.hass.states[this._fill_entity]
         ? this.hass.states[this._fill_entity].state === 'on'
@@ -279,13 +359,16 @@ export class FluidLevelBackgroundCard extends LitElement {
     return html` <fluid-background
       .size=${this.size}
       .value=${value}
-      .backgroundColor=${this.backgroundColor}
-      .levelColor=${this._level_color || LEVEL_COLOR}
+      .backgroundColor=${this._background_color || this.backgroundColor}
+      .levelColor=${levelColor || LEVEL_COLOR}
       .filling=${filling}
     ></fluid-background>`;
   }
 
   private makeEntityCard(): TemplateResult {
+    if (!this._card) {
+      return html``;
+    }
     return html` <ha-card
       @action=${this._handleAction}
       .actionHandler=${actionHandler({
@@ -302,13 +385,20 @@ export class FluidLevelBackgroundCard extends LitElement {
     return css`
       #container {
         position: relative;
-        border-radius: var(--ha-card-border-radius, 4px);
-        box-shadow: var(--ha-card-box-shadow, 0 2px 4px 0 rgba(0, 0, 0, 0.14));
+        border-radius: var(--ha-card-border-radius, 12px);
+        border-style: solid;
+        border-width: var(--ha-card-border-width, 1px);
+        border-color: transparent;
+        overflow: hidden;
+      }
+
+      .edit-mode #container {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
       }
 
       ha-card {
-        position: relative;
-        overflow: hidden;
+        border: none;
       }
     `;
   }

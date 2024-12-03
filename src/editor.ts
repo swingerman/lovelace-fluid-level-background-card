@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { customElement, property, state } from 'lit/decorators.js';
 import {
   HomeAssistant,
@@ -8,12 +9,21 @@ import {
   ActionConfig,
   LovelaceConfig,
   HASSDomEvent,
-  LovelaceCardConfig,
 } from 'custom-card-helpers';
 
-import { FluidLevelBackgroundCardConfig, GUIModeChangedEvent } from './types';
+import { FluidLevelBackgroundCardConfig, GUIModeChangedEvent, Severity } from './types';
 import { localize } from './localize/localize';
-import { LEVEL_COLOR } from './const';
+import {
+  BACKGROUND_COLOR,
+  FULL_VALUE,
+  LEVEL_COLOR,
+  THEME_BACKGROUND_COLOR_VARIABLE,
+  THEME_PRIMARY_COLOR_VARIABLE,
+} from './const';
+import { getThemeColor } from './utils/theme-parser';
+import { parseCssColor } from './utils/color';
+import { mdiMinus, mdiPlus } from '@mdi/js';
+import { LovelaceCardConfig } from './lovelace-types';
 
 export interface EditorTab {
   slug: string;
@@ -156,6 +166,25 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return this._config?.double_tap_action || { action: 'none' };
   }
 
+  get _full_value(): number {
+    return this._config?.full_value ?? FULL_VALUE;
+  }
+
+  get _severity(): Severity[] {
+    return this._config?.severity || [];
+  }
+
+  private _lastUsedBackgroundColor: number[] | undefined;
+  private _lastUsedLevelColor: number[] | undefined;
+
+  get usesLevelThemeColor(): boolean {
+    return this._config?.level_color === undefined;
+  }
+
+  get usesBackgroundThemeColor(): boolean {
+    return this._config?.background_color === undefined;
+  }
+
   protected render(): TemplateResult | void {
     if (!this.hass || !this._helpers) {
       return html``;
@@ -253,6 +282,17 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
             allow-custom-entity
           ></ha-entity-picker>
         </div>
+        <div class="entity-row">
+          <ha-textfield
+            type="number"
+            .label="${localize('editor.tab.entities.labels.full-value')} (${localize(
+              'editor.tab.entities.labels.full-value-description',
+            )})"
+            .configValue=${'full_value'}
+            .value=${this._full_value}
+            @change=${this._valueChanged}
+          ></ha-textfield>
+        </div>
       </div>
     `;
   }
@@ -286,17 +326,181 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   }
 
   renderAppearanceTab(): TemplateResult {
+    const themePrimaryColor = getThemeColor(THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR);
+    const themeBackgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
+
     return html`
       <h3>${localize('editor.tab.appearance.choose-colors')}</h3>
-      <ha-selector
-        .hass=${this.hass}
-        .selector=${{ color_rgb: {} }}
-        .label=${localize('editor.tab.appearance.labels.level-color')}
-        .value=${this._config?.level_color ? this._config?.level_color : LEVEL_COLOR}
-        .configValue=${'level_color'}
-        @value-changed=${this._colorChanged}
-      ></ha-selector>
+      <p>${localize('editor.tab.appearance.labels.color-description')}</p>
+      <div class="form-row-dual">
+        <ha-selector
+          .hass=${this.hass}
+          .selector=${{ color_rgb: {} }}
+          .label=${localize('editor.tab.appearance.labels.level-color')}
+          .value=${this._config?.level_color || themePrimaryColor}
+          .configValue=${'level_color'}
+          @value-changed=${this._levelColorChanged}
+        ></ha-selector>
+        <ha-formfield label=${localize('editor.tab.appearance.labels.use-theme-color')}>
+          <ha-switch .checked=${this.usesLevelThemeColor} @change=${this._toggleLevelDefaultColor}> </ha-switch>
+        </ha-formfield>
+      </div>
+      <div class="form-row-dual">
+        <ha-selector
+          .hass=${this.hass}
+          .selector=${{ color_rgb: {} }}
+          .label=${localize('editor.tab.appearance.labels.background-color')}
+          .value=${this._config?.background_color || themeBackgroundColor}
+          .configValue=${'background_color'}
+          @value-changed=${this._backgroundColorChanged}
+        ></ha-selector>
+        <ha-formfield label=${localize('editor.tab.appearance.labels.use-theme-color')}>
+          <ha-switch .checked=${this.usesBackgroundThemeColor} @change=${this._toggleBackgroundDefaultColor}>
+          </ha-switch>
+        </ha-formfield>
+      </div>
+      <ha-formfield label=${localize('editor.tab.appearance.labels.use-severity')}>
+        <ha-switch .checked=${this._severity.length > 0} @change=${this._toggleSeverity}> </ha-switch>
+      </ha-formfield>
+      ${this.severitySection()}
     `;
+  }
+
+  severitySection(): TemplateResult {
+    if (this._severity.length > 0) {
+      return html`
+        <h3>${localize('editor.tab.appearance.choose-severity')}</h3>
+        <ha-icon-button
+          .label=${this.hass?.localize('ui.common.add') || 'Add'}
+          .path=${mdiPlus}
+          @click=${this._addSeverity}
+        ></ha-icon-button>
+        ${this._severity.map((severity) => this.severityItem(severity))}
+      `;
+    }
+    return html``;
+  }
+
+  severityItem(severity: Severity): TemplateResult {
+    const severityColor = parseCssColor(severity.color);
+    const index = this._severity.indexOf(severity);
+    return html`
+      <div class="form-row-tripple">
+        <ha-selector
+          .hass=${this.hass}
+          .selector=${{ color_rgb: {} }}
+          .value=${severityColor}
+          .index=${index}
+          @value-changed=${this._severityColorChanged}
+        ></ha-selector>
+
+        <ha-textfield
+          type="number"
+          .configValue=${'full_value'}
+          .value=${severity.value}
+          .index=${index}
+          @change=${this._severityValueChanged}
+        ></ha-textfield>
+
+        <ha-icon-button
+          .label=${this.hass?.localize('ui.common.remove') || 'Remove'}
+          .path=${mdiMinus}
+          .index=${index}
+          @click=${this._removeSeverity}
+        ></ha-icon-button>
+      </div>
+    `;
+  }
+
+  protected _toggleLevelDefaultColor(): void {
+    if (!this._config) {
+      return;
+    }
+
+    if (!this.usesLevelThemeColor) {
+      this._config = { ...this._config, level_color: undefined };
+    } else {
+      this._config = { ...this._config, level_color: this._lastUsedLevelColor };
+    }
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _toggleBackgroundDefaultColor(): void {
+    if (!this._config) {
+      return;
+    }
+    if (!this.usesBackgroundThemeColor) {
+      this._config = { ...this._config, background_color: undefined };
+    } else {
+      this._config = { ...this._config, background_color: this._lastUsedBackgroundColor };
+    }
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _toggleSeverity(): void {
+    if (!this._config) {
+      return;
+    }
+    if (this._severity.length > 0) {
+      this._config = { ...this._config, severity: [] };
+    } else {
+      this._config = { ...this._config, severity: [{ color: '#FF0000', value: 0 }] };
+    }
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _addSeverity(): void {
+    if (!this._config) {
+      return;
+    }
+    this._config = { ...this._config, severity: [...this._severity, { color: '#FF0000', value: 0 }] };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _removeSeverity(ev): void {
+    if (!this._config) {
+      return;
+    }
+    const [index] = this._getSeverityItemFormEvent(ev);
+
+    this._config = { ...this._config, severity: this._severity.filter((_, i) => i !== index) };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _severityColorChanged(ev): void {
+    if (!this._config) {
+      return;
+    }
+    let severityItem = this._severity[ev.target.index];
+    const color = ev.detail.value;
+    const severity = [...this._severity];
+
+    severityItem = { ...severityItem, color };
+    severity[ev.target.index] = severityItem;
+
+    this._config = { ...this._config, severity };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _severityValueChanged(ev): void {
+    if (!this._config) {
+      return;
+    }
+    const index = ev.target.index;
+    const value = ev.target.value;
+    let severityItem = this._severity[index];
+    const severity = [...this._severity];
+
+    severityItem = { ...severityItem, value: parseFloat(value) };
+    severity[index] = severityItem;
+
+    this._config = { ...this._config, severity };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  private _getSeverityItemFormEvent(ev): [number, any, Severity] {
+    const index = ev.target.index;
+    return [index, ev.target.value, this._severity[index]];
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -357,12 +561,23 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     this._toggle = !this._toggle;
   }
 
-  private _colorChanged(ev: CustomEvent): void {
+  private _levelColorChanged(ev: CustomEvent): void {
     if (!this._config) {
       return;
     }
     const color = ev.detail.value;
+    this._lastUsedLevelColor = color;
     this._config = { ...this._config, level_color: color };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  private _backgroundColorChanged(ev: CustomEvent): void {
+    if (!this._config) {
+      return;
+    }
+    const color = ev.detail.value;
+    this._lastUsedBackgroundColor = color;
+    this._config = { ...this._config, background_color: color };
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
@@ -445,6 +660,22 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       }
       .entity-row > * {
         min-width: 100%;
+      }
+      .form-row-dual {
+        margin-bottom: 14px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+      }
+      .form-row-dual > :last-child {
+        margin-inline: 8px;
+      }
+      .form-row-tripple {
+        margin-bottom: 14px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 48px;
+      }
+      .form-row-tripple > :not(:first-child) {
+        margin-inline: 8px;
       }
       .title {
         padding-left: 16px;

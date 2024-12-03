@@ -1,11 +1,5 @@
-import {
-  ActionConfig,
-  EntityConfig,
-  HomeAssistant,
-  LovelaceCard,
-  LovelaceCardConfig,
-  LovelaceCardEditor,
-} from 'custom-card-helpers';
+import { ActionConfig, EntityConfig, HomeAssistant, LovelaceCardEditor } from 'custom-card-helpers';
+import { LovelaceCard, LovelaceCardConfig } from './lovelace-types';
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -125,6 +119,11 @@ export interface LovelaceRow extends HTMLElement {
   setConfig(config: LovelaceRowConfig);
 }
 
+export interface Severity {
+  color: string | number[];
+  value: number;
+}
+
 export interface FluidLevelBackgroundCardConfig extends LovelaceCardConfig {
   type: string;
   name?: string;
@@ -134,7 +133,10 @@ export interface FluidLevelBackgroundCardConfig extends LovelaceCardConfig {
   test_gui?: boolean;
   entity?: string;
   fill_entity?: string;
-  level_color?: number[];
+  full_value?: number;
+  background_color?: number[] | string;
+  level_color?: number[] | string;
+  severity: Severity[];
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
   double_tap_action?: ActionConfig;

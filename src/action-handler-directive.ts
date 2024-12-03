@@ -3,7 +3,7 @@
 import { ActionHandlerDetail, ActionHandlerOptions } from 'custom-card-helpers/dist/types';
 import { fireEvent } from 'custom-card-helpers';
 import { AttributePart, Directive, directive, DirectiveParameters } from '../node_modules/lit-html/directive';
-import { noChange } from 'lit-element';
+import { noChange } from 'lit';
 
 const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.maxTouchPoints > 0;
 
@@ -167,7 +167,7 @@ customElements.define('action-handler-fluid-level-background-card', ActionHandle
 
 const getActionHandler = (): ActionHandler => {
   const body = document.body;
-  if (body.querySelector('action-handler-sbar')) {
+  if (body.querySelector('action-handler-fluid-level-background-card')) {
     return body.querySelector('action-handler-fluid-level-background-card') as ActionHandler;
   }
 
