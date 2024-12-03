@@ -1,15 +1,36 @@
 # Lovelace Fluid Level Background Card by [@swingerman](https://www.github.com/swingerman)
 
-A card that wraps other card or cards and renders a fluid level background behind them.
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/swingerman/lovelace-fluid-level-background-card) ![GitHub release (latest by date)](https://img.shields.io/github/downloads/swingerman/lovelace-fluid-level-background-card/total?style=for-the-badge)
+![Release](https://img.shields.io/github/v/release/swingerman/lovelace-fluid-level-background-card?style=for-the-badge)
+
+A card that wraps other card or cards and renders a fluid level background behind them. The fluid level is controlled by a sensor entity and the background color can be set to any color. The card is designed to be used with any other card, including grid and stack cards.
+
+<img style="border: 5px solid #767676;border-radius: 10px;box-sizing: border-box;" src="https://github.com/swingerman/lovelace-fluid-level-background-card/blob/master/docs/assets/grid-cards.gif?raw=true" alt="Demo">
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=swingerman&repository=lovelace-fluid-level-background-card&category=Plugin)
+
+
+## Configurable options
+
+Options can be cofigured in the UI or in the card configuration. The following options are available:
+
+- `entity` - the entity that controls the fluid level
+- `fill_entity` - the entity that controls the fill state of the fluid level
+- `full_value` - the maximum value of the sensor entity
+- `level_color` - the color of the fluid level
+- `background_color` - the color of the background
+- `severity` - a list of severity levels that will change the color of the fluid level based on the value of the sensor entity
+
 
 ---
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/swingerman/lovelace-fluid-level-background-card) ![GitHub release (latest by date)](https://img.shields.io/github/downloads/swingerman/lovelace-fluid-level-background-card/total?style=for-the-badge)
+
 [![Donate](https://img.shields.io/badge/Donate-PayPal-yellowgreen?style=for-the-badge&logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S6NC9BYVDDJMA&source=url)
+[![Donate](https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?style=for-the-badge&logo=buy-me-a-coffee)](https://www.buymeacoffee.com/swingerman)
+
 
 The fluid effect is an improved version of [@aarcorcaci](https://github.com/aarcoraci)'s [fluid-meter](https://github.com/aarcoraci/javascript-fluid-meter), improved and ported to typescript.
 
-<img style="border: 5px solid #767676;border-radius: 10px;box-sizing: border-box;" src="https://github.com/swingerman/lovelace-fluid-level-background-card/blob/master/docs/assets/grid-cards.gif?raw=true" alt="Demo">
 
 ### Example config
 
@@ -26,28 +47,35 @@ level_color:
       - 68
       - 115
       - 159
+      - 1
 background_color:
       - 255
       - 255
       - 0
+      - 1
 ```
 
 ### Supported Color Formats
 
 ```yaml
-level_color: [68,115,159]
+level_color: [68,115,159,1]
 level_color:
       - 255
       - 255
       - 0
+      - 1
 level_color: red
 level_color: 'red'
 level_color: '#ff0000'
 level_color: var(--red-color)
 level_color: 'var(--red-color)'
-level_color: rgb(242,142,28) # or rgba()
-level_color: 'rgb(242,142,28)' # or rgba()
+level_color: rgb(242,142,28)
+level_color: 'rgb(242,142,28)'
+level_color: rgba(242,142,28,1)
+level_color: 'rgba(242,142,28,1)'
 ```
+
+Note: RGBA alpha channel can be set only in the yaml configuration.
 
 ## How To Install
 
@@ -94,4 +122,4 @@ severity:
 Hey dude! Help me out for a couple of :beers: or a :coffee:!
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-yellowgreen?style=for-the-badge&logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S6NC9BYVDDJMA&source=url)
-[![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/swingerman)
+[![Donate](https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?style=for-the-badge&logo=buy-me-a-coffee)](https://www.buymeacoffee.com/swingerman)

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement, property } from 'lit-element';
 import { ElementSize } from './fluid-level-background-card';
 import { FluidMeterEnv } from './fluid-meter.interface';
 import { FluidMeter } from './fliud-meter';
 import { rgbaToString } from './utils/color';
 import { BACKGROUND_COLOR, LEVEL_COLOR } from './const';
+import { customElement, property } from 'lit/decorators.js';
 
 @customElement('fluid-background')
 export class FluidBackground extends LitElement {
@@ -97,6 +97,9 @@ export class FluidBackground extends LitElement {
 
   private initFluidMeter(container: Element): void {
     const maxSize = Math.max(this.size?.width as number, this.size?.height as number);
+    const alpha = this.levelColor.length > 3 ? this.levelColor[3] : 1;
+    const backgroundAlpha = alpha * 0.3;
+
     const env: FluidMeterEnv = {
       targetContainer: container,
       fillPercentage: this.value,
@@ -111,17 +114,17 @@ export class FluidBackground extends LitElement {
         width: this.size?.width,
         height: this.size?.height,
         borderWidth: 0,
-        backgroundColor: rgbaToString(this.backgroundColor, 1),
+        backgroundColor: rgbaToString(this.backgroundColor, alpha),
         foregroundColor: 'rgba(28, 28, 28,.5)',
         foregroundFluidLayer: {
-          fillStyle: rgbaToString(this.levelColor, 1),
+          fillStyle: rgbaToString(this.levelColor, backgroundAlpha),
           angularSpeed: 100,
           maxAmplitude: 8,
           frequency: 30,
           horizontalSpeed: -75,
         },
         backgroundFluidLayer: {
-          fillStyle: rgbaToString(this.levelColor, 0.3),
+          fillStyle: rgbaToString(this.levelColor, backgroundAlpha),
           angularSpeed: 100,
           maxAmplitude: 6,
           frequency: 30,
