@@ -15,7 +15,7 @@
   "author": "Ian Richardson <iantrich@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@commitlint/config-conventional": "^19.5.0",
+    "@commitlint/config-conventional": "^19.6.0",
     "@mdi/js": "^7.4.47",
     "colortranslator": "^4.0.0",
     "custom-card-helpers": "^1.9.0",
