@@ -200,6 +200,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       },
       { once: true },
     );
+
     return element;
   }
 
@@ -219,20 +220,92 @@ export class FluidLevelBackgroundCard extends LitElement {
       return true;
     }
 
-    const { themes } = changedProps.get('hass') as HomeAssistant;
-    const { darkMode } = themes as FluidThemes;
-    const hass = changedProps.get('hass') as HomeAssistant;
-    if (this.config && this.config.fill_entity && hass && hass.states[this.config.fill_entity]) {
-      if (hass.states[this.config.fill_entity].state !== this.hass.states[this.config.fill_entity].state) {
-        return true;
-      }
+    if (this.hasFillEntityChanged(changedProps)) {
+      return true;
     }
+
+    if (this.hsDarkModeChchanged()) {
+      return true;
+    }
+
+    if (this.hasCardEntityChanged(changedProps)) {
+      return true;
+    }
+
+    if (this.hasCardEntitiesChanged(changedProps)) {
+      return true;
+    }
+
+    return hasConfigOrEntityChanged(this, changedProps, false);
+  }
+
+  /**
+   * Checks if the dark mode has changed
+   * @returns boolean
+   */
+  private hsDarkModeChchanged(): boolean {
+    const { themes } = this.hass;
+    const { darkMode } = themes as FluidThemes;
+
     if (this._darkModeLastValue !== darkMode) {
       this._darkModeLastValue = darkMode;
       this.backgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
       return true;
     }
-    return hasConfigOrEntityChanged(this, changedProps, false);
+    return false;
+  }
+
+  /**
+   * Checks if the fill entity has changed
+   * @param changedProps
+   * @returns boolean
+   */
+  private hasFillEntityChanged(changedProps: PropertyValues): boolean {
+    const oldHass = changedProps.get('hass') as HomeAssistant;
+    if (this.config?.fill_entity && oldHass?.states[this.config.fill_entity]) {
+      if (oldHass.states[this.config.fill_entity].state !== this.hass.states[this.config.fill_entity].state) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Checks if the card entities have changed
+   * @param changedProps
+   * @returns boolean
+   */
+  private hasCardEntitiesChanged(changedProps: PropertyValues): boolean {
+    const oldHass = changedProps.get('hass') as HomeAssistant;
+    const cardEntities = this._card && (this._card as any)._config.entities;
+
+    if (cardEntities && oldHass && changedProps.has('hass')) {
+      const newHass = this.hass;
+      for (const entity of cardEntities) {
+        if (oldHass.states[entity] !== newHass.states[entity]) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Checks if the card entity has changed
+   * @param changedProps
+   * @returns boolean
+   */
+  private hasCardEntityChanged(changedProps: PropertyValues): boolean {
+    const oldHass = changedProps.get('hass') as HomeAssistant;
+    const cardEntity = this._card && (this._card as any)._config.entity;
+
+    if (cardEntity && oldHass?.states[cardEntity] && changedProps.has('hass')) {
+      const newHass = this.hass;
+      if (oldHass.states[cardEntity] !== newHass.states[cardEntity]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   protected updated(changedProps: PropertyValues): void {
