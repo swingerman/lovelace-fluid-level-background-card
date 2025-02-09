@@ -39,7 +39,8 @@
         "no-underscore-dangle": [
           "error",
           {
-            "allowAfterThis": true
+            "allowAfterThis": true,
+            "allow": ["_config"]
           }
         ],
         "no-param-reassign": "off",
