@@ -40,9 +40,14 @@ export class FluidBackground extends LitElement {
     }
 
     if (name === 'size') {
-      this.updateSize();
-      this.fm.setPercentage(this.value);
-      super.requestUpdate(name, oldValue);
+      if (
+        (oldValue as ElementSize)?.width !== this.size?.width ||
+        (oldValue as ElementSize)?.height !== this.size?.height
+      ) {
+        this.updateSize();
+        this.fm.setPercentage(this.value);
+        super.requestUpdate(name, oldValue);
+      }
     }
 
     if (name === 'backgroundColor') {
