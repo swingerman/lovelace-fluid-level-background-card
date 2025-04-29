@@ -35,7 +35,8 @@
           "background-color": "Cor de fundo",
           "use-theme-color": "Usar cor do tema",
           "color-description": "Defina as cores que você gosta para o cartão. Se você quiser usar as cores do tema, basta marcar a caixa. As cores do tema são úteis para o modo claro/escuro.",
-          "use-severity": "Usar severidade"
+          "use-severity": "Usar severidade",
+          "random-start": "Início Atrasado Aleatoriamente"
         }
       }
     }

@@ -435,7 +435,7 @@ export function FluidMeter(): FluidMeterInstance {
 
       bubblesLayer.init();
       setupCanvas();
-      this.start();
+      this.start(env.options.randomStart || false);
     },
     setPercentage(percentage: number) {
       fillPercentage = clamp(percentage, 0, 100);
@@ -492,9 +492,24 @@ export function FluidMeter(): FluidMeterInstance {
     stop() {
       stop = true;
     },
-    start() {
-      stop = false;
-      startDrawing(30);
+    start(randomStart = false) {
+      const start = () => {
+        stop = false;
+        startDrawing(30);
+      };
+
+      if (!randomStart) {
+        start();
+        return;
+      }
+      if (randomStart) {
+        const randomDelay = random(0, 3) * 800;
+        stop = true;
+        setTimeout(() => {
+          start();
+        }, randomDelay);
+        return;
+      }
     },
   };
 }

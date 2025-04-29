@@ -39,6 +39,7 @@ export interface FluidMeterOptions {
   backgroundFluidColor?: string;
   foregroundFluidLayer?: Layer;
   backgroundFluidLayer?: Layer;
+  randomStart?: boolean;
 }
 
 export interface FluidMeterEnv {
@@ -56,5 +57,5 @@ export type FluidMeterInstance = {
   setLevelColor(levelColor: number[]);
   resizeCanvas(newSize: ElementSize);
   stop();
-  start();
+  start(randomStart?: boolean);
 };

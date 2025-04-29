@@ -35,7 +35,8 @@
           "background-color": "Bakgrundsfärg",
           "use-theme-color": "Använd Temafärg",
           "color-description": "Ställ in de färger du gillar för kortet. Om du vill använda temafärgerna, kryssa bara i rutan. Temafärger är praktiska för ljus/mörkt läge.",
-          "use-severity": "Använd allvarlighetsgrad"
+          "use-severity": "Använd allvarlighetsgrad",
+          "random-start": "Slumpmässigt Fördröjd Start"
         }
       }
     }

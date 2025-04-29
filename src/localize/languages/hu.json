@@ -35,7 +35,8 @@
           "level-color": "Szint Színe",
           "background-color": "Háttér Színe",
           "use-theme-color": "Téma Színe",
-          "color-description": "Állítsa be a kártya színeit, amilyenre szeretné. Ha a téma színeit szeretné használni, csak jelölje be a négyzetet. A téma színek hasznosak a világos/sötét módban."
+          "color-description": "Állítsa be a kártya színeit, amilyenre szeretné. Ha a téma színeit szeretné használni, csak jelölje be a négyzetet. A téma színek hasznosak a világos/sötét módban.",
+          "random-start": "Véletlenszerűen késleltetett rajzolás"
         }
       }
     }

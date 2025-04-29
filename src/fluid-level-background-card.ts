@@ -95,6 +95,8 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @state() protected _severity: Severity[] = [];
 
+  @state() protected _random_start = false;
+
   @state() private config!: FluidLevelBackgroundCardConfig;
 
   private _darkModeLastValue!: boolean;
@@ -135,8 +137,8 @@ export class FluidLevelBackgroundCard extends LitElement {
           (config.background_color && parseCssColor(config.background_color)) ||
           getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
         this._full_value = config.full_value ?? FULL_VALUE;
-        // set severity from the config sorted by value
         this._severity = config.severity ? [...config.severity].sort((a, b) => b.value - a.value) : [];
+        this._random_start = config.random_start || false;
       });
     }
   }
@@ -179,6 +181,10 @@ export class FluidLevelBackgroundCard extends LitElement {
     }
 
     if (name === '_severity') {
+      super.requestUpdate(name, oldValue);
+    }
+
+    if (name === '_random_start') {
       super.requestUpdate(name, oldValue);
     }
 
@@ -437,6 +443,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       .backgroundColor=${this._background_color || this.backgroundColor}
       .levelColor=${levelColor || LEVEL_COLOR}
       .filling=${filling}
+      .randomStart=${this._random_start}
     ></fluid-background>`;
   }
 

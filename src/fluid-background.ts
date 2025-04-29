@@ -27,6 +27,9 @@ export class FluidBackground extends LitElement {
   @property({ type: Boolean })
   filling = false;
 
+  @property({ type: Boolean })
+  randomStart = false;
+
   fm = FluidMeter();
 
   protected render(): TemplateResult | void {
@@ -59,12 +62,21 @@ export class FluidBackground extends LitElement {
     if (name === 'filling') {
       this.setBubbles(this.filling);
     }
+
+    if (name === 'randomStart') {
+      this.setRandomStart(this.randomStart);
+    }
+  }
+
+  private setRandomStart(randomStart: boolean): void {
+    if (this.fm) {
+      this.fm.start(randomStart);
+    }
   }
 
   private setBubbles(filling: boolean): void {
     if (this.fm) {
       this.fm.setDrawBubbles(filling);
-      this.fm.start();
     }
   }
 
@@ -131,6 +143,7 @@ export class FluidBackground extends LitElement {
           frequency: 30,
           horizontalSpeed: 75,
         },
+        randomStart: this.randomStart,
       },
     };
     this.fm.init(env);
