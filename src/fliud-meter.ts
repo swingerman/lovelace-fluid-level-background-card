@@ -140,8 +140,6 @@ export function FluidMeter(): FluidMeterInstance {
 
     elapsed = now - then;
 
-    requestAnimationFrame(draw);
-
     if (elapsed > fpsInterval) {
       if (context) {
         context.clearRect(0, 0, options.width as number, options.height as number);
@@ -152,6 +150,7 @@ export function FluidMeter(): FluidMeterInstance {
         drawText();
       }
     }
+    requestAnimationFrame(draw);
   }
 
   function drawMeterBackground() {
@@ -495,7 +494,7 @@ export function FluidMeter(): FluidMeterInstance {
     },
     start() {
       stop = false;
-      startDrawing(24);
+      startDrawing(30);
     },
   };
 }

@@ -45,8 +45,6 @@ export class FluidBackground extends LitElement {
         (oldValue as ElementSize)?.height !== this.size?.height
       ) {
         this.updateSize();
-        this.fm.setPercentage(this.value);
-        super.requestUpdate(name, oldValue);
       }
     }
 
@@ -84,11 +82,9 @@ export class FluidBackground extends LitElement {
 
   private updateSize(): void {
     if (this.size && this.size.width && this.size.height) {
-      this.fm.start();
       this.fm.resizeCanvas(this.size as ElementSize);
       return;
     }
-    this.fm.stop();
   }
 
   protected firstUpdated(): void {
