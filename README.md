@@ -53,6 +53,7 @@ background_color:
       - 255
       - 0
       - 1
+random_start: true
 ```
 
 ### Supported Color Formats
@@ -116,6 +117,12 @@ severity:
   - value: 80
     color: green
 ```
+
+## Randomly Delayed Start
+
+You can set the `random_start` property to true to start the fluid level at a random delay. This could be useful when mnay cards are used in the same view and you want to avoid the same start time for all of them.
+
+```yaml
 
 ## Support
 

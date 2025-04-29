@@ -174,6 +174,10 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return this._config?.severity || [];
   }
 
+  get _random_start(): boolean {
+    return this._config?.random_start || false;
+  }
+
   private _lastUsedBackgroundColor: number[] | undefined;
   private _lastUsedLevelColor: number[] | undefined;
 
@@ -359,9 +363,17 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
           </ha-switch>
         </ha-formfield>
       </div>
-      <ha-formfield label=${localize('editor.tab.appearance.labels.use-severity')}>
-        <ha-switch .checked=${this._severity.length > 0} @change=${this._toggleSeverity}> </ha-switch>
-      </ha-formfield>
+      <div class="form-row-dual">
+        <ha-formfield label=${localize('editor.tab.appearance.labels.random-start')}>
+          <ha-switch .checked=${this._random_start === true} @change=${this._toggelRandomStart}> </ha-switch>
+        </ha-formfield>
+      </div>
+      <div class="form-row-dual">
+        <ha-formfield label=${localize('editor.tab.appearance.labels.use-severity')}>
+          <ha-switch .checked=${this._severity.length > 0} @change=${this._toggleSeverity}> </ha-switch>
+        </ha-formfield>
+      </div>
+
       ${this.severitySection()}
     `;
   }
@@ -446,6 +458,14 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     } else {
       this._config = { ...this._config, severity: [{ color: '#FF0000', value: 0 }] };
     }
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _toggelRandomStart(): void {
+    if (!this._config) {
+      return;
+    }
+    this._config = { ...this._config, random_start: !this._random_start };
     fireEvent(this, 'config-changed', { config: this._config });
   }
 

@@ -28,7 +28,8 @@
         "title": "Vzhľad",
         "choose-colors": "Vyberte farby",
         "labels": {
-          "level-color": "Farba úrovne"
+          "level-color": "Farba úrovne",
+          "random-start": "Náhodné oneskorené spustenie"
         }
       }
     }
