@@ -355,7 +355,7 @@ export class FluidLevelBackgroundCard extends LitElement {
   firstUpdated(): void {
     const container = this.shadowRoot?.querySelector('#container');
     if (container) {
-      this.ro.observe(container as Element);
+      this.resizeObserver.observe(container as Element);
     }
   }
 
@@ -363,8 +363,10 @@ export class FluidLevelBackgroundCard extends LitElement {
     this.size = { width: newSize.width, height: newSize.height };
   }
 
-  ro = new ResizeObserver((entries) => {
-    entries.forEach((entry) => this.updateSize(entry.contentRect));
+  resizeObserver = new ResizeObserver((entries) => {
+    window.requestAnimationFrame(() => {
+      entries.forEach((entry) => this.updateSize(entry.contentRect));
+    });
   });
 
   private _handleAction(ev: ActionHandlerEvent): void {
