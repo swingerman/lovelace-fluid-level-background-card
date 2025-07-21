@@ -417,11 +417,11 @@ export class FluidLevelBackgroundCard extends LitElement {
       safeEntityValue = entityValue;
     }
     if (typeof entityValue === 'string') {
-      safeEntityValue = isNaN(parseInt(entityValue, 10)) ? 0 : parseInt(entityValue, 10);
+      safeEntityValue = isNaN(parseFloat(entityValue)) ? 0 : parseFloat(entityValue);
     }
 
-    if (safeEntityValue > 0) {
-      // calcualte the percentage bsed on the full value
+    if (safeEntityValue >= 0) {
+      // calculate the percentage based on the full value
       return (safeEntityValue / this._full_value) * 100;
     }
     return 0;
