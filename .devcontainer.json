@@ -1,7 +1,7 @@
 // See https://aka.ms/vscode-remote/devcontainer.json for format details.
 {
   "name": "Fluid Level Background Card",
-  "image": "mcr.microsoft.com/devcontainers/python:dev-3.12-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/python:dev-3.13-bookworm",
   "context": "..",
   "postCreateCommand": "scripts/setup",
   "appPort": ["5000:5000"],
