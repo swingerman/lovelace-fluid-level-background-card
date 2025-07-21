@@ -2,9 +2,25 @@ views:
   - cards:
       - type: custom:fluid-level-background-card
         name: Fluid Level Background Card
-        entity: input_number.battery_evel
+        entity: input_number.battery_level
         test_gui: true
+      
+      # Test case for issue #567 - decimal values less than 1.0
+      - type: custom:fluid-level-background-card
+        card:
+          type: tile
+          entity: input_number.energy_consumption
+          features_position: bottom
+          vertical: true
+          hide_state: false
+          show_entity_picture: false
+          icon: mdi:lightning-bolt
+          name: Today's Energy Consumption
+        full_value: 1.8
+        entity: input_number.energy_consumption
+        
       - type: entities
         entities:
           - input_number.battery_level
-          - input_number.battery_charging
+          - input_boolean.battery_charging
+          - input_number.energy_consumption

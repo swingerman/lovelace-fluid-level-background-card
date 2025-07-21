@@ -13,6 +13,15 @@ input_number:
     max: 100
     step: .5
     icon: hass:battery
+  
+  energy_consumption:
+    name: Today's Energy Consumption
+    initial: 0.95
+    min: 0
+    max: 2.0
+    step: 0.01
+    unit_of_measurement: "kWh"
+    icon: mdi:lightning-bolt
 
 input_boolean:
   battery_charging:

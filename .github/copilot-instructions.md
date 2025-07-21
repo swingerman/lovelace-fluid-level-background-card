@@ -109,9 +109,14 @@ interface Severity {
 
 ### Local Testing Environment
 
-- Home Assistant runs in dev container on port 9123
+- Home Assistant runs in dev container on port 8123
 - Card served from Rollup dev server on port 5000
 - Test entities defined in `config/configuration.yaml` (input_number, input_boolean)
+- start home assistant:
+
+```bash
+./scripts/develop
+```
 
 ### Common Issues
 
