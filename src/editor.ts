@@ -315,30 +315,32 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       </div>
       <div class="help-text">${localize('editor.tab.actions.labels.allow-click-through-help')}</div>
 
-      <hui-action-editor
-        .label="${this.hass?.localize('ui.panel.lovelace.editor.card.generic.tap_action')} (${this.hass?.localize(
-          'ui.panel.lovelace.editor.card.config.optional',
-        )})"
-        .hass=${this.hass}
-        .config=${this._tap_action}
-        .actions=${actions}
-        .configValue=${'tap_action'}
-        .tooltipText=${this.hass?.localize('ui.panel.lovelace.editor.card.button.default_action_help')}
-        @value-changed=${this._actionChanged}
-        .disabled=${this._allow_click_through}
-      ></hui-action-editor>
-      <hui-action-editor
-        .label="${this.hass?.localize('ui.panel.lovelace.editor.card.generic.hold_action')} (${this.hass?.localize(
-          'ui.panel.lovelace.editor.card.config.optional',
-        )})"
-        .hass=${this.hass}
-        .config=${this._hold_action}
-        .actions=${actions}
-        .configValue=${'hold_action'}
-        .tooltipText=${this.hass?.localize('ui.panel.lovelace.editor.card.button.default_action_help')}
-        @value-changed=${this._actionChanged}
-        .disabled=${this._allow_click_through}
-      ></hui-action-editor>
+      ${!this._allow_click_through
+        ? html`
+            <hui-action-editor
+              .label="${this.hass?.localize('ui.panel.lovelace.editor.card.generic.tap_action')} (${this.hass?.localize(
+                'ui.panel.lovelace.editor.card.config.optional',
+              )})"
+              .hass=${this.hass}
+              .config=${this._tap_action}
+              .actions=${actions}
+              .configValue=${'tap_action'}
+              .tooltipText=${this.hass?.localize('ui.panel.lovelace.editor.card.button.default_action_help')}
+              @value-changed=${this._actionChanged}
+            ></hui-action-editor>
+            <hui-action-editor
+              .label="${this.hass?.localize(
+                'ui.panel.lovelace.editor.card.generic.hold_action',
+              )} (${this.hass?.localize('ui.panel.lovelace.editor.card.config.optional')})"
+              .hass=${this.hass}
+              .config=${this._hold_action}
+              .actions=${actions}
+              .configValue=${'hold_action'}
+              .tooltipText=${this.hass?.localize('ui.panel.lovelace.editor.card.button.default_action_help')}
+              @value-changed=${this._actionChanged}
+            ></hui-action-editor>
+          `
+        : ''}
     `;
   }
 
@@ -488,15 +490,6 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     }
     const newValue = !this._allow_click_through;
     this._config = { ...this._config, allow_click_through: newValue };
-
-    // If enabling click-through, clear any existing tap/hold actions since they won't work
-    if (newValue) {
-      this._config = {
-        ...this._config,
-        tap_action: { action: 'none' },
-        hold_action: { action: 'none' },
-      };
-    }
 
     fireEvent(this, 'config-changed', { config: this._config });
   }
