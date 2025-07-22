@@ -22,7 +22,11 @@
         }
       },
       "actions": {
-        "title": "Akcie"
+        "title": "Akcie",
+        "labels": {
+          "allow-click-through": "Povoliť kliknutie",
+          "allow-click-through-help": "Keď je povolené, kliknutie na jednotlivé entity zobrazí ich špecifické dialógy s ďalšími informáciami namiesto dialógu hlavnej entity. Toto zakáže akcie ťuknutia a podržania karty."
+        }
       },
       "appearance": {
         "title": "Vzhľad",

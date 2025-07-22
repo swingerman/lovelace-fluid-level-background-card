@@ -24,7 +24,11 @@
         }
       },
       "actions": {
-        "title": "Ações"
+        "title": "Ações",
+        "labels": {
+          "allow-click-through": "Permitir Clique Direto",
+          "allow-click-through-help": "Quando habilitado, cliques em entidades individuais mostrarão seus diálogos de mais informações específicos em vez do diálogo da entidade principal. Isso desabilita as ações de toque e manutenção do cartão."
+        }
       },
       "appearance": {
         "title": "Aparência",
