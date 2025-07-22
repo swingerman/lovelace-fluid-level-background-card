@@ -19,6 +19,55 @@ views:
         full_value: 1.8
         entity: input_number.energy_consumption
         
+      # Test case for issue #572 - click-through functionality
+      - type: custom:fluid-level-background-card
+        entity: input_number.battery_level
+        card:
+          type: glance
+          title: Click-Through Test
+          show_name: false
+          show_icon: true
+          show_state: true
+          state_color: false
+          columns: 3
+          entities:
+            - entity: input_number.battery_level
+              name: Battery
+              icon: mdi:battery
+            - entity: input_boolean.battery_charging
+              name: Charging
+              icon: mdi:battery-charging
+            - entity: input_number.energy_consumption
+              name: Energy
+              icon: mdi:lightning-bolt
+        full_value: 100
+        allow_click_through: true
+        
+      # Test case without click-through (original behavior)
+      - type: custom:fluid-level-background-card
+        entity: input_number.battery_level
+        card:
+          type: glance
+          title: Traditional Test
+          show_name: false
+          show_icon: true
+          show_state: true
+          state_color: false
+          columns: 3
+          entities:
+            - entity: input_number.battery_level
+              name: Battery
+              icon: mdi:battery
+            - entity: input_boolean.battery_charging
+              name: Charging
+              icon: mdi:battery-charging
+            - entity: input_number.energy_consumption
+              name: Energy
+              icon: mdi:lightning-bolt
+        full_value: 100
+        tap_action:
+          action: more-info
+        
       - type: entities
         entities:
           - input_number.battery_level

@@ -24,7 +24,11 @@
         }
       },
       "actions": {
-        "title": "Handlinger"
+        "title": "Handlinger",
+        "labels": {
+          "allow-click-through": "Tillat klikk gjennom",
+          "allow-click-through-help": "Når aktivert, vil klikk på individuelle enheter vise deres spesifikke mer-info dialoger i stedet for hovedentitetens dialog. Dette deaktiverer kortets tap- og hold-handlinger."
+        }
       },
       "appearance": {
         "title": "Utseende",

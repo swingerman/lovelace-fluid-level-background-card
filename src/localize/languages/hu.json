@@ -26,7 +26,11 @@
         }
       },
       "actions": {
-        "title": "Akciók"
+        "title": "Akciók",
+        "labels": {
+          "allow-click-through": "Kattintás Engedélyezése",
+          "allow-click-through-help": "Ha engedélyezett, az egyes entitásokra való kattintás azok specifikus további-információ párbeszédpaneljeit jeleníti meg a fő entitás párbeszédpanelje helyett. Ez letiltja a kártya érintési és tartási műveleteit."
+        }
       },
       "appearance": {
         "title": "Megjelenés",

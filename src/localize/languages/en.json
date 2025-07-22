@@ -24,7 +24,11 @@
         }
       },
       "actions": {
-        "title": "Actions"
+        "title": "Actions",
+        "labels": {
+          "allow-click-through": "Allow Click Through",
+          "allow-click-through-help": "When enabled, clicks on individual entities within the card will show their specific more-info dialogs instead of the main entity's dialog. This disables the card's tap and hold actions."
+        }
       },
       "appearance": {
         "title": "Appearance",
