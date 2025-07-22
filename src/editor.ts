@@ -178,6 +178,10 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return this._config?.random_start || false;
   }
 
+  get _allow_click_through(): boolean {
+    return this._config?.allow_click_through || false;
+  }
+
   private _lastUsedBackgroundColor: number[] | undefined;
   private _lastUsedLevelColor: number[] | undefined;
 
@@ -304,6 +308,13 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   renderActionsTab(): TemplateResult {
     const actions = ['more-info', 'toggle', 'navigate', 'url', 'call-service', 'none'];
     return html`
+      <div class="form-row-dual">
+        <ha-formfield label=${localize('editor.tab.actions.labels.allow-click-through')}>
+          <ha-switch .checked=${this._allow_click_through === true} @change=${this._toggleClickThrough}> </ha-switch>
+        </ha-formfield>
+      </div>
+      <div class="help-text">${localize('editor.tab.actions.labels.allow-click-through-help')}</div>
+
       <hui-action-editor
         .label="${this.hass?.localize('ui.panel.lovelace.editor.card.generic.tap_action')} (${this.hass?.localize(
           'ui.panel.lovelace.editor.card.config.optional',
@@ -314,6 +325,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
         .configValue=${'tap_action'}
         .tooltipText=${this.hass?.localize('ui.panel.lovelace.editor.card.button.default_action_help')}
         @value-changed=${this._actionChanged}
+        .disabled=${this._allow_click_through}
       ></hui-action-editor>
       <hui-action-editor
         .label="${this.hass?.localize('ui.panel.lovelace.editor.card.generic.hold_action')} (${this.hass?.localize(
@@ -325,6 +337,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
         .configValue=${'hold_action'}
         .tooltipText=${this.hass?.localize('ui.panel.lovelace.editor.card.button.default_action_help')}
         @value-changed=${this._actionChanged}
+        .disabled=${this._allow_click_through}
       ></hui-action-editor>
     `;
   }
@@ -466,6 +479,25 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       return;
     }
     this._config = { ...this._config, random_start: !this._random_start };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  protected _toggleClickThrough(): void {
+    if (!this._config) {
+      return;
+    }
+    const newValue = !this._allow_click_through;
+    this._config = { ...this._config, allow_click_through: newValue };
+
+    // If enabling click-through, clear any existing tap/hold actions since they won't work
+    if (newValue) {
+      this._config = {
+        ...this._config,
+        tap_action: { action: 'none' },
+        hold_action: { action: 'none' },
+      };
+    }
+
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
