@@ -454,9 +454,8 @@ export class FluidLevelBackgroundCard extends LitElement {
 
     // If click-through is enabled, don't add action handlers to allow inner card interactions
     if (this.config.allow_click_through) {
-      return html`<ha-card tabindex="0" .label=${`FluidProgressBar: ${this._level_entity || 'No Entity Defined'}`}
-        >${this._card}</ha-card
-      >`;
+      const cardLabel = `FluidProgressBar: ${this._level_entity || 'No Entity Defined'}`;
+      return html` <ha-card tabindex="0" .label=${cardLabel}> ${this._card} </ha-card> `;
     }
 
     return html` <ha-card

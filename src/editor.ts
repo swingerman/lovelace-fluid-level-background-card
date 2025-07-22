@@ -122,7 +122,6 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
 
   public setConfig(config: FluidLevelBackgroundCardConfig): void {
     this._config = config;
-
     this.loadCardHelpers();
   }
 
@@ -306,43 +305,75 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   }
 
   renderActionsTab(): TemplateResult {
-    const actions = ['more-info', 'toggle', 'navigate', 'url', 'call-service', 'none'];
     return html`
       <div class="form-row-dual">
         <ha-formfield label=${localize('editor.tab.actions.labels.allow-click-through')}>
-          <ha-switch .checked=${this._allow_click_through === true} @change=${this._toggleClickThrough}> </ha-switch>
+          <ha-switch .checked=${this._allow_click_through} @change=${this._toggleClickThrough}> </ha-switch>
         </ha-formfield>
       </div>
       <div class="help-text">${localize('editor.tab.actions.labels.allow-click-through-help')}</div>
 
-      ${!this._allow_click_through
-        ? html`
-            <hui-action-editor
-              .label="${this.hass?.localize('ui.panel.lovelace.editor.card.generic.tap_action')} (${this.hass?.localize(
-                'ui.panel.lovelace.editor.card.config.optional',
-              )})"
-              .hass=${this.hass}
-              .config=${this._tap_action}
-              .actions=${actions}
-              .configValue=${'tap_action'}
-              .tooltipText=${this.hass?.localize('ui.panel.lovelace.editor.card.button.default_action_help')}
-              @value-changed=${this._actionChanged}
-            ></hui-action-editor>
-            <hui-action-editor
-              .label="${this.hass?.localize(
-                'ui.panel.lovelace.editor.card.generic.hold_action',
-              )} (${this.hass?.localize('ui.panel.lovelace.editor.card.config.optional')})"
-              .hass=${this.hass}
-              .config=${this._hold_action}
-              .actions=${actions}
-              .configValue=${'hold_action'}
-              .tooltipText=${this.hass?.localize('ui.panel.lovelace.editor.card.button.default_action_help')}
-              @value-changed=${this._actionChanged}
-            ></hui-action-editor>
-          `
-        : ''}
+      ${this._renderActionEditors()}
     `;
   }
+
+  private _renderActionEditors(): TemplateResult | string {
+    if (this._allow_click_through) {
+      return '';
+    }
+
+    return html`
+      <ha-form
+        .hass=${this.hass}
+        .data=${{
+          tap_action: this._tap_action,
+          hold_action: this._hold_action,
+          double_tap_action: this._double_tap_action,
+        }}
+        .schema=${[
+          {
+            name: 'tap_action',
+            selector: {
+              ui_action: {
+                default_action: 'more-info',
+              },
+            },
+          },
+          {
+            name: 'hold_action',
+            selector: {
+              ui_action: {
+                default_action: 'more-info',
+              },
+            },
+          },
+          {
+            name: 'double_tap_action',
+            selector: {
+              ui_action: {
+                default_action: 'none',
+              },
+            },
+          },
+        ]}
+        .computeLabel=${this._computeActionLabel}
+        @value-changed=${this._actionChanged}
+      ></ha-form>
+    `;
+  }
+
+  private readonly _computeActionLabel = (schema: { name: string }): string => {
+    switch (schema.name) {
+      case 'tap_action':
+        return `${this.hass?.localize('ui.panel.lovelace.editor.card.generic.tap_action')} (${this.hass?.localize('ui.panel.lovelace.editor.card.config.optional')})`;
+      case 'hold_action':
+        return `${this.hass?.localize('ui.panel.lovelace.editor.card.generic.hold_action')} (${this.hass?.localize('ui.panel.lovelace.editor.card.config.optional')})`;
+      case 'double_tap_action':
+        return `${this.hass?.localize('ui.panel.lovelace.editor.card.generic.double_tap_action')} (${this.hass?.localize('ui.panel.lovelace.editor.card.config.optional')})`;
+      default:
+        return schema.name;
+    }
+  };
 
   renderAppearanceTab(): TemplateResult {
     const themePrimaryColor = getThemeColor(THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR);
@@ -488,8 +519,12 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     if (!this._config) {
       return;
     }
-    const newValue = !this._allow_click_through;
-    this._config = { ...this._config, allow_click_through: newValue };
+
+    if (this._allow_click_through) {
+      this._config = { ...this._config, allow_click_through: false };
+    } else {
+      this._config = { ...this._config, allow_click_through: true };
+    }
 
     fireEvent(this, 'config-changed', { config: this._config });
   }
@@ -502,7 +537,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
-  protected _removeSeverity(ev): void {
+  protected _removeSeverity(ev: Event): void {
     if (!this._config) {
       return;
     }
@@ -512,27 +547,29 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
-  protected _severityColorChanged(ev): void {
+  protected _severityColorChanged(ev: CustomEvent): void {
     if (!this._config) {
       return;
     }
-    let severityItem = this._severity[ev.target.index];
+    const target = ev.target as any;
+    let severityItem = this._severity[target.index];
     const color = ev.detail.value;
     const severity = [...this._severity];
 
     severityItem = { ...severityItem, color };
-    severity[ev.target.index] = severityItem;
+    severity[target.index] = severityItem;
 
     this._config = { ...this._config, severity };
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
-  protected _severityValueChanged(ev): void {
+  protected _severityValueChanged(ev: Event): void {
     if (!this._config) {
       return;
     }
-    const index = ev.target.index;
-    const value = ev.target.value;
+    const target = ev.target as any;
+    const index = target.index;
+    const value = target.value;
     let severityItem = this._severity[index];
     const severity = [...this._severity];
 
@@ -543,13 +580,14 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
-  private _getSeverityItemFormEvent(ev): [number, any, Severity] {
-    const index = ev.target.index;
-    return [index, ev.target.value, this._severity[index]];
+  private _getSeverityItemFormEvent(ev: Event): [number, any, Severity] {
+    const target = ev.target as any;
+    const index = target.index;
+    return [index, target.value, this._severity[index]];
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  protected _handleCardPicked(ev): void {
+  protected _handleCardPicked(ev: CustomEvent): void {
     ev.stopPropagation();
     if (!this._config) {
       return;
@@ -568,7 +606,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  protected _handleConfigChanged(ev): void {
+  protected _handleConfigChanged(ev: CustomEvent): void {
     ev.stopPropagation();
     if (!this._config) {
       return;
@@ -589,20 +627,21 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     this._helpers = await (window as any).loadCardHelpers();
   }
 
-  private _toggleAction(ev): void {
+  private _toggleAction(ev: Event): void {
     this._toggleThing(ev, options.actions.options);
   }
 
-  private _toggleOption(ev): void {
+  private _toggleOption(ev: Event): void {
     this._toggleThing(ev, options);
   }
 
-  private _toggleThing(ev, optionList): void {
-    const show = !optionList[ev.target.option].show;
+  private _toggleThing(ev: Event, optionList: any): void {
+    const target = ev.target as any;
+    const show = !optionList[target.option].show;
     for (const [key] of Object.entries(optionList)) {
       optionList[key].show = false;
     }
-    optionList[ev.target.option].show = show;
+    optionList[target.option].show = show;
     this._toggle = !this._toggle;
   }
 
@@ -626,11 +665,11 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
-  private _valueChanged(ev): void {
-    if (!this._config || !this.hass || ev.target.value === '') {
+  private _valueChanged(ev: Event): void {
+    if (!this._config || !this.hass || (ev.target as any)?.value === '') {
       return;
     }
-    const target = ev.target;
+    const target = ev.target as any;
     if (this[`_${target.configValue}`] === target.value) {
       return;
     }
@@ -649,32 +688,50 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
-  private _actionChanged(ev): void {
+  private _actionChanged(ev: CustomEvent): void {
     if (!this._config || !this.hass) {
       return;
     }
-    const target = ev.target!;
-    const value = ev.detail.value;
 
-    if (this[`_${target.configValue}`] === value) {
+    const formData = ev.detail.value;
+    if (!formData || typeof formData !== 'object') {
       return;
     }
-    let newConfig;
-    if (target.configValue) {
-      if (value !== false && !value) {
-        newConfig = { ...this._config };
-        delete newConfig[target.configValue!];
+
+    // Update config with the form data
+    const newConfig = { ...this._config };
+
+    // Update tap_action if present
+    if (formData.tap_action !== undefined) {
+      if (!formData.tap_action || formData.tap_action.action === 'none') {
+        delete newConfig.tap_action;
       } else {
-        newConfig = {
-          ...this._config,
-          [target.configValue!]: value,
-        };
+        newConfig.tap_action = formData.tap_action;
       }
     }
+
+    // Update hold_action if present
+    if (formData.hold_action !== undefined) {
+      if (!formData.hold_action || formData.hold_action.action === 'none') {
+        delete newConfig.hold_action;
+      } else {
+        newConfig.hold_action = formData.hold_action;
+      }
+    }
+
+    // Update double_tap_action if present
+    if (formData.double_tap_action !== undefined) {
+      if (!formData.double_tap_action || formData.double_tap_action.action === 'none') {
+        delete newConfig.double_tap_action;
+      } else {
+        newConfig.double_tap_action = formData.double_tap_action;
+      }
+    }
+
     fireEvent(this, 'config-changed', { config: newConfig });
   }
 
-  private _handleSelectedCard(ev) {
+  private _handleSelectedCard(ev: CustomEvent): void {
     this._selectedTab = parseInt(ev.detail.selected, 10);
   }
 
