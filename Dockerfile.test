@@ -1,16 +1,15 @@
 # Dockerfile for running Home Assistant in test environment
 FROM homeassistant/home-assistant:latest
 
-USER homeassistant
-
-# Install necessary packages for testing
+# Install necessary packages for testing (run as root by default)
+USER root
 RUN apk add --no-cache \
     nodejs \
     npm \
     curl
 
-# Create test configuration directory
-RUN mkdir -p /config
+# Create test configuration directory with proper permissions
+RUN mkdir -p /config && chown -R root:root /config
 
 # Copy test configuration
 COPY tests/fixtures/config/* /config/
@@ -18,5 +17,5 @@ COPY tests/fixtures/config/* /config/
 # Expose Home Assistant port
 EXPOSE 8123
 
-# Set up Home Assistant
+# Set up Home Assistant (run as root for simplicity in test environment)
 CMD ["python", "-m", "homeassistant", "--config", "/config"]
