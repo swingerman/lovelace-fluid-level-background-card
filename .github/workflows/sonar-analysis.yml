@@ -50,7 +50,7 @@ jobs:
 
       - name: Start test environment for E2E
         run: |
-          docker-compose -f docker-compose.test.yml up -d
+          docker compose -f docker-compose.test.yml up -d
           # Wait for Home Assistant to be ready
           timeout 300 bash -c 'until curl -f http://localhost:8123; do sleep 5; done'
 
@@ -62,7 +62,7 @@ jobs:
 
       - name: Cleanup test environment
         if: always()
-        run: docker-compose -f docker-compose.test.yml down
+        run: docker compose -f docker-compose.test.yml down
 
       - name: SonarQube Scan
         uses: sonarqube-quality-gate-action@master
