@@ -30,12 +30,8 @@ async function globalSetup(): Promise<void> {
 
       console.log(`Current URL: ${currentUrl}, Title: ${title}`);
 
-      // With auth_required: false, we should not see any auth pages
-      if (currentUrl.includes('/auth/authorize') || currentUrl.includes('/auth/')) {
-        console.log('Still on auth page, waiting...');
-      } else if (currentUrl.includes('/onboarding') || title.includes('onboarding')) {
-        console.log('Still on onboarding screen, waiting...');
-      } else if (title && title.includes('Home Assistant')) {
+      // With trusted networks and allow_bypass_login: true, should go directly to dashboard
+      if (title && title.includes('Home Assistant')) {
         // Check if we can see any HA UI elements
         const hasHaElements = await page.evaluate(() => {
           return document.querySelector('home-assistant') !== null ||
