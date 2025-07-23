@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Fluid Level Background Card Simple Tests', () => {
     test('should load the card JavaScript without errors', async ({ page }) => {
-        // Navigate to Home Assistant first so it can load our card resource
+        // Navigate to Home Assistant first so it can load properly
         await page.goto('http://localhost:8123');
 
         // Wait for Home Assistant to fully load
@@ -20,7 +20,11 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
         // Track network errors
         page.on('requestfailed', request => {
             errors.push(`Network error: ${request.failure()?.errorText} - ${request.url()}`);
-        });
+        });        // Verify the card dev server is accessible
+        const cardUrl = 'http://127.0.0.1:5000/fluid-level-background-card.js';
+        const response = await page.request.get(cardUrl);
+        expect(response.status()).toBe(200);
+        console.log(`Loading card from: ${cardUrl}`);
 
         // Track module loading errors
         const moduleErrors: any[] = [];
@@ -36,10 +40,15 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
             }
         });
 
-        // Home Assistant should have loaded our card through the configuration
-        // Let's wait for the custom element to be defined
+        // Load the card script manually
         try {
-            console.log('Waiting for custom element definition...');
+            // Load the script with better error tracking
+            await page.addScriptTag({
+                url: cardUrl,
+                type: 'module'
+            });
+
+            console.log('Script tag added, waiting for custom element definition...');
 
             // Wait for the custom element to be defined with proper timeout and polling
             await page.waitForFunction(() => {
@@ -47,7 +56,7 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
                 return typeof customElements !== 'undefined' &&
                     customElements.get('fluid-level-background-card') !== undefined;
             }, {
-                timeout: 30000, // Increase timeout to 30 seconds for HA loading
+                timeout: 20000, // 20 seconds should be enough
                 polling: 1000   // Check every second
             });
 
