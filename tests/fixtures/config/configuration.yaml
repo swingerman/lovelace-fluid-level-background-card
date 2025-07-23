@@ -5,9 +5,9 @@ homeassistant:
   unit_system: metric
   time_zone: UTC
   external_url: http://localhost:8123
+  auth_required: false
 
-# Disable authentication for testing
-# This allows the E2E tests to access HA without login
+# Disable authentication completely for testing
 http:
   use_x_forwarded_for: true
   trusted_proxies:
@@ -17,21 +17,6 @@ http:
     - 192.168.0.0/16
   ip_ban_enabled: false
   login_attempts_threshold: -1
-
-# Use trusted networks only with proper bypass
-auth:
-  providers:
-    - type: trusted_networks
-      trusted_networks:
-        - 127.0.0.1/32
-        - ::1/128
-        - 172.16.0.0/12
-        - 192.168.0.0/16
-        - 0.0.0.0/0  # Allow all IPs for testing
-      trusted_users:
-        127.0.0.1: admin
-        "::1": admin
-      allow_bypass_login: true
 
 # Enable basic components
 frontend:

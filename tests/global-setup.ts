@@ -30,7 +30,7 @@ async function globalSetup(): Promise<void> {
 
       console.log(`Current URL: ${currentUrl}, Title: ${title}`);
 
-      // We want to avoid auth/authorize pages and look for the actual dashboard
+      // With auth_required: false, we should not see any auth pages
       if (currentUrl.includes('/auth/authorize') || currentUrl.includes('/auth/')) {
         console.log('Still on auth page, waiting...');
       } else if (title && title.includes('Home Assistant')) {
@@ -44,6 +44,8 @@ async function globalSetup(): Promise<void> {
         if (hasHaElements || currentUrl === 'http://localhost:8123/' || currentUrl.endsWith('/lovelace/')) {
           haReady = true;
           console.log('✅ Home Assistant is ready!');
+        } else {
+          console.log('HA title found but no UI elements detected yet...');
         }
       }
     } catch (error) {
