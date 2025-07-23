@@ -16,13 +16,11 @@
       "entities": {
         "title": "Entitások*",
         "chose-entities": "Válasszon entitásokat",
-        "choose-severity": "Válasszon súlyosságot",
         "labels": {
           "level-entity": "Szint Entitás",
           "fill-entity": "Töltés Entitás",
           "full-value": "Teli Érték",
-          "full-value-description": "Az érték, amikor a kártya tele van",
-          "use-severity": "Használja a súlyosságot"
+          "full-value-description": "Az érték, amikor a kártya tele van"
         }
       },
       "actions": {
@@ -35,12 +33,15 @@
       "appearance": {
         "title": "Megjelenés",
         "choose-colors": "Válasszon színeket",
+        "choose-severity": "Válasszon súlyosságot",
         "labels": {
           "level-color": "Szint Színe",
           "background-color": "Háttér Színe",
           "use-theme-color": "Téma Színe",
           "color-description": "Állítsa be a kártya színeit, amilyenre szeretné. Ha a téma színeit szeretné használni, csak jelölje be a négyzetet. A téma színek hasznosak a világos/sötét módban.",
-          "random-start": "Véletlenszerűen késleltetett rajzolás"
+          "use-severity": "Használja a súlyosságot",
+          "random-start": "Véletlenszerűen késleltetett rajzolás",
+          "top-margin": "Felső margó (%)"
         }
       }
     }

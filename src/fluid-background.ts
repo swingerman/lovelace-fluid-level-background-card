@@ -30,6 +30,9 @@ export class FluidBackground extends LitElement {
   @property({ type: Boolean })
   randomStart = false;
 
+  @property({ type: Number })
+  topMargin = 0;
+
   fm = FluidMeter();
 
   protected render(): TemplateResult | void {
@@ -65,6 +68,15 @@ export class FluidBackground extends LitElement {
 
     if (name === 'randomStart') {
       this.setRandomStart(this.randomStart);
+    }
+
+    if (name === 'topMargin') {
+      // Reinitialize the fluid meter with new top margin
+      const container = this.shadowRoot?.querySelector('.fluid-background');
+      if (container) {
+        this.fm.stop();
+        this.initFluidMeter(container);
+      }
     }
   }
 
@@ -144,6 +156,7 @@ export class FluidBackground extends LitElement {
           horizontalSpeed: 75,
         },
         randomStart: this.randomStart,
+        top_margin: this.topMargin,
       },
     };
     this.fm.init(env);

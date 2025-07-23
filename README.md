@@ -20,6 +20,7 @@ Options can be cofigured in the UI or in the card configuration. The following o
 - `level_color` - the color of the fluid level
 - `background_color` - the color of the background
 - `severity` - a list of severity levels that will change the color of the fluid level based on the value of the sensor entity
+- `top_margin` - a percentage (0-20%) margin from the top to prevent wave clipping at 100% level
 
 
 ---
@@ -54,6 +55,7 @@ background_color:
       - 0
       - 1
 random_start: true
+top_margin: 5
 ```
 
 ### Supported Color Formats
