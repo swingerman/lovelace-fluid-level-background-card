@@ -1,0 +1,74 @@
+
+# Test configuration for fluid-level-background-card E2E tests
+homeassistant:
+  name: Test Home
+  unit_system: metric
+  time_zone: UTC
+  external_url: http://localhost:8123
+
+# Enable the frontend
+frontend:
+  themes: !include_dir_merge_named themes
+
+# Enable Lovelace
+lovelace:
+  mode: yaml
+  resources:
+    - url: http://127.0.0.1:5000/fluid-level-background-card.js
+      type: module
+
+# Test entities for the card
+input_number:
+  test_level:
+    name: Test Level
+    min: 0
+    max: 100
+    step: 1
+    initial: 50
+    unit_of_measurement: "%"
+    icon: mdi:water-percent
+  
+  test_battery:
+    name: Test Battery
+    min: 0
+    max: 100
+    step: 1
+    initial: 75
+    unit_of_measurement: "%"
+    icon: mdi:battery
+
+input_boolean:
+  test_fill_state:
+    name: Test Fill State
+    initial: false
+    icon: mdi:toggle-switch
+
+# Test sensors
+template:
+  - sensor:
+    - name: "Test Level Sensor"
+      state: "{{ states('input_number.test_level') }}"
+      unit_of_measurement: "%"
+      icon: mdi:water-percent
+    
+    - name: "Test Battery Sensor"  
+      state: "{{ states('input_number.test_battery') }}"
+      unit_of_measurement: "%"
+      icon: mdi:battery
+      
+# Enable configuration UI
+config:
+
+# Enable history
+history:
+
+# Enable recorder for state persistence
+recorder:
+  db_url: sqlite:///:memory:
+  auto_purge: false
+
+# Enable logger for debugging
+logger:
+  default: info
+  logs:
+    custom_components: debug

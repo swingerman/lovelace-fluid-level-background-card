@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  homeassistant:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    ports:
+      - "8123:8123"
+    volumes:
+      - ./tests/fixtures/config:/config
+      - ./dist:/config/www/community/fluid-level-background-card
+    environment:
+      - TZ=UTC
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8123"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  card-dev-server:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "5000:5000"
+    command: npm run start
+    depends_on:
+      - homeassistant

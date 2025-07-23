@@ -1,0 +1,114 @@
+name: 'UI Tests'
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        if: always()
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-0 \
+            libgdk-3.0 \
+            libgconf-2-4 \
+            libxss1 \
+            libxtst6 \
+            libxrandr2 \
+            libasound2 \
+            libpangocairo-1.0-0 \
+            libatk1.0-0 \
+            libcairo-gobject2 \
+            libgtk-3-0 \
+            libgdk-pixbuf2.0-0
+
+      - name: Install Python and Home Assistant
+        run: |
+          python -m pip install --upgrade pip
+          pip install homeassistant
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build card
+        run: npm run build
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 5
+
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build
+        run: npm run build
+
+      - name: Check bundle size
+        run: |
+          ls -la dist/
+          echo "Bundle size:"
+          du -h dist/fluid-level-background-card.js
