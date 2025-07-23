@@ -33,6 +33,8 @@ async function globalSetup(): Promise<void> {
       // With auth_required: false, we should not see any auth pages
       if (currentUrl.includes('/auth/authorize') || currentUrl.includes('/auth/')) {
         console.log('Still on auth page, waiting...');
+      } else if (currentUrl.includes('/onboarding') || title.includes('onboarding')) {
+        console.log('Still on onboarding screen, waiting...');
       } else if (title && title.includes('Home Assistant')) {
         // Check if we can see any HA UI elements
         const hasHaElements = await page.evaluate(() => {
@@ -47,6 +49,8 @@ async function globalSetup(): Promise<void> {
         } else {
           console.log('HA title found but no UI elements detected yet...');
         }
+      } else {
+        console.log('Waiting for Home Assistant to load...');
       }
     } catch (error) {
       console.log(`⏳ Waiting for Home Assistant... (${retries} retries left)`);
