@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "auth",
+  "data": {
+    "users": [
+      {
+        "id": "testuser123",
+        "is_owner": true,
+        "is_active": true,
+        "name": "Test User",
+        "system_generated": false,
+        "groups": [
+          {
+            "id": "system-admin"
+          }
+        ],
+        "credentials": [],
+        "local_only": false
+      }
+    ],
+    "groups": [
+      {
+        "id": "system-admin",
+        "name": "Administrators"
+      }
+    ],
+    "credentials": [],
+    "refresh_tokens": []
+  }
+}
