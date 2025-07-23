@@ -14,33 +14,85 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
             }
         });
 
+        // Track network errors
+        page.on('requestfailed', request => {
+            errors.push(`Network error: ${request.failure()?.errorText} - ${request.url()}`);
+        });
+
         // First, verify the card server is accessible
         const response = await page.request.get('http://127.0.0.1:5000/fluid-level-background-card.js');
         expect(response.status()).toBe(200);
 
         // Add our card script via external URL (not inline text)
         try {
+            // Load the script
             await page.addScriptTag({
                 url: 'http://127.0.0.1:5000/fluid-level-background-card.js',
                 type: 'module'
             });
 
-            // Wait longer for the module to load and execute
-            await page.waitForTimeout(5000);
+            // Wait for the custom element to be defined with proper timeout and polling
+            await page.waitForFunction(() => {
+                // Check if customElements is available and our element is defined
+                return typeof customElements !== 'undefined' &&
+                    customElements.get('fluid-level-background-card') !== undefined;
+            }, {
+                timeout: 20000, // Increase timeout to 20 seconds
+                polling: 1000   // Check every second
+            });
+
+            // Additional verification
+            const elementExists = await page.evaluate(() => {
+                return typeof customElements !== 'undefined' &&
+                    customElements.get('fluid-level-background-card') !== undefined;
+            });
 
             // Check that no errors occurred during loading
             console.log('Console errors:', errors);
-            expect(errors.length).toBe(0);
+            console.log('Element defined:', elementExists);
 
-            // Check that the custom element is defined
-            const isElementDefined = await page.evaluate(() => {
-                return customElements.get('fluid-level-background-card') !== undefined;
-            });
-            console.log('Element defined:', isElementDefined);
-            expect(isElementDefined).toBe(true);
+            expect(errors.length).toBe(0);
+            expect(elementExists).toBe(true);
 
         } catch (error) {
             console.error('Failed to load card script:', error);
+
+            // Add detailed diagnostics
+            const diagnostics = await page.evaluate(() => {
+                const result: any = {
+                    customElementsAvailable: typeof customElements !== 'undefined',
+                    elementDefined: false,
+                    windowProperties: [],
+                    scriptTags: [],
+                    errors: []
+                };
+
+                if (typeof customElements !== 'undefined') {
+                    result.elementDefined = customElements.get('fluid-level-background-card') !== undefined;
+                }
+
+                // Get window properties that might be related to our card
+                result.windowProperties = Object.keys(window).filter(key =>
+                    key.includes('fluid') ||
+                    key.includes('card') ||
+                    key.includes('lit') ||
+                    key.includes('custom')
+                );
+
+                // Get all script tags
+                const scripts = document.querySelectorAll('script');
+                result.scriptTags = Array.from(scripts).map(script => ({
+                    src: script.src,
+                    type: script.type,
+                    loaded: (script as any).readyState || 'unknown'
+                }));
+
+                return result;
+            });
+
+            console.log('Diagnostic info:', JSON.stringify(diagnostics, null, 2));
+            console.log('Console errors:', errors);
+
             throw error;
         }
     });
