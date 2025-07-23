@@ -1,6 +1,8 @@
 # Dockerfile for running Home Assistant in test environment
 FROM homeassistant/home-assistant:latest
 
+USER homeassistant
+
 # Install necessary packages for testing
 RUN apk add --no-cache \
     nodejs \

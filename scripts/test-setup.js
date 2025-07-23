@@ -28,11 +28,26 @@ function ensureConfig() {
     console.log('🔧 Creating Home Assistant configuration...');
 
     // Use hass script to ensure config
+    // Filter PATH to only include fixed, unwritable directories
+    const fixedPath = [
+      '/usr/local/sbin',
+      '/usr/local/bin',
+      '/usr/sbin',
+      '/usr/bin',
+      '/sbin',
+      '/bin'
+    ].join(':');
+
+    // Set PATH to only fixed, unwritable directories (no user/bin)
     const ensureConfigProcess = spawn('hass', [
       '--config', configDir,
       '--script', 'ensure_config'
     ], {
-      stdio: 'inherit'
+      stdio: 'inherit',
+      env: {
+      ...process.env,
+      PATH: fixedPath // Only fixed system paths
+      }
     });
 
     return new Promise((resolve, reject) => {
@@ -190,14 +205,24 @@ async function startHomeAssistant() {
     await ensureConfig();
     addTestResources();
 
+    const fixedPath = [
+      '/usr/local/sbin',
+      '/usr/local/bin',
+      '/usr/sbin',
+      '/usr/bin',
+      '/sbin',
+      '/bin'
+    ].join(':');
+
     const haProcess = spawn('hass', [
       '--config', configDir,
       '--debug'
     ], {
       stdio: 'inherit',
       env: {
-        ...process.env,
-        PYTHONPATH: process.env.PYTHONPATH || ''
+      ...process.env,
+      PATH: fixedPath,
+      PYTHONPATH: process.env.PYTHONPATH || ''
       }
     });
 

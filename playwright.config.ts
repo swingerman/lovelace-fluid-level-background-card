@@ -73,12 +73,12 @@ export default defineConfig({
     {
       command: 'npm run start',
       port: 5000,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: true, // Always reuse existing server since Docker Compose handles this in CI
     },
     {
       command: 'npm run test:setup',
       port: 8123,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: true, // Always reuse existing server since Docker Compose handles this in CI
       timeout: 120 * 1000, // 2 minutes for HA to start
     },
   ],
