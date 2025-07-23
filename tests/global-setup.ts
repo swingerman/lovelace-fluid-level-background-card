@@ -16,17 +16,42 @@ async function globalSetup(): Promise<void> {
 
   while (retries > 0 && !haReady) {
     try {
-      await page.goto('http://localhost:8123', { timeout: 5000 });
+      await page.goto('http://localhost:8123', {
+        timeout: 5000,
+        waitUntil: 'domcontentloaded'
+      });
 
-      // Check if we can see the HA interface or auth page
+      // Wait a moment for any redirects to settle
+      await page.waitForTimeout(1000);
+
+      // Check if we're on the main HA interface (not auth pages)
+      const currentUrl = page.url();
       const title = await page.title();
-      if (title && (title.includes('Home Assistant') || title.includes('Sign In'))) {
-        haReady = true;
-        console.log('✅ Home Assistant is ready!');
+
+      console.log(`Current URL: ${currentUrl}, Title: ${title}`);
+
+      // We want to avoid auth/authorize pages and look for the actual dashboard
+      if (currentUrl.includes('/auth/authorize') || currentUrl.includes('/auth/')) {
+        console.log('Still on auth page, waiting...');
+      } else if (title && title.includes('Home Assistant')) {
+        // Check if we can see any HA UI elements
+        const hasHaElements = await page.evaluate(() => {
+          return document.querySelector('home-assistant') !== null ||
+            document.querySelector('ha-app-layout') !== null ||
+            document.querySelector('[data-page="lovelace"]') !== null;
+        });
+
+        if (hasHaElements || currentUrl === 'http://localhost:8123/' || currentUrl.endsWith('/lovelace/')) {
+          haReady = true;
+          console.log('✅ Home Assistant is ready!');
+        }
       }
     } catch (error) {
       console.log(`⏳ Waiting for Home Assistant... (${retries} retries left)`);
       console.log(`Error details: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    if (!haReady) {
       await new Promise(resolve => setTimeout(resolve, 4000));
       retries--;
     }

@@ -5,10 +5,10 @@
   "data": {
     "users": [
       {
-        "id": "testuser123",
+        "id": "admin",
         "is_owner": true,
         "is_active": true,
-        "name": "Test User",
+        "name": "Admin",
         "system_generated": false,
         "groups": [
           {

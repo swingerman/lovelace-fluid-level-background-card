@@ -13,16 +13,24 @@ http:
   trusted_proxies:
     - 127.0.0.1
     - ::1
+    - 172.16.0.0/12
+    - 192.168.0.0/16
   ip_ban_enabled: false
   login_attempts_threshold: -1
 
-# Enable authentication bypass
+# Use trusted networks only with proper bypass
 auth:
   providers:
     - type: trusted_networks
       trusted_networks:
-        - 127.0.0.1
-        - ::1
+        - 127.0.0.1/32
+        - ::1/128
+        - 172.16.0.0/12
+        - 192.168.0.0/16
+        - 0.0.0.0/0  # Allow all IPs for testing
+      trusted_users:
+        127.0.0.1: admin
+        "::1": admin
       allow_bypass_login: true
 
 # Enable basic components
