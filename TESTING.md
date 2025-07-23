@@ -12,7 +12,7 @@ The testing framework consists of two main types of tests:
 - **Purpose**: Test individual functions and component logic
 - **Coverage**: Editor methods, configuration validation, utility functions
 
-### 🌐 E2E Tests  
+### 🌐 E2E Tests
 - **Framework**: Playwright
 - **Location**: `tests/e2e/`
 - **Purpose**: Test the card in a real Home Assistant environment
@@ -78,7 +78,7 @@ npm run test:ui
 npm run build
 
 # Start test environment (Docker)
-docker-compose -f docker-compose.test.yml up -d
+docker compose -f docker-compose.test.yml up -d
 
 # Run E2E tests
 npm run test:e2e
@@ -90,7 +90,7 @@ npm run test:e2e:ui
 npm run test:e2e:headed
 
 # Cleanup
-docker-compose -f docker-compose.test.yml down
+docker compose -f docker-compose.test.yml down
 ```
 
 ## Test Environment
@@ -234,10 +234,10 @@ When using Docker:
 
 ```bash
 # View Home Assistant logs
-docker-compose -f docker-compose.test.yml logs homeassistant
+docker compose -f docker-compose.test.yml logs homeassistant
 
-# Follow logs in real-time  
-docker-compose -f docker-compose.test.yml logs -f homeassistant
+# Follow logs in real-time
+docker compose -f docker-compose.test.yml logs -f homeassistant
 ```
 
 ## Troubleshooting
