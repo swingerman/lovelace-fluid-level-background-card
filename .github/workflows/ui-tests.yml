@@ -49,21 +49,26 @@ jobs:
       - name: Install Playwright browsers (with dependencies)
         run: npx playwright install --with-deps
 
-      - name: Install Python and Home Assistant
-        run: |
-          python -m pip install --upgrade pip
-          pip install homeassistant
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
-
       - name: Build card
         run: npm run build
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Start test environment
+        run: |
+          docker compose -f docker-compose.test.yml up -d
+          # Wait for Home Assistant to be ready
+          timeout 300 bash -c 'until curl -f http://localhost:8123; do sleep 5; done'
 
       - name: Run E2E tests
         run: npm run test:e2e
         env:
           CI: true
+
+      - name: Cleanup test environment
+        if: always()
+        run: docker compose -f docker-compose.test.yml down
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
