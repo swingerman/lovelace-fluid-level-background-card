@@ -26,6 +26,7 @@ async function globalSetup(): Promise<void> {
       }
     } catch (error) {
       console.log(`⏳ Waiting for Home Assistant... (${retries} retries left)`);
+      console.log(`Error details: ${error instanceof Error ? error.message : 'Unknown error'}`);
       await new Promise(resolve => setTimeout(resolve, 4000));
       retries--;
     }

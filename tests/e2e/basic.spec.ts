@@ -23,7 +23,6 @@ test.describe('Fluid Level Background Card Basic E2E Tests', () => {
         await page.screenshot({ path: 'debug-homepage.png' });
 
         // Check page state
-        const pageContent = await page.content();
         console.log('Page title:', await page.title());
         console.log('Final URL:', page.url());
 

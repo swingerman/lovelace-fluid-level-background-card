@@ -109,8 +109,6 @@ test.describe('Fluid Level Background Card E2E Tests', () => {
 
     // This should trigger the tap action (more-info by default)
     // We can check if more-info dialog appears
-    const moreInfoDialog = page.locator('ha-more-info-dialog');
-
     // Note: This test might need adjustment based on actual card behavior
     // For now, we just verify clicking doesn't cause errors
     await expect(cardWithActions).toBeVisible();
