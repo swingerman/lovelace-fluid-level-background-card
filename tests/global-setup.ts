@@ -30,8 +30,16 @@ async function globalSetup(): Promise<void> {
 
       console.log(`Current URL: ${currentUrl}, Title: ${title}`);
 
-      // With trusted networks and allow_bypass_login: true, should go directly to dashboard
-      if (title && title.includes('Home Assistant')) {
+      // With auth_required: false, there should be no auth pages, but check anyway
+      if (currentUrl.includes('/auth/authorize') || currentUrl.includes('/auth/')) {
+        console.log('❌ Still on auth page despite auth_required: false - this should not happen!');
+        console.log('Trying to force navigation to main page...');
+        await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+        await page.waitForTimeout(2000);
+        const newUrl = page.url();
+        const newTitle = await page.title();
+        console.log(`After force navigation - URL: ${newUrl}, Title: ${newTitle}`);
+      } else if (title && title.includes('Home Assistant')) {
         // Check if we can see any HA UI elements
         const hasHaElements = await page.evaluate(() => {
           return document.querySelector('home-assistant') !== null ||
