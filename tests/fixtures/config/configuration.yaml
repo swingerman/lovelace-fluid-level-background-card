@@ -36,7 +36,7 @@ frontend:
 lovelace:
   mode: yaml
   resources:
-    - url: http://127.0.0.1:5000/fluid-level-background-card.js
+    - url: /community/fluid-level-background-card/fluid-level-background-card.js
       type: module
 
 # Test entities for the card
@@ -49,7 +49,7 @@ input_number:
     initial: 50
     unit_of_measurement: "%"
     icon: mdi:water-percent
-  
+
   test_battery:
     name: Test Battery
     min: 0
@@ -72,12 +72,12 @@ template:
       state: "{{ states('input_number.test_level') }}"
       unit_of_measurement: "%"
       icon: mdi:water-percent
-    
-    - name: "Test Battery Sensor"  
+
+    - name: "Test Battery Sensor"
       state: "{{ states('input_number.test_battery') }}"
       unit_of_measurement: "%"
       icon: mdi:battery
-      
+
 # Enable configuration UI
 config:
 

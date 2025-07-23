@@ -3,8 +3,11 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Fluid Level Background Card Simple Tests', () => {
     test('should load the card JavaScript without errors', async ({ page }) => {
-        // Navigate to a blank page
-        await page.goto('about:blank');
+        // Navigate to Home Assistant first so it can load our card resource
+        await page.goto('http://localhost:8123');
+
+        // Wait for Home Assistant to fully load
+        await page.waitForLoadState('networkidle');
 
         // Track console errors
         const errors: string[] = [];
@@ -19,17 +22,24 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
             errors.push(`Network error: ${request.failure()?.errorText} - ${request.url()}`);
         });
 
-        // First, verify the card server is accessible
-        const response = await page.request.get('http://127.0.0.1:5000/fluid-level-background-card.js');
-        expect(response.status()).toBe(200);
+        // Track module loading errors
+        const moduleErrors: any[] = [];
+        page.on('pageerror', (error) => {
+            console.log('Page error:', error.message);
+            moduleErrors.push({ type: 'pageerror', message: error.message, stack: error.stack });
+        });
 
-        // Add our card script via external URL (not inline text)
+        page.on('console', (msg) => {
+            if (msg.type() === 'error') {
+                console.log('Console error:', msg.text());
+                moduleErrors.push({ type: 'console', message: msg.text() });
+            }
+        });
+
+        // Home Assistant should have loaded our card through the configuration
+        // Let's wait for the custom element to be defined
         try {
-            // Load the script
-            await page.addScriptTag({
-                url: 'http://127.0.0.1:5000/fluid-level-background-card.js',
-                type: 'module'
-            });
+            console.log('Waiting for custom element definition...');
 
             // Wait for the custom element to be defined with proper timeout and polling
             await page.waitForFunction(() => {
@@ -37,7 +47,7 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
                 return typeof customElements !== 'undefined' &&
                     customElements.get('fluid-level-background-card') !== undefined;
             }, {
-                timeout: 20000, // Increase timeout to 20 seconds
+                timeout: 30000, // Increase timeout to 30 seconds for HA loading
                 polling: 1000   // Check every second
             });
 
@@ -57,6 +67,11 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
         } catch (error) {
             console.error('Failed to load card script:', error);
 
+            // Log any module loading errors we captured
+            if (moduleErrors.length > 0) {
+                console.log('Module loading errors captured:', moduleErrors);
+            }
+
             // Add detailed diagnostics
             const diagnostics = await page.evaluate(() => {
                 const result: any = {
@@ -64,12 +79,21 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
                     elementDefined: false,
                     windowProperties: [],
                     scriptTags: [],
-                    errors: []
+                    errors: [],
+                    moduleLoadErrors: [],
+                    dependencies: {}
                 };
 
                 if (typeof customElements !== 'undefined') {
                     result.elementDefined = customElements.get('fluid-level-background-card') !== undefined;
                 }
+
+                // Check for dependencies that should be loaded
+                result.dependencies = {
+                    lit: typeof (window as any).lit !== 'undefined',
+                    customCardHelpers: typeof (window as any).loadCardHelpers !== 'undefined',
+                    litElement: typeof (window as any).LitElement !== 'undefined'
+                };
 
                 // Get window properties that might be related to our card
                 result.windowProperties = Object.keys(window).filter(key =>
