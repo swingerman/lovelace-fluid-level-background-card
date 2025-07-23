@@ -177,6 +177,13 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return this._config?.random_start || false;
   }
 
+  get _top_margin(): number {
+    const value = this._config?.top_margin ?? 0;
+    // Ensure the value is always within valid bounds
+    if (typeof value !== 'number' || isNaN(value)) return 0;
+    return Math.max(0, Math.min(20, Math.round(value)));
+  }
+
   get _allow_click_through(): boolean {
     return this._config?.allow_click_through || false;
   }
@@ -413,6 +420,16 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
         <ha-formfield label=${localize('editor.tab.appearance.labels.random-start')}>
           <ha-switch .checked=${this._random_start === true} @change=${this._toggelRandomStart}> </ha-switch>
         </ha-formfield>
+      </div>
+      <div class="form-row-dual">
+        <ha-selector
+          .hass=${this.hass}
+          .selector=${{ number: { min: 0, max: 20, step: 1, mode: 'slider' } }}
+          .label=${localize('editor.tab.appearance.labels.top-margin')}
+          .value=${this._top_margin}
+          .configValue=${'top_margin'}
+          @value-changed=${this._selectorChanged}
+        ></ha-selector>
       </div>
       <div class="form-row-dual">
         <ha-formfield label=${localize('editor.tab.appearance.labels.use-severity')}>
@@ -686,6 +703,89 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       }
     }
     fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  private _selectorChanged(ev: CustomEvent): void {
+    if (!this._config || !this.hass) {
+      return;
+    }
+
+    const target = ev.target as any;
+    const rawValue = ev.detail.value;
+    const configKey = target.configValue;
+
+    if (!configKey) {
+      return;
+    }
+
+    // Validate and sanitize the value
+    const sanitizedValue = this._sanitizeConfigValue(configKey, rawValue);
+
+    // Check if the value actually changed
+    if (this[`_${configKey}`] === sanitizedValue) {
+      return;
+    }
+
+    // Update the configuration
+    this._updateConfig(configKey, sanitizedValue);
+  }
+
+  private _sanitizeConfigValue(configKey: string, rawValue: any): any {
+    if (configKey === 'top_margin') {
+      return this._sanitizeTopMargin(rawValue);
+    }
+
+    return rawValue;
+  }
+
+  private _sanitizeTopMargin(rawValue: any): number {
+    const numValue = typeof rawValue === 'number' ? rawValue : parseFloat(rawValue);
+
+    if (isNaN(numValue) || numValue < 0) {
+      return 0;
+    }
+
+    if (numValue > 20) {
+      return 20;
+    }
+
+    return Math.round(numValue);
+  }
+
+  private _updateConfig(configKey: string, value: any): void {
+    if (!this._config) {
+      return;
+    }
+
+    // Special handling for certain config keys
+    if (this._shouldAlwaysKeepConfigKey(configKey)) {
+      this._setConfigValue(configKey, value);
+    } else if (value === '' || value === null || value === undefined) {
+      // Default behavior: remove empty/null/undefined values
+      const tmpConfig = { ...this._config };
+      delete tmpConfig[configKey];
+      this._config = tmpConfig;
+    } else {
+      this._setConfigValue(configKey, value);
+    }
+
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  private _setConfigValue(configKey: string, value: any): void {
+    if (!this._config) {
+      return;
+    }
+    this._config = {
+      ...this._config,
+      [configKey]: value,
+    };
+  }
+
+  private _shouldAlwaysKeepConfigKey(configKey: string): boolean {
+    // Config keys that should always be kept with a valid value (never deleted)
+    const alwaysKeepKeys = ['top_margin'];
+    return alwaysKeepKeys.includes(configKey);
   }
 
   private _actionChanged(ev: CustomEvent): void {

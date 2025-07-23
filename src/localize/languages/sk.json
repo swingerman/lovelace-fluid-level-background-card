@@ -18,7 +18,9 @@
         "chose-entities": "Zvoliť entity",
         "labels": {
           "level-entity": "Entita úrovne",
-          "fill-entity": "Vyplňte entitu stavu"
+          "fill-entity": "Vyplňte entitu stavu",
+          "full-value": "Plná hodnota",
+          "full-value-description": "Hodnota, keď bude karta plná."
         }
       },
       "actions": {
@@ -31,9 +33,15 @@
       "appearance": {
         "title": "Vzhľad",
         "choose-colors": "Vyberte farby",
+        "choose-severity": "Vyberte závažnosť",
         "labels": {
           "level-color": "Farba úrovne",
-          "random-start": "Náhodné oneskorené spustenie"
+          "background-color": "Farba pozadia",
+          "use-theme-color": "Použiť farbu témy",
+          "color-description": "Nastavte farby, ktoré sa vám páčia pre kartu. Ak chcete použiť farby témy, jednoducho začiarknite políčko. Farby témy sú užitočné pre svetlý/tmavý režim.",
+          "use-severity": "Použiť závažnosť",
+          "random-start": "Náhodné oneskorené spustenie",
+          "top-margin": "Horný okraj (%)"
         }
       }
     }

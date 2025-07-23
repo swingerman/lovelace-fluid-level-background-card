@@ -27,6 +27,7 @@ export function FluidMeter(): FluidMeterInstance {
     borderWidth: 25,
     backgroundColor: '#e2e2e2',
     foregroundColor: '#fafafa',
+    top_margin: 0,
   };
 
   let currentFillPercentage = 0;
@@ -380,7 +381,10 @@ export function FluidMeter(): FluidMeterInstance {
   }
 
   function getFluidAmount(): number {
-    return (currentFillPercentage * (options.height as number)) / 100;
+    const maxHeight = options.height as number;
+    const topMarginPixels = ((options.top_margin || 0) / 100) * maxHeight;
+    const effectiveHeight = maxHeight - topMarginPixels;
+    return (currentFillPercentage * effectiveHeight) / 100;
   }
 
   function initOptions(envOptions: FluidMeterOptions): void {
@@ -394,6 +398,7 @@ export function FluidMeter(): FluidMeterInstance {
     options.backgroundFluidColor = envOptions.backgroundFluidColor || options.backgroundFluidColor;
     options.backgroundColor = envOptions.backgroundColor || options.backgroundColor;
     options.foregroundColor = envOptions.foregroundColor || options.foregroundColor;
+    options.top_margin = envOptions.top_margin || 0;
 
     options.drawText = envOptions.drawText === false ? false : true;
     options.drawPercentageSign = envOptions.drawPercentageSign === false ? false : true;

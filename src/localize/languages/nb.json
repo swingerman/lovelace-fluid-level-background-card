@@ -40,7 +40,8 @@
           "use-theme-color": "Bruk Tema Farge",
           "color-description": "Sett fargene du liker for kortet. Hvis du vil bruke temafargene, bare merk av i boksen. Temafarger er hendige for lys/mørk modus.",
           "use-severity": "Bruk Alvorlighetsgrad",
-          "random-start": "Tilfeldig Forsinket Start"
+          "random-start": "Tilfeldig Forsinket Start",
+          "top-margin": "Toppmargin (%)"
         }
       }
     }

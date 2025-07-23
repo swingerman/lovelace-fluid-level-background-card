@@ -40,6 +40,7 @@ export interface FluidMeterOptions {
   foregroundFluidLayer?: Layer;
   backgroundFluidLayer?: Layer;
   randomStart?: boolean;
+  top_margin?: number;
 }
 
 export interface FluidMeterEnv {
