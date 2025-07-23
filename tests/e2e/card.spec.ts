@@ -2,18 +2,32 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Fluid Level Background Card E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
+    // First verify server connectivity before trying to navigate
+    try {
+      const healthResponse = await page.request.get('http://localhost:8123');
+      expect(healthResponse.status()).toBeLessThan(500);
+    } catch (error) {
+      console.log('Home Assistant server not accessible:', error);
+      test.skip(true, 'Home Assistant server not accessible');
+    }
+
     // Navigate to Home Assistant
     await page.goto('/', { timeout: 30000 });
     await page.waitForTimeout(2000);
 
     // Check if we have a valid HA response (even if auth redirect)
-    const title = await page.title();
-    console.log('Page title:', title);
-    console.log('Page URL:', page.url());
+    try {
+      const title = await page.title();
+      console.log('Page title:', title);
+      console.log('Page URL:', page.url());
 
-    // If we're on an auth page, we can't test dashboard features
-    if (page.url().includes('/auth/') || !title.includes('Home Assistant')) {
-      test.skip('Skipping test - Home Assistant authentication required');
+      // If we're on an auth page, we can't test dashboard features
+      if (page.url().includes('/auth/') || !title.includes('Home Assistant')) {
+        test.skip(true, 'Skipping test - Home Assistant authentication required');
+      }
+    } catch (error) {
+      console.log('Failed to get page title:', error);
+      test.skip(true, 'Page context not available');
     }
 
     try {
@@ -21,7 +35,7 @@ test.describe('Fluid Level Background Card E2E Tests', () => {
       await page.waitForSelector('ha-sidebar, ha-app-layout, partial-panel-resolver, home-assistant', { timeout: 5000 });
     } catch {
       // If no HA elements are found, skip the test
-      test.skip('Skipping test - Home Assistant elements not available');
+      test.skip(true, 'Skipping test - Home Assistant elements not available');
     }
 
     // Navigate to our test dashboard

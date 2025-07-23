@@ -69,16 +69,16 @@ export default defineConfig({
   globalTeardown: require.resolve('./tests/global-teardown.ts'),
 
   /* Run your local dev server before starting the tests */
-  webServer: [
+  webServer: process.env.CI ? [] : [
     {
       command: 'npm run start',
       port: 5000,
-      reuseExistingServer: true, // Always reuse existing server since Docker Compose handles this in CI
+      reuseExistingServer: true,
     },
     {
       command: 'npm run test:setup',
       port: 8123,
-      reuseExistingServer: true, // Always reuse existing server since Docker Compose handles this in CI
+      reuseExistingServer: true,
       timeout: 120 * 1000, // 2 minutes for HA to start
     },
   ],

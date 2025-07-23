@@ -14,6 +14,10 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
             }
         });
 
+        // First, verify the card server is accessible
+        const response = await page.request.get('http://127.0.0.1:5000/fluid-level-background-card.js');
+        expect(response.status()).toBe(200);
+
         // Add our card script via external URL (not inline text)
         try {
             await page.addScriptTag({
@@ -22,7 +26,7 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
             });
 
             // Wait longer for the module to load and execute
-            await page.waitForTimeout(3000);
+            await page.waitForTimeout(5000);
 
             // Check that no errors occurred during loading
             console.log('Console errors:', errors);
@@ -45,14 +49,23 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
         // Navigate to a blank page
         await page.goto('about:blank');
 
+        // Verify server is accessible
+        const response = await page.request.get('http://127.0.0.1:5000/fluid-level-background-card.js');
+        expect(response.status()).toBe(200);
+
         // Add our card script
         await page.addScriptTag({
             url: 'http://127.0.0.1:5000/fluid-level-background-card.js',
             type: 'module'
         });
 
-        // Wait for the script to load
-        await page.waitForTimeout(3000);
+        // Wait for the script to load and custom element to be defined
+        await page.waitForTimeout(5000);
+
+        // Wait specifically for the custom element to be defined
+        await page.waitForFunction(() => {
+            return customElements.get('fluid-level-background-card') !== undefined;
+        }, { timeout: 10000 });
 
         // Create a card element
         const cardResult = await page.evaluate(() => {
@@ -75,13 +88,20 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
         // Navigate to a blank page
         await page.goto('about:blank');
 
+        // Verify server is accessible
+        const response = await page.request.get('http://127.0.0.1:5000/fluid-level-background-card.js');
+        expect(response.status()).toBe(200);
+
         // Add our card script
         await page.addScriptTag({
             url: 'http://127.0.0.1:5000/fluid-level-background-card.js',
             type: 'module'
         });
 
-        await page.waitForTimeout(3000);
+        // Wait for custom element to be defined
+        await page.waitForFunction(() => {
+            return customElements.get('fluid-level-background-card') !== undefined;
+        }, { timeout: 10000 });
 
         // Test basic configuration
         const configResult = await page.evaluate(() => {
@@ -118,13 +138,20 @@ test.describe('Fluid Level Background Card Simple Tests', () => {
         // Navigate to a blank page
         await page.goto('about:blank');
 
+        // Verify server is accessible
+        const response = await page.request.get('http://127.0.0.1:5000/fluid-level-background-card.js');
+        expect(response.status()).toBe(200);
+
         // Add our card script
         await page.addScriptTag({
             url: 'http://127.0.0.1:5000/fluid-level-background-card.js',
             type: 'module'
         });
 
-        await page.waitForTimeout(3000);
+        // Wait for custom element to be defined
+        await page.waitForFunction(() => {
+            return customElements.get('fluid-level-background-card') !== undefined;
+        }, { timeout: 10000 });
 
         // Create and configure the card
         const renderResult = await page.evaluate(() => {

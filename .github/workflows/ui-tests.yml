@@ -46,22 +46,8 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libgtk-3-0 \
-            libgdk-3.0 \
-            libgconf-2-4 \
-            libxss1 \
-            libxtst6 \
-            libxrandr2 \
-            libasound2 \
-            libpangocairo-1.0-0 \
-            libatk1.0-0 \
-            libcairo-gobject2 \
-            libgtk-3-0 \
-            libgdk-pixbuf2.0-0
+      - name: Install Playwright browsers (with dependencies)
+        run: npx playwright install --with-deps
 
       - name: Install Python and Home Assistant
         run: |
