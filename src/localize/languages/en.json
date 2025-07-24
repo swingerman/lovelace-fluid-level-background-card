@@ -24,7 +24,11 @@
         }
       },
       "actions": {
-        "title": "Actions"
+        "title": "Actions",
+        "labels": {
+          "allow-click-through": "Allow Click Through",
+          "allow-click-through-help": "When enabled, clicks on individual entities within the card will show their specific more-info dialogs instead of the main entity's dialog. This disables the card's tap and hold actions."
+        }
       },
       "appearance": {
         "title": "Appearance",
@@ -36,7 +40,8 @@
           "use-theme-color": "Use Theme Color",
           "color-description": "Set the colors you like for the card. If you want to use the theme colors, just check the box. Theme colors are handy for light/dark mode.",
           "use-severity": "Use Severity",
-          "random-start": "Randomly Delayed Start"
+          "random-start": "Randomly Delayed Start",
+          "top-margin": "Top Margin (%)"
         }
       }
     }

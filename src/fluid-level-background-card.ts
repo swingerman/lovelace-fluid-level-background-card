@@ -97,6 +97,8 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @state() protected _random_start = false;
 
+  @state() protected _top_margin = 0;
+
   @state() private config!: FluidLevelBackgroundCardConfig;
 
   private _darkModeLastValue!: boolean;
@@ -139,6 +141,7 @@ export class FluidLevelBackgroundCard extends LitElement {
         this._full_value = config.full_value ?? FULL_VALUE;
         this._severity = config.severity ? [...config.severity].sort((a, b) => b.value - a.value) : [];
         this._random_start = config.random_start || false;
+        this._top_margin = config.top_margin ?? 0;
       });
     }
   }
@@ -417,11 +420,11 @@ export class FluidLevelBackgroundCard extends LitElement {
       safeEntityValue = entityValue;
     }
     if (typeof entityValue === 'string') {
-      safeEntityValue = isNaN(parseInt(entityValue, 10)) ? 0 : parseInt(entityValue, 10);
+      safeEntityValue = isNaN(parseFloat(entityValue)) ? 0 : parseFloat(entityValue);
     }
 
-    if (safeEntityValue > 0) {
-      // calcualte the percentage bsed on the full value
+    if (safeEntityValue >= 0) {
+      // calculate the percentage based on the full value
       return (safeEntityValue / this._full_value) * 100;
     }
     return 0;
@@ -444,6 +447,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       .levelColor=${levelColor || LEVEL_COLOR}
       .filling=${filling}
       .randomStart=${this._random_start}
+      .topMargin=${this._top_margin}
     ></fluid-background>`;
   }
 
@@ -451,6 +455,13 @@ export class FluidLevelBackgroundCard extends LitElement {
     if (!this._card) {
       return html``;
     }
+
+    // If click-through is enabled, don't add action handlers to allow inner card interactions
+    if (this.config.allow_click_through) {
+      const cardLabel = `FluidProgressBar: ${this._level_entity || 'No Entity Defined'}`;
+      return html` <ha-card tabindex="0" .label=${cardLabel}> ${this._card} </ha-card> `;
+    }
+
     return html` <ha-card
       @action=${this._handleAction}
       .actionHandler=${actionHandler({

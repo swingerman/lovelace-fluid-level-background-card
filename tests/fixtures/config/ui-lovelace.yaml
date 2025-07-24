@@ -1,0 +1,56 @@
+
+title: Fluid Level Background Card Test Dashboard
+views:
+  - title: Test Cards
+    path: test
+    cards:
+      # Basic card test
+      - type: custom:fluid-level-background-card
+        entity: input_number.test_level
+        card:
+          type: entities
+          entities:
+            - input_number.test_level
+        
+      # Card with fill entity
+      - type: custom:fluid-level-background-card
+        entity: input_number.test_battery
+        fill_entity: input_boolean.test_fill_state
+        card:
+          type: glance
+          entities:
+            - input_number.test_battery
+            - input_boolean.test_fill_state
+            
+      # Card with custom colors and severity
+      - type: custom:fluid-level-background-card
+        entity: input_number.test_level
+        background_color: [0, 0, 0, 0.3]
+        level_color: [0, 150, 255, 1.0]
+        severity:
+          - color: [255, 0, 0, 1.0]
+            value: 20
+          - color: [255, 255, 0, 1.0] 
+            value: 50
+          - color: [0, 255, 0, 1.0]
+            value: 80
+        card:
+          type: entity
+          entity: input_number.test_level
+          
+      # Card with top margin and random start
+      - type: custom:fluid-level-background-card
+        entity: input_number.test_battery
+        top_margin: 5
+        random_start: true
+        card:
+          type: button
+          entity: input_number.test_battery
+          
+      # Card with click through enabled
+      - type: custom:fluid-level-background-card
+        entity: input_number.test_level
+        allow_click_through: true
+        card:
+          type: entity
+          entity: input_number.test_level

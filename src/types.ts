@@ -141,4 +141,6 @@ export interface FluidLevelBackgroundCardConfig extends LovelaceCardConfig {
   hold_action?: ActionConfig;
   double_tap_action?: ActionConfig;
   random_start?: boolean;
+  allow_click_through?: boolean;
+  top_margin?: number;
 }

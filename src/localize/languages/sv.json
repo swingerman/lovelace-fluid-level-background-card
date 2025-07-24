@@ -24,7 +24,11 @@
         }
       },
       "actions": {
-        "title": "Actions"
+        "title": "Actions",
+        "labels": {
+          "allow-click-through": "Tillåt klick igenom",
+          "allow-click-through-help": "När aktiverat kommer klick på enskilda enheter att visa deras specifika mer-info dialoger istället för huvudentitetens dialog. Detta inaktiverar kortets tryck- och håll-åtgärder."
+        }
       },
       "appearance": {
         "title": "Utseende",
@@ -36,7 +40,8 @@
           "use-theme-color": "Använd Temafärg",
           "color-description": "Ställ in de färger du gillar för kortet. Om du vill använda temafärgerna, kryssa bara i rutan. Temafärger är praktiska för ljus/mörkt läge.",
           "use-severity": "Använd allvarlighetsgrad",
-          "random-start": "Slumpmässigt Fördröjd Start"
+          "random-start": "Slumpmässigt Fördröjd Start",
+          "top-margin": "Övre marginal (%)"
         }
       }
     }

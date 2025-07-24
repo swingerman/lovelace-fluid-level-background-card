@@ -8,3 +8,12 @@ src/.eslintcache
 config/*
 !config/configuration.yaml
 !config/ui-lovelace.yaml
+
+# Test results and reports
+test-results/
+playwright-report/
+coverage/
+
+# SonarQube
+.sonar/
+.scannerwork/

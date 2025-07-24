@@ -1,4 +1,31 @@
-default_config:
+homeassistant:
+  name: Test Home
+  latitude: 37.7749
+  longitude: -122.4194
+  time_zone: "America/Los_Angeles"
+  unit_system: metric
+
+# Essential components only
+frontend:
+api:
+config:
+history:
+logbook:
+system_health:
+my:
+mobile_app:
+
+# Authentication bypass for testing - remove auth requirements entirely
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - ::1
+    - 172.17.0.0/16
+  ip_ban_enabled: false
+  login_attempts_threshold: -1
+
 lovelace:
   # mode: yaml
   resources:
@@ -14,8 +41,16 @@ input_number:
     step: .5
     icon: hass:battery
 
+  energy_consumption:
+    name: Today's Energy Consumption
+    initial: 0.95
+    min: 0
+    max: 2.0
+    step: 0.01
+    unit_of_measurement: "kWh"
+    icon: mdi:lightning-bolt
+
 input_boolean:
   battery_charging:
     name: Battery charging
-#demo:
 
