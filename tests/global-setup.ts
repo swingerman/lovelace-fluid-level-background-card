@@ -30,15 +30,59 @@ async function globalSetup(): Promise<void> {
 
       console.log(`Current URL: ${currentUrl}, Title: ${title}`);
 
-      // With auth_required: false, there should be no auth pages, but check anyway
+      // Check if we're on auth pages - with trusted_networks this should not happen
       if (currentUrl.includes('/auth/authorize') || currentUrl.includes('/auth/')) {
-        console.log('❌ Still on auth page despite auth_required: false - this should not happen!');
-        console.log('Trying to force navigation to main page...');
-        await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
-        await page.waitForTimeout(2000);
+        console.log('⚠️ Detected auth page - trying to handle OAuth flow...');
+
+        // Try to create a bypass by simulating the auth approval
+        // For testing, we'll try to complete the OAuth flow automatically
+        try {
+          // Look for and click the approve button (common in HA OAuth)
+          const approveButton = page.locator('text=Allow').or(page.locator('text=Approve')).or(page.locator('[type="submit"]'));
+          if (await approveButton.isVisible({ timeout: 2000 })) {
+            console.log('Found approve button, clicking...');
+            await approveButton.click();
+            await page.waitForTimeout(3000);
+          } else {
+            console.log('No approve button found, trying direct navigation...');
+            // Try to complete the OAuth flow by directly hitting the callback
+            const urlParams = new URL(currentUrl).searchParams;
+            const redirectUri = urlParams.get('redirect_uri');
+            if (redirectUri) {
+              const callbackUrl = decodeURIComponent(redirectUri);
+              console.log(`Trying callback URL: ${callbackUrl}`);
+              await page.goto(callbackUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
+              await page.waitForTimeout(2000);
+            }
+          }
+        } catch (authError) {
+          console.log(`Auth handling failed: ${authError}`);
+          // If auth handling fails, try direct navigation to dashboard
+          await page.goto('http://localhost:8123/lovelace/0', {
+            waitUntil: 'domcontentloaded',
+            timeout: 10000
+          });
+          await page.waitForTimeout(3000);
+        }
+
         const newUrl = page.url();
         const newTitle = await page.title();
-        console.log(`After force navigation - URL: ${newUrl}, Title: ${newTitle}`);
+        console.log(`After auth handling - URL: ${newUrl}, Title: ${newTitle}`);
+
+        // Check if we successfully reached a lovelace page
+        if (newUrl.includes('/lovelace') || newUrl.includes('auth_callback=1')) {
+          console.log('✅ Successfully reached lovelace interface!');
+          haReady = true;
+          break;
+        }
+
+        // If still on auth page, mark as configuration issue but continue
+        if (newUrl.includes('/auth/')) {
+          console.log('❌ Still stuck on auth page - configuration issue detected');
+          retries--; // Continue trying
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          continue;
+        }
       } else if (title && title.includes('Home Assistant')) {
         // Check if we can see any HA UI elements
         const hasHaElements = await page.evaluate(() => {

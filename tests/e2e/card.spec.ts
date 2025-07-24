@@ -21,9 +21,29 @@ test.describe('Fluid Level Background Card E2E Tests', () => {
       console.log('Page title:', title);
       console.log('Page URL:', page.url());
 
-      // If we're on an auth page, we can't test dashboard features
-      if (page.url().includes('/auth/') || !title.includes('Home Assistant')) {
-        test.skip(true, 'Skipping test - Home Assistant authentication required');
+      // If we're on an auth page, try to handle it with OAuth callback like global setup
+      if (page.url().includes('/auth/')) {
+        console.log('Auth page detected in test, trying OAuth callback approach...');
+
+        // Try the OAuth callback URL approach that worked in global setup
+        try {
+          await page.goto('http://localhost:8123/lovelace?auth_callback=1');
+          await page.waitForLoadState('networkidle');
+
+          const newTitle = await page.title();
+          const newUrl = page.url();
+          console.log('After OAuth callback - Title:', newTitle, 'URL:', newUrl);
+
+          // If still on auth page, skip the test
+          if (newUrl.includes('/auth/')) {
+            test.skip(true, 'Skipping test - Home Assistant authentication still required after callback attempt');
+          }
+        } catch (callbackError) {
+          console.log('OAuth callback attempt failed:', callbackError);
+          test.skip(true, 'Skipping test - Home Assistant authentication required');
+        }
+      } else if (!title.includes('Home Assistant')) {
+        test.skip(true, 'Skipping test - Home Assistant not accessible');
       }
     } catch (error) {
       console.log('Failed to get page title:', error);
