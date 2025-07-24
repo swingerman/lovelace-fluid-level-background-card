@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "minor_version": 2,
+  "key": "repairs.issue_registry",
+  "data": {
+    "issues": [
+      {
+        "created": "2025-07-24T09:38:52.997403+00:00",
+        "dismissed_version": null,
+        "domain": "homeassistant",
+        "is_persistent": true,
+        "issue_id": "storage_corruption_auth_provider.homeassistant_2025-07-24T09:38:52.984217+00:00",
+        "breaks_in_ha_version": null,
+        "data": null,
+        "is_fixable": true,
+        "issue_domain": "homeassistant",
+        "learn_more_url": null,
+        "severity": "critical",
+        "translation_key": "storage_corruption",
+        "translation_placeholders": {
+          "storage_key": "auth_provider.homeassistant",
+          "original_path": "/config/.storage/auth_provider.homeassistant",
+          "corrupt_path": "/config/.storage/auth_provider.homeassistant.corrupt.2025-07-24T09:38:52.984217+00:00",
+          "error": "Error while loading /config/.storage/auth_provider.homeassistant: Input is a zero-length, empty document: line 1 column 1 (char 0)"
+        }
+      },
+      {
+        "created": "2025-07-24T09:38:53.067528+00:00",
+        "dismissed_version": null,
+        "domain": "homeassistant",
+        "is_persistent": false,
+        "issue_id": "country_not_configured"
+      }
+    ]
+  }
+}
