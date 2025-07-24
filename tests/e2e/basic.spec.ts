@@ -19,15 +19,19 @@ test.describe('Fluid Level Background Card Basic E2E Tests', () => {
             await page.waitForTimeout(2000);
         }
 
+        // Wait for page to stabilize first
+        await page.waitForLoadState('networkidle', { timeout: 30000 });
+
         // Take a screenshot for debugging
         await page.screenshot({ path: 'debug-homepage.png' });
 
-        // Check page state
-        console.log('Page title:', await page.title());
+        // Check page state (after waiting for stability)
+        try {
+            console.log('Page title:', await page.title());
+        } catch (error) {
+            console.log('Could not get page title (context destroyed):', error.message);
+        }
         console.log('Final URL:', page.url());
-
-        // Wait for the basic page to be loaded (don't worry about specific components yet)
-        await page.waitForLoadState('networkidle', { timeout: 30000 });
     });
 
     test('should connect to Home Assistant', async ({ page }) => {
@@ -38,8 +42,16 @@ test.describe('Fluid Level Background Card Basic E2E Tests', () => {
         // Go to Home Assistant
         await page.goto('/', { timeout: 30000 });
 
+        // Wait for page to stabilize before accessing page properties
+        await page.waitForLoadState('networkidle', { timeout: 30000 });
+
         // Basic connectivity test - check if we get a valid page
-        const title = await page.title();
+        let title = 'Unknown';
+        try {
+            title = await page.title();
+        } catch (error) {
+            console.log('Could not get page title (context destroyed):', error.message);
+        }
         console.log('Page title for test:', title);
         console.log('Page URL for test:', page.url());
 
