@@ -7,7 +7,7 @@ import { noChange } from 'lit';
 
 const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.maxTouchPoints > 0;
 
-interface ActionHandler extends HTMLElement {
+interface ActionHandlerInterface extends HTMLElement {
   holdTime: number;
   bind(element: Element, options): void;
 }
@@ -21,7 +21,7 @@ declare global {
   }
 }
 
-class ActionHandler extends HTMLElement implements ActionHandler {
+class ActionHandler extends HTMLElement implements ActionHandlerInterface {
   public holdTime = 500;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

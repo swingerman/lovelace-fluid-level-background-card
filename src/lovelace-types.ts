@@ -17,8 +17,8 @@ export interface LovelaceCard extends HTMLElement {
 export interface LovelaceCardConfig {
   index?: number;
   view_index?: number;
-  view_layout?: any;
+  view_layout?: unknown;
   layout_options?: LovelaceLayoutOptions;
   type: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }

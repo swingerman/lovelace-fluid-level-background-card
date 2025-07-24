@@ -25,7 +25,7 @@ This is a Home Assistant Lovelace custom card that wraps other cards and renders
 
 ```bash
 # Initial setup (dev container environment)
-npm install --legacy-peer-deps
+npm install
 ./scripts/setup  # Installs HA + dependencies
 
 # Development server
