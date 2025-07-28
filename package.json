@@ -57,7 +57,7 @@
     "ts-lit-plugin": "^1.2.1",
     "typescript": "^5.7.3",
     "vitest": "^1.2.0",
-    "wait-on": "^7.2.0"
+    "wait-on": "^8.0.4"
   },
   "scripts": {
     "start": "rollup -c rollup.config.js --watch",
