@@ -230,9 +230,20 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     const selected = this._selectedTab;
 
     return html` <div class="toolbar">
-      <mwc-tab-bar .activeIndex=${selected} @MDCTabBar:activated=${this._handleSelectedCard}>
-        ${editorTabs.map((_tab) => (_tab.enabled ? html` <mwc-tab .label=${_tab.localizedLabel}></mwc-tab> ` : null))}
-      </mwc-tab-bar>
+      <div class="custom-tab-bar">
+        ${editorTabs.map((_tab, index) =>
+          _tab.enabled
+            ? html`
+                <button
+                  class="custom-tab ${selected === index ? 'active' : ''}"
+                  @click=${() => this._handleTabClick(index)}
+                >
+                  ${_tab.localizedLabel}
+                </button>
+              `
+            : null,
+        )}
+      </div>
     </div>`;
   }
 
@@ -824,8 +835,8 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     fireEvent(this, 'config-changed', { config: newConfig });
   }
 
-  private _handleSelectedCard(ev: CustomEvent): void {
-    this._selectedTab = ev.detail.index;
+  private _handleTabClick(index: number): void {
+    this._selectedTab = index;
   }
 
   static get styles(): CSSResultGroup {
@@ -836,11 +847,37 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
         --mdc-tab-text-label-color-default: var(--primary-text-color);
         --mdc-tab-color-default: var(--primary-text-color);
       }
-      mwc-tab-bar {
+      .custom-tab-bar {
         display: flex;
         font-size: 14px;
         flex-grow: 1;
         border-bottom: 1px solid var(--divider-color);
+        background: transparent;
+      }
+      .custom-tab {
+        background: transparent;
+        border: none;
+        padding: 16px 20px;
+        font-size: 14px;
+        font-family: inherit;
+        color: var(--primary-text-color);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s ease;
+        outline: none;
+        position: relative;
+      }
+      .custom-tab:hover {
+        background: var(--divider-color);
+        color: var(--primary-color);
+      }
+      .custom-tab.active {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+        font-weight: 500;
+      }
+      .custom-tab:focus {
+        background: var(--divider-color);
       }
       .option {
         padding: 4px 0px;
