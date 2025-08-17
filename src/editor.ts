@@ -230,20 +230,15 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     const selected = this._selectedTab;
 
     return html` <div class="toolbar">
-      <div class="custom-tab-bar">
+      <sl-tab-group @sl-tab-show=${this._handleTabChanged}>
         ${editorTabs.map((_tab, index) =>
           _tab.enabled
             ? html`
-                <button
-                  class="custom-tab ${selected === index ? 'active' : ''}"
-                  @click=${() => this._handleTabClick(index)}
-                >
-                  ${_tab.localizedLabel}
-                </button>
+                <sl-tab slot="nav" .active=${selected === index} panel="tab-${index}"> ${_tab.localizedLabel} </sl-tab>
               `
             : null,
         )}
-      </div>
+      </sl-tab-group>
     </div>`;
   }
 
@@ -835,49 +830,27 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     fireEvent(this, 'config-changed', { config: newConfig });
   }
 
-  private _handleTabClick(index: number): void {
-    this._selectedTab = index;
+  private _handleTabChanged(ev: CustomEvent): void {
+    const newTab = ev.detail.name;
+    const tabIndex = parseInt(newTab.replace('tab-', ''), 10);
+    this._selectedTab = tabIndex;
   }
 
   static get styles(): CSSResultGroup {
     return css`
       .toolbar {
         display: flex;
-        --mdc-theme-primary: var(--primary-color);
-        --mdc-tab-text-label-color-default: var(--primary-text-color);
-        --mdc-tab-color-default: var(--primary-text-color);
       }
-      .custom-tab-bar {
-        display: flex;
-        font-size: 14px;
+      sl-tab-group {
+        margin-bottom: 16px;
         flex-grow: 1;
-        border-bottom: 1px solid var(--divider-color);
-        background: transparent;
       }
-      .custom-tab {
-        background: transparent;
-        border: none;
-        padding: 16px 20px;
-        font-size: 14px;
-        font-family: inherit;
-        color: var(--primary-text-color);
-        cursor: pointer;
-        border-bottom: 2px solid transparent;
-        transition: all 0.2s ease;
-        outline: none;
-        position: relative;
+      sl-tab {
+        flex: 1;
       }
-      .custom-tab:hover {
-        background: var(--divider-color);
-        color: var(--primary-color);
-      }
-      .custom-tab.active {
-        color: var(--primary-color);
-        border-bottom-color: var(--primary-color);
-        font-weight: 500;
-      }
-      .custom-tab:focus {
-        background: var(--divider-color);
+      sl-tab::part(base) {
+        width: 100%;
+        justify-content: center;
       }
       .option {
         padding: 4px 0px;
