@@ -228,18 +228,11 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
 
   renderToolbar(): TemplateResult {
     const selected = this._selectedTab;
-    const numTabs = editorTabs.length;
 
     return html` <div class="toolbar">
-      <paper-tabs .selected=${selected} @iron-activate=${this._handleSelectedCard}>
-        ${editorTabs.map((_tab) => (_tab.enabled ? html` <paper-tab> ${_tab.localizedLabel} </paper-tab> ` : null))}
-      </paper-tabs>
-      <paper-tabs
-        id="add-card"
-        .selected=${selected === numTabs ? '0' : undefined}
-        @iron-activate=${this._handleSelectedCard}
-      >
-      </paper-tabs>
+      <mwc-tab-bar .activeIndex=${selected} @MDCTabBar:activated=${this._handleSelectedCard}>
+        ${editorTabs.map((_tab) => (_tab.enabled ? html` <mwc-tab .label=${_tab.localizedLabel}></mwc-tab> ` : null))}
+      </mwc-tab-bar>
     </div>`;
   }
 
@@ -832,20 +825,22 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   }
 
   private _handleSelectedCard(ev: CustomEvent): void {
-    this._selectedTab = parseInt(ev.detail.selected, 10);
+    this._selectedTab = ev.detail.index;
   }
 
   static get styles(): CSSResultGroup {
     return css`
       .toolbar {
         display: flex;
-        --paper-tabs-selection-bar-color: var(--primary-color);
-        --paper-tab-ink: var(--primary-color);
+        --mdc-theme-primary: var(--primary-color);
+        --mdc-tab-text-label-color-default: var(--primary-text-color);
+        --mdc-tab-color-default: var(--primary-text-color);
       }
-      paper-tabs {
+      mwc-tab-bar {
         display: flex;
         font-size: 14px;
         flex-grow: 1;
+        border-bottom: 1px solid var(--divider-color);
       }
       .option {
         padding: 4px 0px;
