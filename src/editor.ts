@@ -228,18 +228,17 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
 
   renderToolbar(): TemplateResult {
     const selected = this._selectedTab;
-    const numTabs = editorTabs.length;
 
     return html` <div class="toolbar">
-      <paper-tabs .selected=${selected} @iron-activate=${this._handleSelectedCard}>
-        ${editorTabs.map((_tab) => (_tab.enabled ? html` <paper-tab> ${_tab.localizedLabel} </paper-tab> ` : null))}
-      </paper-tabs>
-      <paper-tabs
-        id="add-card"
-        .selected=${selected === numTabs ? '0' : undefined}
-        @iron-activate=${this._handleSelectedCard}
-      >
-      </paper-tabs>
+      <sl-tab-group @sl-tab-show=${this._handleTabChanged}>
+        ${editorTabs.map((_tab, index) =>
+          _tab.enabled
+            ? html`
+                <sl-tab slot="nav" .active=${selected === index} panel="tab-${index}"> ${_tab.localizedLabel} </sl-tab>
+              `
+            : null,
+        )}
+      </sl-tab-group>
     </div>`;
   }
 
@@ -831,21 +830,27 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     fireEvent(this, 'config-changed', { config: newConfig });
   }
 
-  private _handleSelectedCard(ev: CustomEvent): void {
-    this._selectedTab = parseInt(ev.detail.selected, 10);
+  private _handleTabChanged(ev: CustomEvent): void {
+    const newTab = ev.detail.name;
+    const tabIndex = parseInt(newTab.replace('tab-', ''), 10);
+    this._selectedTab = tabIndex;
   }
 
   static get styles(): CSSResultGroup {
     return css`
       .toolbar {
         display: flex;
-        --paper-tabs-selection-bar-color: var(--primary-color);
-        --paper-tab-ink: var(--primary-color);
       }
-      paper-tabs {
-        display: flex;
-        font-size: 14px;
+      sl-tab-group {
+        margin-bottom: 16px;
         flex-grow: 1;
+      }
+      sl-tab {
+        flex: 1;
+      }
+      sl-tab::part(base) {
+        width: 100%;
+        justify-content: center;
       }
       .option {
         padding: 4px 0px;
