@@ -207,16 +207,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     // The climate more-info has ha-switch and paper-dropdown-menu elements that are lazy loaded unless explicitly done here
     this._helpers.importMoreInfoControl('climate');
 
-    const tab = editorTabs[this._selectedTab];
-
-    return this[tab.renderer] && tab.enabled
-      ? html`
-          <div class="card-config">
-            ${this.renderToolbar()}
-            <div id="editor">${this[tab.renderer]()}</div>
-          </div>
-        `
-      : html``;
+    return html` <div class="card-config">${this.renderToolbar()}</div> `;
   }
 
   private _initialize(): void {
@@ -228,18 +219,23 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
 
   renderToolbar(): TemplateResult {
     const selected = this._selectedTab;
-    const numTabs = editorTabs.length;
 
     return html` <div class="toolbar">
-      <paper-tabs .selected=${selected} @iron-activate=${this._handleSelectedCard}>
-        ${editorTabs.map((_tab) => (_tab.enabled ? html` <paper-tab> ${_tab.localizedLabel} </paper-tab> ` : null))}
-      </paper-tabs>
-      <paper-tabs
-        id="add-card"
-        .selected=${selected === numTabs ? '0' : undefined}
-        @iron-activate=${this._handleSelectedCard}
-      >
-      </paper-tabs>
+      <sl-tab-group @sl-tab-show=${this._handleTabShow}>
+        ${editorTabs.map((_tab, index) =>
+          _tab.enabled
+            ? html`
+                <sl-tab slot="nav" panel="tab-${index}" ?active=${index === selected}> ${_tab.localizedLabel} </sl-tab>
+              `
+            : null,
+        )}
+        ${editorTabs.map((_tab, index) => {
+          if (!_tab.enabled) return null;
+
+          const tabContent = index === selected ? this[_tab.renderer]() : '';
+          return html` <sl-tab-panel name="tab-${index}"> ${tabContent} </sl-tab-panel> `;
+        })}
+      </sl-tab-group>
     </div>`;
   }
 
@@ -831,21 +827,32 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     fireEvent(this, 'config-changed', { config: newConfig });
   }
 
-  private _handleSelectedCard(ev: CustomEvent): void {
-    this._selectedTab = parseInt(ev.detail.selected, 10);
+  private _handleTabShow(ev: CustomEvent): void {
+    const panelName = ev.detail.name;
+    const tabIndex = parseInt(panelName.replace('tab-', ''), 10);
+    this._selectedTab = tabIndex;
   }
 
   static get styles(): CSSResultGroup {
     return css`
       .toolbar {
         display: flex;
-        --paper-tabs-selection-bar-color: var(--primary-color);
-        --paper-tab-ink: var(--primary-color);
+        flex-direction: column;
       }
-      paper-tabs {
-        display: flex;
-        font-size: 14px;
-        flex-grow: 1;
+      sl-tab-group {
+        --sl-color-primary-600: var(--primary-color);
+        --sl-color-neutral-200: var(--divider-color);
+        --sl-font-size-medium: 14px;
+      }
+      sl-tab::part(base) {
+        color: var(--secondary-text-color);
+        padding: 12px 16px;
+      }
+      sl-tab[active]::part(base) {
+        color: var(--primary-color);
+      }
+      sl-tab-panel::part(base) {
+        padding: 16px 0;
       }
       .option {
         padding: 4px 0px;
