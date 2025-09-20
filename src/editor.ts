@@ -229,13 +229,12 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
               `
             : null,
         )}
-        ${editorTabs.map((_tab, index) =>
-          _tab.enabled
-            ? html`
-                <sl-tab-panel name="tab-${index}"> ${index === selected ? this[_tab.renderer]() : ''} </sl-tab-panel>
-              `
-            : null,
-        )}
+        ${editorTabs.map((_tab, index) => {
+          if (!_tab.enabled) return null;
+
+          const tabContent = index === selected ? this[_tab.renderer]() : '';
+          return html` <sl-tab-panel name="tab-${index}"> ${tabContent} </sl-tab-panel> `;
+        })}
       </sl-tab-group>
     </div>`;
   }
