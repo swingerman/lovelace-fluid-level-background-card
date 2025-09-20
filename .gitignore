@@ -17,3 +17,5 @@ coverage/
 # SonarQube
 .sonar/
 .scannerwork/
+tests/fixtures/config/.storage/
+
