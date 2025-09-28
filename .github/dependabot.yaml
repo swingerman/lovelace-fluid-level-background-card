@@ -4,8 +4,57 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "iantrich"
+    assignees:
+      - "iantrich"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
 
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "iantrich"
+    assignees:
+      - "iantrich"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    groups:
+      development-dependencies:
+        patterns:
+          - "@babel/*"
+          - "@rollup/*"
+          - "@typescript-eslint/*"
+          - "@vitest/*"
+          - "@playwright/*"
+          - "eslint*"
+          - "prettier*"
+          - "rollup*"
+          - "typescript"
+          - "vitest"
+          - "husky"
+          - "cz*"
+          - "happy-dom"
+          - "wait-on"
+        update-types:
+          - "minor"
+          - "patch"
+      production-dependencies:
+        patterns:
+          - "@mdi/*"
+          - "colortranslator"
+          - "custom-card-helpers"
+          - "home-assistant-js-websocket"
+          - "lit"
+          - "rollup-plugin-sourcemaps"
+        update-types:
+          - "minor"
+          - "patch"

@@ -23,6 +23,19 @@ jobs:
         run: npm ci --legacy-peer-deps
       - name: Build
         run: npm run build
+      - name: Check bundle size
+        run: |
+          ls -la dist/
+          echo "Bundle size:"
+          du -h dist/fluid-level-background-card.js
+          # Fail if bundle is too large (> 500KB)
+          BUNDLE_SIZE=$(du -k dist/fluid-level-background-card.js | cut -f1)
+          if [ $BUNDLE_SIZE -gt 500 ]; then
+            echo "❌ Bundle size ($BUNDLE_SIZE KB) exceeds 500KB limit"
+            exit 1
+          else
+            echo "✅ Bundle size ($BUNDLE_SIZE KB) is within limits"
+          fi
 
   unit-tests:
     name: Unit Tests
@@ -47,6 +60,40 @@ jobs:
           name: coverage-reports
           path: coverage/
           retention-days: 7
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Read coverage summary if it exists
+            const coveragePath = 'coverage/coverage-summary.json';
+            if (fs.existsSync(coveragePath)) {
+              const coverage = JSON.parse(fs.readFileSync(coveragePath, 'utf8'));
+              const total = coverage.total;
+              const percentage = total.lines.pct;
+              
+              const comment = `## 📊 Test Coverage Report
+              
+              **Total Coverage: ${percentage}%**
+              
+              | Metric | Covered | Total | Percentage |
+              |--------|---------|-------|------------|
+              | Lines | ${total.lines.covered} | ${total.lines.total} | ${total.lines.pct}% |
+              | Functions | ${total.functions.covered} | ${total.functions.total} | ${total.functions.pct}% |
+              | Branches | ${total.branches.covered} | ${total.branches.total} | ${total.branches.pct}% |
+              | Statements | ${total.statements.covered} | ${total.statements.total} | ${total.statements.pct}% |
+              `;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
 
   e2e-tests:
     name: E2E Tests

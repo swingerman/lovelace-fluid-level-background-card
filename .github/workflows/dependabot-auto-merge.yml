@@ -1,0 +1,84 @@
+name: Dependabot Auto-merge
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: write
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Build check
+        run: npm run build
+
+      - name: Check if PR is safe to auto-merge
+        id: safety-check
+        run: |
+          # Check if this is a minor or patch update
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $PR_TITLE"
+          
+          # Extract version information from PR title
+          if echo "$PR_TITLE" | grep -E "(bump|update).*from.*to.*" > /dev/null; then
+            echo "This appears to be a version bump"
+            
+            # Check if it's a major version update (unsafe)
+            if echo "$PR_TITLE" | grep -E "from [0-9]+\.[0-9]+\.[0-9]+ to [0-9]+\.[0-9]+\.[0-9]+" | grep -E "from [0-9]+\.[0-9]+\.[0-9]+ to [1-9][0-9]*\.[0-9]+\.[0-9]+" > /dev/null; then
+              echo "Major version update detected - NOT SAFE for auto-merge"
+              echo "safe_to_merge=false" >> $GITHUB_OUTPUT
+            else
+              echo "Minor/patch update detected - SAFE for auto-merge"
+              echo "safe_to_merge=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "Could not determine version type - NOT SAFE for auto-merge"
+            echo "safe_to_merge=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Auto-merge if safe
+        if: steps.safety-check.outputs.safe_to_merge == 'true'
+        run: |
+          echo "Auto-merging Dependabot PR..."
+          gh pr merge ${{ github.event.pull_request.number }} --squash --auto
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add comment for unsafe updates
+        if: steps.safety-check.outputs.safe_to_merge == 'false'
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "🤖 This PR contains a major version update that requires manual review. Please review the changes before merging."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add comment for successful auto-merge
+        if: steps.safety-check.outputs.safe_to_merge == 'true'
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "✅ All checks passed! Auto-merging this dependency update."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
