@@ -8,6 +8,13 @@
     "runem.lit-plugin",
     "auchenberg.vscode-browser-preview",
     "davidanson.vscode-markdownlint",
-    "redhat.vscode-yaml"
+    "redhat.vscode-yaml",
+    "ms-vscode.vscode-typescript-next",
+    "vitest.explorer",
+    "ms-playwright.playwright",
+    "usernamehw.errorlens",
+    "streetsidesoftware.code-spell-checker",
+    "gruntfuggly.todo-tree",
+    "pflannery.vscode-versionlens"
   ]
 }
