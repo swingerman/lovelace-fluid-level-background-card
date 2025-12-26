@@ -1,0 +1,109 @@
+name: Security Scan
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run npm audit
+        run: |
+          echo "Running npm audit..."
+          npm audit --audit-level=moderate --json > audit-results.json || true
+          
+          # Check for high/critical vulnerabilities
+          if npm audit --audit-level=high; then
+            echo "✅ No high or critical vulnerabilities found"
+          else
+            echo "❌ High or critical vulnerabilities found"
+            exit 1
+          fi
+
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+
+      - name: Upload audit results
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: security-audit-results
+          path: audit-results.json
+          retention-days: 30
+
+  dependency-check:
+    name: Dependency Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Check for known vulnerabilities
+        run: |
+          echo "Checking for known vulnerabilities..."
+          npx audit-ci --config .audit-ci.json || true
+
+      - name: Check for outdated packages
+        run: |
+          echo "Checking for outdated packages..."
+          npm outdated || true
+
+      - name: Generate security report
+        run: |
+          echo "## 🔒 Security Report" > security-report.md
+          echo "" >> security-report.md
+          echo "### Audit Results" >> security-report.md
+          echo "\`\`\`" >> security-report.md
+          npm audit --audit-level=moderate >> security-report.md || true
+          echo "\`\`\`" >> security-report.md
+          echo "" >> security-report.md
+          echo "### Outdated Packages" >> security-report.md
+          echo "\`\`\`" >> security-report.md
+          npm outdated >> security-report.md || true
+          echo "\`\`\`" >> security-report.md
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v6
+        with:
+          name: security-report
+          path: security-report.md
+          retention-days: 30

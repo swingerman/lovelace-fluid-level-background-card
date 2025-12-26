@@ -1,0 +1,122 @@
+name: Dependabot PR Handler
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  dependabot-handler:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Analyze PR changes
+        id: analyze-pr
+        run: |
+          echo "Analyzing Dependabot PR changes..."
+          
+          # Get the list of changed files
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+          echo "Changed files: $CHANGED_FILES"
+          
+          # Check if only package files were changed
+          if echo "$CHANGED_FILES" | grep -v -E "(package\.json|package-lock\.json|yarn\.lock|pnpm-lock\.yaml)" | grep -v "^$"; then
+            echo "Non-package files changed - manual review required"
+            echo "requires_manual_review=true" >> $GITHUB_OUTPUT
+          else
+            echo "Only package files changed - safe for auto-merge"
+            echo "requires_manual_review=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Extract package name and version from PR title
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $PR_TITLE"
+          
+          # Check if it's a major version update
+          if echo "$PR_TITLE" | grep -E "from [0-9]+\.[0-9]+\.[0-9]+ to [1-9][0-9]*\.[0-9]+\.[0-9]+" > /dev/null; then
+            echo "Major version update detected"
+            echo "is_major_update=true" >> $GITHUB_OUTPUT
+          else
+            echo "Minor/patch update detected"
+            echo "is_major_update=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run tests
+        run: |
+          echo "Running tests for Dependabot PR..."
+          npm run lint
+          npm run test
+          npm run build
+
+      - name: Add labels
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const labels = ['dependencies'];
+            
+            if ('${{ steps.analyze-pr.outputs.is_major_update }}' === 'true') {
+              labels.push('major-update', 'needs-review');
+            } else {
+              labels.push('auto-merge-candidate');
+            }
+            
+            if ('${{ steps.analyze-pr.outputs.requires_manual_review }}' === 'true') {
+              labels.push('manual-review-required');
+            }
+            
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: labels
+            });
+
+      - name: Add PR comment
+        uses: actions/github-script@v8
+        with:
+          script: |
+            let comment = '## 🤖 Dependabot PR Analysis\n\n';
+            
+            if ('${{ steps.analyze-pr.outputs.is_major_update }}' === 'true') {
+              comment += '⚠️ **Major version update detected** - This PR requires manual review before merging.\n\n';
+            } else {
+              comment += '✅ **Minor/patch update** - This PR is safe for auto-merge.\n\n';
+            }
+            
+            if ('${{ steps.analyze-pr.outputs.requires_manual_review }}' === 'true') {
+              comment += '📝 **Manual review required** - Non-package files were modified.\n\n';
+            }
+            
+            comment += '### Test Results\n';
+            comment += '- ✅ Linting passed\n';
+            comment += '- ✅ Unit tests passed\n';
+            comment += '- ✅ Build successful\n\n';
+            
+            if ('${{ steps.analyze-pr.outputs.is_major_update }}' === 'false' && '${{ steps.analyze-pr.outputs.requires_manual_review }}' === 'false') {
+              comment += '🚀 **Ready for auto-merge** - All checks passed and this is a safe update.';
+            } else {
+              comment += '👀 **Manual review needed** - Please review the changes before merging.';
+            }
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
