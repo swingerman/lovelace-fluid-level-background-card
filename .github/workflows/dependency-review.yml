@@ -1,0 +1,28 @@
+name: Dependency Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          # Fail the action if any vulnerabilities are found
+          fail-on-severity: moderate
+          # Allow only specific dependency types
+          allow-licenses: MIT, Apache-2.0, BSD-3-Clause, BSD-2-Clause, ISC, Unlicense
+          # Deny specific licenses
+          deny-licenses: GPL-2.0, GPL-3.0, AGPL-3.0
+          # Comment on the PR with the review
+          comment-summary-in-pr: always
