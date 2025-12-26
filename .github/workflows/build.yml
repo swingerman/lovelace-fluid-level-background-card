@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '18'
           cache: 'npm'
@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '18'
           cache: 'npm'
@@ -54,7 +54,7 @@ jobs:
         env:
           CI: true
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: coverage-reports
@@ -62,7 +62,7 @@ jobs:
           retention-days: 7
       - name: Comment coverage on PR
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const fs = require('fs');
@@ -102,7 +102,7 @@ jobs:
   #   steps:
   #     - uses: actions/checkout@v6
   #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
+  #       uses: actions/setup-node@v6
   #       with:
   #         node-version: '18'
   #         cache: 'npm'
@@ -124,7 +124,7 @@ jobs:
   #       env:
   #         CI: true
   #     - name: Upload test results
-  #       uses: actions/upload-artifact@v5
+  #       uses: actions/upload-artifact@v6
   #       if: always()
   #       with:
   #         name: e2e-test-results
