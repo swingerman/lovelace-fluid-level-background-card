@@ -28,7 +28,7 @@ jobs:
         run: npm run test
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         if: always()
 
   # e2e-tests:
