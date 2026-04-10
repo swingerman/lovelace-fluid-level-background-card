@@ -65,7 +65,7 @@ jobs:
           npm run build
 
       - name: Add labels
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const labels = ['dependencies'];
@@ -88,7 +88,7 @@ jobs:
             });
 
       - name: Add PR comment
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             let comment = '## 🤖 Dependabot PR Analysis\n\n';
