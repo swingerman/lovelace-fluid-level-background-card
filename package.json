@@ -18,7 +18,7 @@
   "dependencies": {
     "@commitlint/config-conventional": "^20.5.0",
     "@mdi/js": "^7.4.47",
-    "colortranslator": "^4.0.0",
+    "colortranslator": "^6.1.1",
     "custom-card-helpers": "^2.0.0",
     "home-assistant-js-websocket": "^9.6.0",
     "lit": "^3.3.2",
