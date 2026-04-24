@@ -51,7 +51,7 @@
     "rollup": "^4.60.1",
     "rollup-plugin-serve": "^2.0.2",
     "rollup-plugin-summary": "^3.0.0",
-    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-terser": "^1.0.0",
     "rollup-plugin-typescript2": "^0.37.0",
     "ts-lit-plugin": "^1.2.1",
     "typescript": "^5.9.3",
