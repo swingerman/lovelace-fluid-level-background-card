@@ -21,7 +21,7 @@
     "colortranslator": "^6.1.1",
     "custom-card-helpers": "^2.0.0",
     "home-assistant-js-websocket": "^9.6.0",
-    "lit": "^3.3.2",
+    "lit": "^3.3.3",
     "rollup-plugin-sourcemaps": "^0.6.3"
   },
   "devDependencies": {
