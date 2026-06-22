@@ -2,8 +2,11 @@ version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 10
     reviewers:
       - "iantrich"
@@ -17,7 +20,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 10
     reviewers:
       - "iantrich"
