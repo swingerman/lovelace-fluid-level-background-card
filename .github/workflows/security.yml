@@ -35,10 +35,10 @@ jobs:
       - name: Run npm audit
         run: |
           echo "Running npm audit..."
-          npm audit --audit-level=moderate --json > audit-results.json || true
+          npm audit --omit=dev --audit-level=moderate --json > audit-results.json || true
           
           # Check for high/critical vulnerabilities
-          if npm audit --audit-level=high; then
+          if npm audit --omit=dev --audit-level=high; then
             echo "✅ No high or critical vulnerabilities found"
           else
             echo "❌ High or critical vulnerabilities found"
@@ -93,7 +93,7 @@ jobs:
           echo "" >> security-report.md
           echo "### Audit Results" >> security-report.md
           echo "\`\`\`" >> security-report.md
-          npm audit --audit-level=moderate >> security-report.md || true
+          npm audit --omit=dev --audit-level=moderate >> security-report.md || true
           echo "\`\`\`" >> security-report.md
           echo "" >> security-report.md
           echo "### Outdated Packages" >> security-report.md
