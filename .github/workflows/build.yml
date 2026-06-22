@@ -62,6 +62,7 @@ jobs:
           retention-days: 7
       - name: Comment coverage on PR
         if: github.event_name == 'pull_request'
+        continue-on-error: true   # dependabot PRs get a read-only token; comment is best-effort
         uses: actions/github-script@v9
         with:
           script: |
