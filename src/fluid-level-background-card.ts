@@ -57,12 +57,40 @@ console.info(
   'color: white; font-weight: bold; background: dimgray',
 );
 
+// True when the entity carries a 0-100 level we can map to a fluid fill.
+function isLevelEntity(hass: HomeAssistant, entityId: string): boolean {
+  const stateObj = hass?.states?.[entityId];
+  if (!stateObj) return false;
+  const domain = entityId.split('.')[0];
+  const attrs = (stateObj as any).attributes ?? {};
+  return (
+    ['number', 'input_number', 'counter'].includes(domain) ||
+    attrs.device_class === 'battery' ||
+    attrs.unit_of_measurement === '%' ||
+    (domain === 'sensor' && !isNaN(parseFloat((stateObj as any).state)))
+  );
+}
+
 // This puts your card into the UI card picker dialog
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
   type: 'fluid-level-background-card',
   name: 'Fluid Level Background Card',
   description: 'A card that has a fluid level as the background',
+  documentationURL: 'https://github.com/swingerman/lovelace-fluid-level-background-card',
+  preview: true,
+  // 2026.6 entity-first card picker: suggest wrapping numeric/% entities so the
+  // card shows up under "Community" when the user picks such an entity.
+  getEntitySuggestion: (hass: HomeAssistant, entityId: string) => {
+    if (!isLevelEntity(hass, entityId)) return null;
+    return {
+      config: {
+        type: 'custom:fluid-level-background-card',
+        entity: entityId,
+        card: { type: 'tile', entity: entityId },
+      },
+    };
+  },
 });
 
 export interface ElementSize {
@@ -107,8 +135,15 @@ export class FluidLevelBackgroundCard extends LitElement {
     return document.createElement('fluid-level-background-card-editor');
   }
 
-  public static getStubConfig(): Record<string, unknown> {
-    return {};
+  public static getStubConfig(
+    hass?: HomeAssistant,
+    entities?: string[],
+    entitiesFallback?: string[],
+  ): Record<string, unknown> {
+    const pick = (list?: string[]) => list?.find((e) => hass && isLevelEntity(hass, e)) ?? list?.[0];
+    const entity = pick(entities) ?? pick(entitiesFallback);
+    // preview: true needs a renderable default; without an entity fall back to empty.
+    return entity ? { entity, card: { type: 'tile', entity } } : {};
   }
 
   public setConfig(config: FluidLevelBackgroundCardConfig): void {
