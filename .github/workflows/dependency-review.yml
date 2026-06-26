@@ -20,9 +20,7 @@ jobs:
         with:
           # Fail the action if any vulnerabilities are found
           fail-on-severity: moderate
-          # Allow only specific dependency types
-          allow-licenses: MIT, Apache-2.0, BSD-3-Clause, BSD-2-Clause, ISC, Unlicense
-          # Deny specific licenses
+          # Block copyleft licenses (allow-licenses and deny-licenses are mutually exclusive)
           deny-licenses: GPL-2.0, GPL-3.0, AGPL-3.0
           # Comment on the PR with the review
           comment-summary-in-pr: always
