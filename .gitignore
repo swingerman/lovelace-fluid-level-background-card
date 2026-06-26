@@ -17,5 +17,14 @@ coverage/
 # SonarQube
 .sonar/
 .scannerwork/
-tests/fixtures/config/.storage/
 
+# Home Assistant runtime artifacts (generated when the test container runs)
+tests/fixtures/config/.storage/
+tests/fixtures/config/.HA_VERSION
+tests/fixtures/config/.ha_run.lock
+tests/fixtures/config/home-assistant.log*
+tests/fixtures/config/blueprints/
+tests/fixtures/config/tts/
+tests/fixtures/config/deps/
+tests/fixtures/config/image/
+.playwright-mcp/

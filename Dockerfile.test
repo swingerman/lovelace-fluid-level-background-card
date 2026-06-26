@@ -1,5 +1,6 @@
 # Dockerfile for running Home Assistant in test environment
-FROM homeassistant/home-assistant:latest
+# Pinned to 2026.6 — first release with the entity-first card picker (getEntitySuggestion)
+FROM homeassistant/home-assistant:2026.6
 
 # Install necessary packages for testing (run as root by default)
 USER root
