@@ -200,6 +200,11 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return this._clampedNumber(this._config?.wave_speed, 50, 100);
   }
 
+  get _wave_style(): string {
+    const v = this._config?.wave_style;
+    return v === 'realistic' || v === 'realistic-performance' ? v : 'classic';
+  }
+
   private _lastUsedBackgroundColor: number[] | undefined;
   private _lastUsedLevelColor: number[] | undefined;
 
@@ -426,6 +431,28 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
         </ha-formfield>
       </div>
       ${this.renderNumberSlider('top-margin', 'top_margin', this._top_margin, 20, 1)}
+      <div class="form-row-dual">
+        <ha-selector
+          .hass=${this.hass}
+          .selector=${{
+            select: {
+              mode: 'dropdown',
+              options: [
+                { value: 'classic', label: localize('editor.tab.appearance.labels.wave-style-classic') },
+                { value: 'realistic', label: localize('editor.tab.appearance.labels.wave-style-realistic') },
+                {
+                  value: 'realistic-performance',
+                  label: localize('editor.tab.appearance.labels.wave-style-realistic-performance'),
+                },
+              ],
+            },
+          }}
+          .label=${localize('editor.tab.appearance.labels.wave-style')}
+          .value=${this._wave_style}
+          .configValue=${'wave_style'}
+          @value-changed=${this._selectorChanged}
+        ></ha-selector>
+      </div>
       ${this.renderNumberSlider('wave-height', 'wave_height', this._wave_height, 100, 5)}
       ${this.renderNumberSlider('wave-speed', 'wave_speed', this._wave_speed, 100, 5)}
       <div class="form-row-dual">

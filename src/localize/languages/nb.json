@@ -41,7 +41,13 @@
           "color-description": "Sett fargene du liker for kortet. Hvis du vil bruke temafargene, bare merk av i boksen. Temafarger er hendige for lys/mørk modus.",
           "use-severity": "Bruk Alvorlighetsgrad",
           "random-start": "Tilfeldig Forsinket Start",
-          "top-margin": "Toppmargin (%)"
+          "top-margin": "Toppmargin (%)",
+          "wave-height": "Bølgehøyde",
+          "wave-speed": "Bølgehastighet",
+          "wave-style": "Bølgestil",
+          "wave-style-classic": "Klassisk",
+          "wave-style-realistic": "Realistisk",
+          "wave-style-realistic-performance": "Realistisk (ytelse)"
         }
       }
     }

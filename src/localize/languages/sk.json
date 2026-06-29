@@ -41,7 +41,13 @@
           "color-description": "Nastavte farby, ktoré sa vám páčia pre kartu. Ak chcete použiť farby témy, jednoducho začiarknite políčko. Farby témy sú užitočné pre svetlý/tmavý režim.",
           "use-severity": "Použiť závažnosť",
           "random-start": "Náhodné oneskorené spustenie",
-          "top-margin": "Horný okraj (%)"
+          "top-margin": "Horný okraj (%)",
+          "wave-height": "Výška vlny",
+          "wave-speed": "Rýchlosť vlny",
+          "wave-style": "Štýl vlny",
+          "wave-style-classic": "Klasický",
+          "wave-style-realistic": "Realistický",
+          "wave-style-realistic-performance": "Realistický (výkon)"
         }
       }
     }

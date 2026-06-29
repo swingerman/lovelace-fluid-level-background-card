@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { ElementSize } from './fluid-level-background-card';
-import { FluidMeterEnv, Layer } from './fluid-meter.interface';
+import { FluidMeterEnv, FluidMeterInstance, Layer } from './fluid-meter.interface';
 import { FluidMeter } from './fliud-meter';
+import { RealisticMeter } from './realistic-meter';
+import { RealisticMorphMeter } from './realistic-morph-meter';
 import { rgbaToString } from './utils/color';
 import { clamp } from './utils/clamp';
 import { BACKGROUND_COLOR, LEVEL_COLOR } from './const';
@@ -46,7 +48,11 @@ export class FluidBackground extends LitElement {
   @property({ type: Number })
   waveSpeed = WAVE_NEUTRAL;
 
-  fm = FluidMeter();
+  // classic = original; realistic = per-frame morphing waves; realistic-performance = cheap strip.
+  @property()
+  waveStyle: 'classic' | 'realistic' | 'realistic-performance' = 'classic';
+
+  fm: FluidMeterInstance = FluidMeter();
 
   protected render(): TemplateResult | void {
     return html` <div class="fluid-background"></div> `;
@@ -90,6 +96,21 @@ export class FluidBackground extends LitElement {
     if (name === 'topMargin') {
       this.setTopMargin(this.topMargin);
     }
+
+    // Switching renderers needs a fresh meter + clean container.
+    if (name === 'waveStyle') {
+      this.rebuildMeter();
+    }
+  }
+
+  private rebuildMeter(): void {
+    const container = this.shadowRoot?.querySelector('.fluid-background');
+    if (!container) {
+      return;
+    }
+    this.fm.stop();
+    container.replaceChildren();
+    this.initFluidMeter(container);
   }
 
   // The setters below guard this.fm: field initializers fire requestUpdate during construction,
@@ -149,15 +170,18 @@ export class FluidBackground extends LitElement {
   }
 
   protected firstUpdated(): void {
-    window.setTimeout(() => {
-      const container = this.shadowRoot?.querySelector('.fluid-background');
-      if (container) {
-        this.initFluidMeter(container);
-      }
-    }, 0);
+    // Go through rebuildMeter (which clears first) so an early waveStyle change can't leave
+    // a second meter + canvas stacked on top.
+    window.setTimeout(() => this.rebuildMeter(), 0);
   }
 
   private initFluidMeter(container: Element): void {
+    this.fm =
+      this.waveStyle === 'realistic'
+        ? RealisticMorphMeter()
+        : this.waveStyle === 'realistic-performance'
+          ? RealisticMeter()
+          : FluidMeter();
     const maxSize = Math.max(this.size?.width as number, this.size?.height as number);
     const alpha = this.levelColor.length > 3 ? this.levelColor[3] : 1;
     const backgroundAlpha = alpha * 0.3;
