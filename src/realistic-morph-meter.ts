@@ -2,6 +2,7 @@ import { ElementSize } from './fluid-level-background-card';
 import { FluidMeterInstance, FluidMeterEnv, Layer } from './fluid-meter.interface';
 import { rgbaToString, lighten, darken, parseRgb } from './utils/color';
 import { clamp } from './utils/clamp';
+import { rand } from './utils/random';
 import { createBubbles } from './bubbles';
 
 // Per-frame realistic renderer. Like the classic engine, each layer's amplitude oscillates
@@ -224,8 +225,8 @@ export function RealisticMorphMeter(): FluidMeterInstance {
       then = 0;
       lastTime = 0;
       if (randomStart) {
-        fg.angle = Math.random() * 360;
-        bg.angle = Math.random() * 360;
+        fg.angle = rand() * 360;
+        bg.angle = rand() * 360;
       }
       raf = requestAnimationFrame(draw);
     },

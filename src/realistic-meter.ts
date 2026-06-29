@@ -2,6 +2,7 @@ import { ElementSize } from './fluid-level-background-card';
 import { FluidMeterInstance, FluidMeterEnv, Layer } from './fluid-meter.interface';
 import { rgbaToString, lighten, darken, parseRgb } from './utils/color';
 import { clamp } from './utils/clamp';
+import { rand } from './utils/random';
 import { createBubbles } from './bubbles';
 
 // Realistic wave renderer using the "canvas-strip" model: the wave (with surface detail)
@@ -263,7 +264,7 @@ export function RealisticMeter(): FluidMeterInstance {
       stopBubbles();
     },
     start(randomStart = false) {
-      const delay = randomStart ? `-${(Math.random() * 4).toFixed(2)}s` : '0s';
+      const delay = randomStart ? `-${(rand() * 4).toFixed(2)}s` : '0s';
       [front, back].forEach((c) => {
         if (!c) return;
         c.style.animationPlayState = 'running';

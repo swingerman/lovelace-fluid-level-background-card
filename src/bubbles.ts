@@ -1,4 +1,5 @@
 // Rising-bubble field shared by the realistic renderers. Bubbles spawn in the lower part of
+import { rand } from './utils/random';
 // the fluid, rise, and fade as they approach the surface — same idea as the classic meter.
 
 interface Bubble {
@@ -19,10 +20,10 @@ export function createBubbles(amount = 10): BubbleField {
   let width = 300;
 
   function spawn(b: Bubble, bottom: number): void {
-    b.x = Math.random() * width;
-    b.y = bottom - Math.random() * 6;
-    b.r = 1 + Math.random() * 2;
-    b.vy = 15 + Math.random() * 20;
+    b.x = rand() * width;
+    b.y = bottom - rand() * 6;
+    b.r = 1 + rand() * 2;
+    b.vy = 15 + rand() * 20;
   }
 
   return {
@@ -33,7 +34,7 @@ export function createBubbles(amount = 10): BubbleField {
       while (bubbles.length < amount) {
         const b = { x: 0, y: 0, r: 0, vy: 0 };
         spawn(b, bottom);
-        b.y = top + Math.random() * (bottom - top); // first spread through the column
+        b.y = top + rand() * (bottom - top); // first spread through the column
         bubbles.push(b);
       }
       for (const b of bubbles) {
