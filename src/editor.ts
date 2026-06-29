@@ -22,6 +22,7 @@ import {
 } from './const';
 import { getThemeColor } from './utils/theme-parser';
 import { parseCssColor } from './utils/color';
+import { clamp } from './utils/clamp';
 import { mdiMinus, mdiPlus } from '@mdi/js';
 import { LovelaceCardConfig } from './lovelace-types';
 
@@ -177,15 +178,26 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return this._config?.random_start || false;
   }
 
+  // Coerce a numeric config value into [0, max], falling back when unset/invalid.
+  private _clampedNumber(value: unknown, fallback: number, max: number): number {
+    if (typeof value !== 'number' || isNaN(value)) return fallback;
+    return clamp(Math.round(value), 0, max);
+  }
+
   get _top_margin(): number {
-    const value = this._config?.top_margin ?? 0;
-    // Ensure the value is always within valid bounds
-    if (typeof value !== 'number' || isNaN(value)) return 0;
-    return Math.max(0, Math.min(20, Math.round(value)));
+    return this._clampedNumber(this._config?.top_margin, 0, 20);
   }
 
   get _allow_click_through(): boolean {
     return this._config?.allow_click_through || false;
+  }
+
+  get _wave_height(): number {
+    return this._clampedNumber(this._config?.wave_height, 50, 100);
+  }
+
+  get _wave_speed(): number {
+    return this._clampedNumber(this._config?.wave_speed, 50, 100);
   }
 
   private _lastUsedBackgroundColor: number[] | undefined;
@@ -218,24 +230,20 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   }
 
   renderToolbar(): TemplateResult {
-    const selected = this._selectedTab;
+    const activeTab = editorTabs[this._selectedTab] ?? editorTabs[0];
 
+    // HA 2026.6 replaced Shoelace (sl-tab-group) with its own ha-tab-group (Web Awesome based).
     return html` <div class="toolbar">
-      <sl-tab-group @sl-tab-show=${this._handleTabShow}>
-        ${editorTabs.map((_tab, index) =>
+      <ha-tab-group .active=${activeTab.slug} @wa-tab-show=${this._handleTabShow}>
+        ${editorTabs.map((_tab) =>
           _tab.enabled
-            ? html`
-                <sl-tab slot="nav" panel="tab-${index}" ?active=${index === selected}> ${_tab.localizedLabel} </sl-tab>
-              `
+            ? html`<ha-tab-group-tab slot="nav" panel=${_tab.slug} ?active=${_tab.slug === activeTab.slug}>
+                ${_tab.localizedLabel}
+              </ha-tab-group-tab>`
             : null,
         )}
-        ${editorTabs.map((_tab, index) => {
-          if (!_tab.enabled) return null;
-
-          const tabContent = index === selected ? this[_tab.renderer]() : '';
-          return html` <sl-tab-panel name="tab-${index}"> ${tabContent} </sl-tab-panel> `;
-        })}
-      </sl-tab-group>
+      </ha-tab-group>
+      <div class="tab-panel">${this[activeTab.renderer]()}</div>
     </div>`;
   }
 
@@ -417,16 +425,9 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
           <ha-switch .checked=${this._random_start === true} @change=${this._toggelRandomStart}> </ha-switch>
         </ha-formfield>
       </div>
-      <div class="form-row-dual">
-        <ha-selector
-          .hass=${this.hass}
-          .selector=${{ number: { min: 0, max: 20, step: 1, mode: 'slider' } }}
-          .label=${localize('editor.tab.appearance.labels.top-margin')}
-          .value=${this._top_margin}
-          .configValue=${'top_margin'}
-          @value-changed=${this._selectorChanged}
-        ></ha-selector>
-      </div>
+      ${this.renderNumberSlider('top-margin', 'top_margin', this._top_margin, 20, 1)}
+      ${this.renderNumberSlider('wave-height', 'wave_height', this._wave_height, 100, 5)}
+      ${this.renderNumberSlider('wave-speed', 'wave_speed', this._wave_speed, 100, 5)}
       <div class="form-row-dual">
         <ha-formfield label=${localize('editor.tab.appearance.labels.use-severity')}>
           <ha-switch .checked=${this._severity.length > 0} @change=${this._toggleSeverity}> </ha-switch>
@@ -434,6 +435,21 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       </div>
 
       ${this.severitySection()}
+    `;
+  }
+
+  renderNumberSlider(labelKey: string, configValue: string, value: number, max: number, step: number): TemplateResult {
+    return html`
+      <div class="form-row-dual">
+        <ha-selector
+          .hass=${this.hass}
+          .selector=${{ number: { min: 0, max, step, mode: 'slider' } }}
+          .label=${localize(`editor.tab.appearance.labels.${labelKey}`)}
+          .value=${value}
+          .configValue=${configValue}
+          @value-changed=${this._selectorChanged}
+        ></ha-selector>
+      </div>
     `;
   }
 
@@ -728,24 +744,11 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
 
   private _sanitizeConfigValue(configKey: string, rawValue: any): any {
     if (configKey === 'top_margin') {
-      return this._sanitizeTopMargin(rawValue);
+      const numValue = typeof rawValue === 'number' ? rawValue : parseFloat(rawValue);
+      return this._clampedNumber(numValue, 0, 20);
     }
 
     return rawValue;
-  }
-
-  private _sanitizeTopMargin(rawValue: any): number {
-    const numValue = typeof rawValue === 'number' ? rawValue : parseFloat(rawValue);
-
-    if (isNaN(numValue) || numValue < 0) {
-      return 0;
-    }
-
-    if (numValue > 20) {
-      return 20;
-    }
-
-    return Math.round(numValue);
   }
 
   private _updateConfig(configKey: string, value: any): void {
@@ -828,9 +831,10 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
   }
 
   private _handleTabShow(ev: CustomEvent): void {
-    const panelName = ev.detail.name;
-    const tabIndex = parseInt(panelName.replace('tab-', ''), 10);
-    this._selectedTab = tabIndex;
+    const index = editorTabs.findIndex((tab) => tab.slug === ev.detail.name);
+    if (index >= 0) {
+      this._selectedTab = index;
+    }
   }
 
   static get styles(): CSSResultGroup {
@@ -839,19 +843,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
         display: flex;
         flex-direction: column;
       }
-      sl-tab-group {
-        --sl-color-primary-600: var(--primary-color);
-        --sl-color-neutral-200: var(--divider-color);
-        --sl-font-size-medium: 14px;
-      }
-      sl-tab::part(base) {
-        color: var(--secondary-text-color);
-        padding: 12px 16px;
-      }
-      sl-tab[active]::part(base) {
-        color: var(--primary-color);
-      }
-      sl-tab-panel::part(base) {
+      .tab-panel {
         padding: 16px 0;
       }
       .option {
