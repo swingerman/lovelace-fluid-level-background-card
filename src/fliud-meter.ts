@@ -416,12 +416,13 @@ export function FluidMeter(): FluidMeterInstance {
     }
   }
 
-  function initLayerOptions(layer: Layer, envLayer: Layer): void {
+  function initLayerOptions(layer: Layer, envLayer: Partial<Layer>): void {
     layer.fillStyle = envLayer.fillStyle || layer.fillStyle;
-    layer.angularSpeed = envLayer.angularSpeed || layer.angularSpeed;
-    layer.maxAmplitude = envLayer.maxAmplitude || layer.maxAmplitude;
-    layer.frequency = envLayer.frequency || layer.frequency;
-    layer.horizontalSpeed = envLayer.horizontalSpeed || layer.horizontalSpeed;
+    // ponytail: ?? not || so an explicit 0 (still water) isn't swallowed as falsy
+    layer.angularSpeed = envLayer.angularSpeed ?? layer.angularSpeed;
+    layer.maxAmplitude = envLayer.maxAmplitude ?? layer.maxAmplitude;
+    layer.frequency = envLayer.frequency ?? layer.frequency;
+    layer.horizontalSpeed = envLayer.horizontalSpeed ?? layer.horizontalSpeed;
   }
   //#endregion
 
@@ -481,6 +482,14 @@ export function FluidMeter(): FluidMeterInstance {
 
       foregroundFluidLayer.fillStyle = rgbaToString(levelColor, alpha);
       backgroundFluidLayer.fillStyle = rgbaToString(levelColor, backgroundAlpha);
+    },
+    // Wave/margin params are read fresh each frame, so update them live instead of rebuilding.
+    setWaveOptions(foregroundLayer: Partial<Layer>, backgroundLayer: Partial<Layer>) {
+      initLayerOptions(foregroundFluidLayer, foregroundLayer);
+      initLayerOptions(backgroundFluidLayer, backgroundLayer);
+    },
+    setTopMargin(topMargin: number) {
+      options.top_margin = topMargin;
     },
     resizeCanvas(size: ElementSize) {
       options.width = size.width;

@@ -56,6 +56,8 @@ export type FluidMeterInstance = {
   setColor(foreggroundColor: string, backgroundColor: string);
   setBackGroundColor(backgroundColor: number[]);
   setLevelColor(levelColor: number[]);
+  setWaveOptions(foregroundLayer: Partial<Layer>, backgroundLayer: Partial<Layer>);
+  setTopMargin(topMargin: number);
   resizeCanvas(newSize: ElementSize);
   stop();
   start(randomStart?: boolean);

@@ -143,4 +143,6 @@ export interface FluidLevelBackgroundCardConfig extends LovelaceCardConfig {
   random_start?: boolean;
   allow_click_through?: boolean;
   top_margin?: number;
+  wave_height?: number;
+  wave_speed?: number;
 }

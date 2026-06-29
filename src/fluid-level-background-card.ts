@@ -127,6 +127,10 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @state() protected _top_margin = 0;
 
+  @state() protected _wave_height = 50;
+
+  @state() protected _wave_speed = 50;
+
   @state() private config!: FluidLevelBackgroundCardConfig;
 
   private _darkModeLastValue!: boolean;
@@ -177,6 +181,8 @@ export class FluidLevelBackgroundCard extends LitElement {
         this._severity = config.severity ? [...config.severity].sort((a, b) => b.value - a.value) : [];
         this._random_start = config.random_start || false;
         this._top_margin = config.top_margin ?? 0;
+        this._wave_height = config.wave_height ?? 50;
+        this._wave_speed = config.wave_speed ?? 50;
       });
     }
   }
@@ -483,6 +489,8 @@ export class FluidLevelBackgroundCard extends LitElement {
       .filling=${filling}
       .randomStart=${this._random_start}
       .topMargin=${this._top_margin}
+      .waveHeight=${this._wave_height}
+      .waveSpeed=${this._wave_speed}
     ></fluid-background>`;
   }
 
