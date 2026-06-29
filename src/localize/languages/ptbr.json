@@ -41,7 +41,13 @@
           "color-description": "Defina as cores que você gosta para o cartão. Se você quiser usar as cores do tema, basta marcar a caixa. As cores do tema são úteis para o modo claro/escuro.",
           "use-severity": "Usar severidade",
           "random-start": "Início Atrasado Aleatoriamente",
-          "top-margin": "Margem Superior (%)"
+          "top-margin": "Margem Superior (%)",
+          "wave-height": "Altura da Onda",
+          "wave-speed": "Velocidade da Onda",
+          "wave-style": "Estilo da Onda",
+          "wave-style-classic": "Clássico",
+          "wave-style-realistic": "Realista",
+          "wave-style-realistic-performance": "Realista (desempenho)"
         }
       }
     }

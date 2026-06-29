@@ -41,7 +41,13 @@
           "color-description": "Állítsa be a kártya színeit, amilyenre szeretné. Ha a téma színeit szeretné használni, csak jelölje be a négyzetet. A téma színek hasznosak a világos/sötét módban.",
           "use-severity": "Használja a súlyosságot",
           "random-start": "Véletlenszerűen késleltetett rajzolás",
-          "top-margin": "Felső margó (%)"
+          "top-margin": "Felső margó (%)",
+          "wave-height": "Hullám magassága",
+          "wave-speed": "Hullám sebessége",
+          "wave-style": "Hullám stílusa",
+          "wave-style-classic": "Klasszikus",
+          "wave-style-realistic": "Valósághű",
+          "wave-style-realistic-performance": "Valósághű (teljesítmény)"
         }
       }
     }

@@ -9,7 +9,6 @@ A card that wraps other card or cards and renders a fluid level background behin
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=swingerman&repository=lovelace-fluid-level-background-card&category=Plugin)
 
-
 ## Configurable options
 
 Options can be cofigured in the UI or in the card configuration. The following options are available:
@@ -21,41 +20,47 @@ Options can be cofigured in the UI or in the card configuration. The following o
 - `background_color` - the color of the background
 - `severity` - a list of severity levels that will change the color of the fluid level based on the value of the sensor entity
 - `top_margin` - a percentage (0-20%) margin from the top to prevent wave clipping at 100% level
-
+- `random_start` - start the animation after a random delay so multiple cards don't move in sync (default `false`)
+- `wave_height` - wave amplitude, `0`-`100` (default `50`; `0` = flat)
+- `wave_speed` - wave animation speed, `0`-`100` (default `50`; `0` = still water)
+- `wave_style` - the wave renderer (default `classic`):
+  - `classic` - the original look
+  - `realistic` - liquid with a depth gradient, surface sheen and waves that flatten near empty/full; smoothest motion (redraws every frame, best for a handful of cards)
+  - `realistic-performance` - the same realistic look, animated via a cheaper render-once technique that stays at 60fps even with many cards on a dashboard
 
 ---
-
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-yellowgreen?style=for-the-badge&logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S6NC9BYVDDJMA&source=url)
 [![Donate](https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?style=for-the-badge&logo=buy-me-a-coffee)](https://www.buymeacoffee.com/swingerman)
 
-
 The fluid effect is an improved version of [@aarcorcaci](https://github.com/aarcoraci)'s [fluid-meter](https://github.com/aarcoraci/javascript-fluid-meter), improved and ported to typescript.
-
 
 ### Example config
 
 ```yaml
 type: custom:fluid-level-background-card
 card:
-    type: glance
-    entities:
+  type: glance
+  entities:
     - entity: person.john_doe
 entity: sensor.battery_level
 fill_entity: binary_sensor.charging
 full_value: 100
 level_color:
-      - 68
-      - 115
-      - 159
-      - 1
+  - 68
+  - 115
+  - 159
+  - 1
 background_color:
-      - 255
-      - 255
-      - 0
-      - 1
+  - 255
+  - 255
+  - 0
+  - 1
 random_start: true
 top_margin: 5
+wave_height: 60
+wave_speed: 50
+wave_style: realistic
 ```
 
 ### Supported Color Formats
@@ -132,3 +137,4 @@ Hey dude! Help me out for a couple of :beers: or a :coffee:!
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-yellowgreen?style=for-the-badge&logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S6NC9BYVDDJMA&source=url)
 [![Donate](https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?style=for-the-badge&logo=buy-me-a-coffee)](https://www.buymeacoffee.com/swingerman)
+```

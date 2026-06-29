@@ -131,6 +131,8 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @state() protected _wave_speed = 50;
 
+  @state() protected _wave_style: 'classic' | 'realistic' | 'realistic-performance' = 'classic';
+
   @state() private config!: FluidLevelBackgroundCardConfig;
 
   private _darkModeLastValue!: boolean;
@@ -183,6 +185,10 @@ export class FluidLevelBackgroundCard extends LitElement {
         this._top_margin = config.top_margin ?? 0;
         this._wave_height = config.wave_height ?? 50;
         this._wave_speed = config.wave_speed ?? 50;
+        this._wave_style =
+          config.wave_style === 'realistic' || config.wave_style === 'realistic-performance'
+            ? config.wave_style
+            : 'classic';
       });
     }
   }
@@ -491,6 +497,7 @@ export class FluidLevelBackgroundCard extends LitElement {
       .topMargin=${this._top_margin}
       .waveHeight=${this._wave_height}
       .waveSpeed=${this._wave_speed}
+      .waveStyle=${this._wave_style}
     ></fluid-background>`;
   }
 

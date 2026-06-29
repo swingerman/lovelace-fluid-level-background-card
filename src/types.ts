@@ -145,4 +145,5 @@ export interface FluidLevelBackgroundCardConfig extends LovelaceCardConfig {
   top_margin?: number;
   wave_height?: number;
   wave_speed?: number;
+  wave_style?: 'classic' | 'realistic' | 'realistic-performance';
 }

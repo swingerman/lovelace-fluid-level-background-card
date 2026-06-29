@@ -43,7 +43,11 @@
           "random-start": "Randomly Delayed Start",
           "top-margin": "Top Margin (%)",
           "wave-height": "Wave Height",
-          "wave-speed": "Wave Speed"
+          "wave-speed": "Wave Speed",
+          "wave-style": "Wave Style",
+          "wave-style-classic": "Classic",
+          "wave-style-realistic": "Realistic",
+          "wave-style-realistic-performance": "Realistic (performance)"
         }
       }
     }
