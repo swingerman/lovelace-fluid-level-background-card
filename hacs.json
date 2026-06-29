@@ -1,5 +1,6 @@
 {
   "name": "Fluid Level Background Card",
   "render_readme": true,
-  "filename": "fluid-level-background-card.js"
+  "filename": "fluid-level-background-card.js",
+  "homeassistant": "2026.6.0"
 }
