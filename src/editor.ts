@@ -13,93 +13,40 @@ import {
 
 import { FluidLevelBackgroundCardConfig, GUIModeChangedEvent, Severity } from './types';
 import { localize } from './localize/localize';
-import {
-  BACKGROUND_COLOR,
-  FULL_VALUE,
-  LEVEL_COLOR,
-  THEME_BACKGROUND_COLOR_VARIABLE,
-  THEME_PRIMARY_COLOR_VARIABLE,
-} from './const';
-import { getThemeColor } from './utils/theme-parser';
-import { parseCssColor } from './utils/color';
+import { FULL_VALUE } from './const';
 import { clamp } from './utils/clamp';
-import { mdiMinus, mdiPlus } from '@mdi/js';
+import { MASK_PRESETS } from './masks';
 import { LovelaceCardConfig } from './lovelace-types';
+import { renderColorsTab } from './editor/colors-tab';
+import { renderWavesTab } from './editor/waves-tab';
+import { renderShapeTab, ensurePictureUpload } from './editor/shape-tab';
 
 export interface EditorTab {
   slug: string;
   localizedLabel: string;
-  renderer: string;
+  render: (editor: FluidLevelBackgroundCardEditor) => TemplateResult;
   enabled: boolean;
 }
 
-const editorTabs = [
-  {
-    slug: 'card',
-    localizedLabel: localize('editor.tab.card.title'),
-    renderer: 'renderCardTab',
-    enabled: true,
-  },
+// Card / Entities / Actions render inline on the editor; Colors / Waves / Shape live in ./editor/*.
+const editorTabs: EditorTab[] = [
+  { slug: 'card', localizedLabel: localize('editor.tab.card.title'), render: (e) => e.renderCardTab(), enabled: true },
   {
     slug: 'entities',
     localizedLabel: localize('editor.tab.entities.title'),
-    renderer: 'renderEntitiesTab',
+    render: (e) => e.renderEntitiesTab(),
     enabled: true,
   },
-  {
-    slug: 'appearance',
-    localizedLabel: localize('editor.tab.appearance.title'),
-    renderer: 'renderAppearanceTab',
-    enabled: true,
-  },
+  { slug: 'colors', localizedLabel: localize('editor.tab.colors.title'), render: renderColorsTab, enabled: true },
+  { slug: 'waves', localizedLabel: localize('editor.tab.waves.title'), render: renderWavesTab, enabled: true },
+  { slug: 'shape', localizedLabel: localize('editor.tab.shape.title'), render: renderShapeTab, enabled: true },
   {
     slug: 'actions',
     localizedLabel: localize('editor.tab.actions.title'),
-    renderer: 'renderActionsTab',
+    render: (e) => e.renderActionsTab(),
     enabled: true,
   },
 ];
-
-const options = {
-  required: {
-    icon: 'tune',
-    name: 'Required',
-    secondary: 'Required options for this card to function',
-    show: true,
-  },
-  actions: {
-    icon: 'gesture-tap-hold',
-    name: 'Actions',
-    secondary: 'Perform actions based on tapping/clicking',
-    show: false,
-    options: {
-      tap: {
-        icon: 'gesture-tap',
-        name: 'Tap',
-        secondary: 'Set the action to perform on tap',
-        show: false,
-      },
-      hold: {
-        icon: 'gesture-tap-hold',
-        name: 'Hold',
-        secondary: 'Set the action to perform on hold',
-        show: false,
-      },
-      double_tap: {
-        icon: 'gesture-double-tap',
-        name: 'Double Tap',
-        secondary: 'Set the action to perform on double tap',
-        show: false,
-      },
-    },
-  },
-  appearance: {
-    icon: 'palette',
-    name: 'Appearance',
-    secondary: 'Customize the name, icon, etc',
-    show: false,
-  },
-};
 
 @customElement('fluid-level-background-card-editor')
 export class FluidLevelBackgroundCardEditor extends LitElement implements LovelaceCardEditor {
@@ -107,7 +54,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
 
   @property({ attribute: false }) public lovelace?: LovelaceConfig;
 
-  @state() protected _config?: FluidLevelBackgroundCardConfig;
+  @state() _config?: FluidLevelBackgroundCardConfig;
 
   @state() protected _selectedTab = 0;
 
@@ -115,11 +62,20 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
 
   @state() protected _guiModeAvailable? = true;
 
-  @state() private _toggle?: boolean;
-
-  @state() private _helpers?: any;
+  @state() _helpers?: any;
 
   private _initialized = false;
+
+  // 'custom' chosen in the dropdown but no URL typed yet (transient, UI-only).
+  @state() _maskCustom = false;
+
+  // True once HA's picture-upload widget is loaded & confirmed to render; until then a URL field shows.
+  @state() _pictureUploadReady = false;
+
+  private _pictureUploadTried = false;
+
+  _lastUsedBackgroundColor: number[] | undefined;
+  _lastUsedLevelColor: number[] | undefined;
 
   public setConfig(config: FluidLevelBackgroundCardConfig): void {
     this._config = config;
@@ -134,24 +90,12 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return true;
   }
 
-  get _name(): string {
-    return this._config?.name || '';
-  }
-
   get _entity(): string {
     return this._config?.entity || '';
   }
 
   get _fill_entity(): string {
     return this._config?.fill_entity || '';
-  }
-
-  get _show_warning(): boolean {
-    return this._config?.show_warning || false;
-  }
-
-  get _show_error(): boolean {
-    return this._config?.show_error || false;
   }
 
   get _tap_action(): ActionConfig {
@@ -205,8 +149,21 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return v === 'realistic' || v === 'realistic-performance' ? v : 'classic';
   }
 
-  private _lastUsedBackgroundColor: number[] | undefined;
-  private _lastUsedLevelColor: number[] | undefined;
+  get _mask_image(): string {
+    return this._config?.mask_image || '';
+  }
+
+  get _mask_size(): string {
+    return this._config?.mask_size || 'contain';
+  }
+
+  // Dropdown value: '' (none) | preset name | 'custom'.
+  get _mask_shape(): string {
+    const v = this._mask_image;
+    if (v && !MASK_PRESETS.includes(v)) return 'custom';
+    if (this._maskCustom) return 'custom';
+    return v;
+  }
 
   get usesLevelThemeColor(): boolean {
     return this._config?.level_color === undefined;
@@ -214,6 +171,19 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
 
   get usesBackgroundThemeColor(): boolean {
     return this._config?.background_color === undefined;
+  }
+
+  // Opacity (0-100%) read from a colour's 4th array element; full when absent.
+  private _opacityOf(color: number[] | string | undefined): number {
+    return Array.isArray(color) && color.length > 3 ? Math.round(clamp(color[3], 0, 1) * 100) : 100;
+  }
+
+  get _level_opacity(): number {
+    return this._opacityOf(this._config?.level_color);
+  }
+
+  get _background_opacity(): number {
+    return this._opacityOf(this._config?.background_color);
   }
 
   protected render(): TemplateResult | void {
@@ -225,6 +195,14 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     this._helpers.importMoreInfoControl('climate');
 
     return html` <div class="card-config">${this.renderToolbar()}</div> `;
+  }
+
+  protected updated(): void {
+    // Lazily force-load the picture-upload widget the first time a custom mask is being edited.
+    if (this._mask_shape === 'custom' && !this._pictureUploadTried) {
+      this._pictureUploadTried = true;
+      ensurePictureUpload(this);
+    }
   }
 
   private _initialize(): void {
@@ -248,7 +226,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
             : null,
         )}
       </ha-tab-group>
-      <div class="tab-panel">${this[activeTab.renderer]()}</div>
+      <div class="tab-panel">${activeTab.render(this)}</div>
     </div>`;
   }
 
@@ -391,186 +369,6 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     }
   };
 
-  renderAppearanceTab(): TemplateResult {
-    const themePrimaryColor = getThemeColor(THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR);
-    const themeBackgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
-
-    return html`
-      <h3>${localize('editor.tab.appearance.choose-colors')}</h3>
-      <p>${localize('editor.tab.appearance.labels.color-description')}</p>
-      <div class="form-row-dual">
-        <ha-selector
-          .hass=${this.hass}
-          .selector=${{ color_rgb: {} }}
-          .label=${localize('editor.tab.appearance.labels.level-color')}
-          .value=${this._config?.level_color || themePrimaryColor}
-          .configValue=${'level_color'}
-          @value-changed=${this._levelColorChanged}
-        ></ha-selector>
-        <ha-formfield label=${localize('editor.tab.appearance.labels.use-theme-color')}>
-          <ha-switch .checked=${this.usesLevelThemeColor} @change=${this._toggleLevelDefaultColor}> </ha-switch>
-        </ha-formfield>
-      </div>
-      <div class="form-row-dual">
-        <ha-selector
-          .hass=${this.hass}
-          .selector=${{ color_rgb: {} }}
-          .label=${localize('editor.tab.appearance.labels.background-color')}
-          .value=${this._config?.background_color || themeBackgroundColor}
-          .configValue=${'background_color'}
-          @value-changed=${this._backgroundColorChanged}
-        ></ha-selector>
-        <ha-formfield label=${localize('editor.tab.appearance.labels.use-theme-color')}>
-          <ha-switch .checked=${this.usesBackgroundThemeColor} @change=${this._toggleBackgroundDefaultColor}>
-          </ha-switch>
-        </ha-formfield>
-      </div>
-      <div class="form-row-dual">
-        <ha-formfield label=${localize('editor.tab.appearance.labels.random-start')}>
-          <ha-switch .checked=${this._random_start === true} @change=${this._toggelRandomStart}> </ha-switch>
-        </ha-formfield>
-      </div>
-      ${this.renderNumberSlider('top-margin', 'top_margin', this._top_margin, 20, 1)}
-      <div class="form-row-dual">
-        <ha-selector
-          .hass=${this.hass}
-          .selector=${{
-            select: {
-              mode: 'dropdown',
-              options: [
-                { value: 'classic', label: localize('editor.tab.appearance.labels.wave-style-classic') },
-                { value: 'realistic', label: localize('editor.tab.appearance.labels.wave-style-realistic') },
-                {
-                  value: 'realistic-performance',
-                  label: localize('editor.tab.appearance.labels.wave-style-realistic-performance'),
-                },
-              ],
-            },
-          }}
-          .label=${localize('editor.tab.appearance.labels.wave-style')}
-          .value=${this._wave_style}
-          .configValue=${'wave_style'}
-          @value-changed=${this._selectorChanged}
-        ></ha-selector>
-      </div>
-      ${this.renderNumberSlider('wave-height', 'wave_height', this._wave_height, 100, 5)}
-      ${this.renderNumberSlider('wave-speed', 'wave_speed', this._wave_speed, 100, 5)}
-      <div class="form-row-dual">
-        <ha-formfield label=${localize('editor.tab.appearance.labels.use-severity')}>
-          <ha-switch .checked=${this._severity.length > 0} @change=${this._toggleSeverity}> </ha-switch>
-        </ha-formfield>
-      </div>
-
-      ${this.severitySection()}
-    `;
-  }
-
-  renderNumberSlider(labelKey: string, configValue: string, value: number, max: number, step: number): TemplateResult {
-    return html`
-      <div class="form-row-dual">
-        <ha-selector
-          .hass=${this.hass}
-          .selector=${{ number: { min: 0, max, step, mode: 'slider' } }}
-          .label=${localize(`editor.tab.appearance.labels.${labelKey}`)}
-          .value=${value}
-          .configValue=${configValue}
-          @value-changed=${this._selectorChanged}
-        ></ha-selector>
-      </div>
-    `;
-  }
-
-  severitySection(): TemplateResult {
-    if (this._severity.length > 0) {
-      return html`
-        <h3>${localize('editor.tab.appearance.choose-severity')}</h3>
-        <ha-icon-button
-          .label=${this.hass?.localize('ui.common.add') || 'Add'}
-          .path=${mdiPlus}
-          @click=${this._addSeverity}
-        ></ha-icon-button>
-        ${this._severity.map((severity) => this.severityItem(severity))}
-      `;
-    }
-    return html``;
-  }
-
-  severityItem(severity: Severity): TemplateResult {
-    const severityColor = parseCssColor(severity.color);
-    const index = this._severity.indexOf(severity);
-    return html`
-      <div class="form-row-tripple">
-        <ha-selector
-          .hass=${this.hass}
-          .selector=${{ color_rgb: {} }}
-          .value=${severityColor}
-          .index=${index}
-          @value-changed=${this._severityColorChanged}
-        ></ha-selector>
-
-        <ha-textfield
-          type="number"
-          .configValue=${'full_value'}
-          .value=${severity.value}
-          .index=${index}
-          @change=${this._severityValueChanged}
-        ></ha-textfield>
-
-        <ha-icon-button
-          .label=${this.hass?.localize('ui.common.remove') || 'Remove'}
-          .path=${mdiMinus}
-          .index=${index}
-          @click=${this._removeSeverity}
-        ></ha-icon-button>
-      </div>
-    `;
-  }
-
-  protected _toggleLevelDefaultColor(): void {
-    if (!this._config) {
-      return;
-    }
-
-    if (!this.usesLevelThemeColor) {
-      this._config = { ...this._config, level_color: undefined };
-    } else {
-      this._config = { ...this._config, level_color: this._lastUsedLevelColor };
-    }
-    fireEvent(this, 'config-changed', { config: this._config });
-  }
-
-  protected _toggleBackgroundDefaultColor(): void {
-    if (!this._config) {
-      return;
-    }
-    if (!this.usesBackgroundThemeColor) {
-      this._config = { ...this._config, background_color: undefined };
-    } else {
-      this._config = { ...this._config, background_color: this._lastUsedBackgroundColor };
-    }
-    fireEvent(this, 'config-changed', { config: this._config });
-  }
-
-  protected _toggleSeverity(): void {
-    if (!this._config) {
-      return;
-    }
-    if (this._severity.length > 0) {
-      this._config = { ...this._config, severity: [] };
-    } else {
-      this._config = { ...this._config, severity: [{ color: '#FF0000', value: 0 }] };
-    }
-    fireEvent(this, 'config-changed', { config: this._config });
-  }
-
-  protected _toggelRandomStart(): void {
-    if (!this._config) {
-      return;
-    }
-    this._config = { ...this._config, random_start: !this._random_start };
-    fireEvent(this, 'config-changed', { config: this._config });
-  }
-
   protected _toggleClickThrough(): void {
     if (!this._config) {
       return;
@@ -583,63 +381,6 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     }
 
     fireEvent(this, 'config-changed', { config: this._config });
-  }
-
-  protected _addSeverity(): void {
-    if (!this._config) {
-      return;
-    }
-    this._config = { ...this._config, severity: [...this._severity, { color: '#FF0000', value: 0 }] };
-    fireEvent(this, 'config-changed', { config: this._config });
-  }
-
-  protected _removeSeverity(ev: Event): void {
-    if (!this._config) {
-      return;
-    }
-    const [index] = this._getSeverityItemFormEvent(ev);
-
-    this._config = { ...this._config, severity: this._severity.filter((_, i) => i !== index) };
-    fireEvent(this, 'config-changed', { config: this._config });
-  }
-
-  protected _severityColorChanged(ev: CustomEvent): void {
-    if (!this._config) {
-      return;
-    }
-    const target = ev.target as any;
-    let severityItem = this._severity[target.index];
-    const color = ev.detail.value;
-    const severity = [...this._severity];
-
-    severityItem = { ...severityItem, color };
-    severity[target.index] = severityItem;
-
-    this._config = { ...this._config, severity };
-    fireEvent(this, 'config-changed', { config: this._config });
-  }
-
-  protected _severityValueChanged(ev: Event): void {
-    if (!this._config) {
-      return;
-    }
-    const target = ev.target as any;
-    const index = target.index;
-    const value = target.value;
-    let severityItem = this._severity[index];
-    const severity = [...this._severity];
-
-    severityItem = { ...severityItem, value: parseFloat(value) };
-    severity[index] = severityItem;
-
-    this._config = { ...this._config, severity };
-    fireEvent(this, 'config-changed', { config: this._config });
-  }
-
-  private _getSeverityItemFormEvent(ev: Event): [number, any, Severity] {
-    const target = ev.target as any;
-    const index = target.index;
-    return [index, target.value, this._severity[index]];
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -683,44 +424,6 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     this._helpers = await (window as any).loadCardHelpers();
   }
 
-  private _toggleAction(ev: Event): void {
-    this._toggleThing(ev, options.actions.options);
-  }
-
-  private _toggleOption(ev: Event): void {
-    this._toggleThing(ev, options);
-  }
-
-  private _toggleThing(ev: Event, optionList: any): void {
-    const target = ev.target as any;
-    const show = !optionList[target.option].show;
-    for (const [key] of Object.entries(optionList)) {
-      optionList[key].show = false;
-    }
-    optionList[target.option].show = show;
-    this._toggle = !this._toggle;
-  }
-
-  private _levelColorChanged(ev: CustomEvent): void {
-    if (!this._config) {
-      return;
-    }
-    const color = ev.detail.value;
-    this._lastUsedLevelColor = color;
-    this._config = { ...this._config, level_color: color };
-    fireEvent(this, 'config-changed', { config: this._config });
-  }
-
-  private _backgroundColorChanged(ev: CustomEvent): void {
-    if (!this._config) {
-      return;
-    }
-    const color = ev.detail.value;
-    this._lastUsedBackgroundColor = color;
-    this._config = { ...this._config, background_color: color };
-    fireEvent(this, 'config-changed', { config: this._config });
-  }
-
   private _valueChanged(ev: Event): void {
     if (!this._config || !this.hass || (ev.target as any)?.value === '') {
       return;
@@ -744,7 +447,8 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
-  private _selectorChanged(ev: CustomEvent): void {
+  // Shared selector handler used by the wave and shape tabs (mask size / wave sliders / etc.).
+  _selectorChanged(ev: CustomEvent): void {
     if (!this._config || !this.hass) {
       return;
     }
@@ -778,7 +482,10 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return rawValue;
   }
 
-  private _updateConfig(configKey: string, value: any): void {
+  // Shared config writer used by _selectorChanged and by the ./editor/* tab modules: sets the key
+  // (or deletes it when empty/undefined, unless always-kept) and fires config-changed.
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  _updateConfig(configKey: string, value: any): void {
     if (!this._config) {
       return;
     }

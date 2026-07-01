@@ -47,8 +47,32 @@
           "wave-style": "Hullám stílusa",
           "wave-style-classic": "Klasszikus",
           "wave-style-realistic": "Valósághű",
-          "wave-style-realistic-performance": "Valósághű (teljesítmény)"
+          "wave-style-realistic-performance": "Valósághű (teljesítmény)",
+          "mask-image": "Egyéni maszk kép",
+          "mask-image-help": "Opcionális. A folyadékot egy alakra vágja. Válasszon beépített sziluettet, vagy az Egyéni lehetőséggel válasszon ki vagy töltsön fel saját képet. A kép átlátszó területei elrejtik a folyadékot.",
+          "mask-size": "Maszk mérete",
+          "mask-size-contain": "Illesztés (contain)",
+          "mask-size-cover": "Kitöltés (cover)",
+          "mask-size-stretch": "Nyújtás",
+          "mask-shape": "Maszk alakja",
+          "mask-shape-none": "Nincs",
+          "mask-shape-bottle": "Palack",
+          "mask-shape-battery": "Akkumulátor",
+          "mask-shape-droplet": "Csepp",
+          "mask-shape-tank": "Tartály",
+          "mask-shape-custom": "Egyéni (kép)",
+          "level-opacity": "Szint átlátszatlanság (%)",
+          "background-opacity": "Háttér átlátszatlanság (%)"
         }
+      },
+      "colors": {
+        "title": "Színek"
+      },
+      "waves": {
+        "title": "Hullámok"
+      },
+      "shape": {
+        "title": "Forma"
       }
     }
   }

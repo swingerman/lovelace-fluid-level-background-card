@@ -47,8 +47,32 @@
           "wave-style": "Стиль хвилі",
           "wave-style-classic": "Класичний",
           "wave-style-realistic": "Реалістичний",
-          "wave-style-realistic-performance": "Реалістичний (продуктивність)"
+          "wave-style-realistic-performance": "Реалістичний (продуктивність)",
+          "mask-image": "Власне зображення маски",
+          "mask-image-help": "Необов'язково. Обрізає рідину за формою. Виберіть вбудований силует або «Власний», щоб вибрати чи завантажити власне зображення. Прозорі ділянки зображення приховують рідину.",
+          "mask-size": "Розмір маски",
+          "mask-size-contain": "Вписати (contain)",
+          "mask-size-cover": "Заповнити (cover)",
+          "mask-size-stretch": "Розтягнути",
+          "mask-shape": "Форма маски",
+          "mask-shape-none": "Немає",
+          "mask-shape-bottle": "Пляшка",
+          "mask-shape-battery": "Батарея",
+          "mask-shape-droplet": "Крапля",
+          "mask-shape-tank": "Резервуар",
+          "mask-shape-custom": "Власний (зображення)",
+          "level-opacity": "Непрозорість рівня (%)",
+          "background-opacity": "Непрозорість фону (%)"
         }
+      },
+      "colors": {
+        "title": "Кольори"
+      },
+      "waves": {
+        "title": "Хвилі"
+      },
+      "shape": {
+        "title": "Форма"
       }
     }
   }

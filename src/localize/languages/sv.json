@@ -47,8 +47,32 @@
           "wave-style": "Vågstil",
           "wave-style-classic": "Klassisk",
           "wave-style-realistic": "Realistisk",
-          "wave-style-realistic-performance": "Realistisk (prestanda)"
+          "wave-style-realistic-performance": "Realistisk (prestanda)",
+          "mask-image": "Anpassad maskbild",
+          "mask-image-help": "Valfritt. Klipp vätskan till en form. Välj en inbyggd siluett, eller välj Anpassad för att välja eller ladda upp en egen bild. Bildens transparenta områden döljer vätskan.",
+          "mask-size": "Maskstorlek",
+          "mask-size-contain": "Anpassa (contain)",
+          "mask-size-cover": "Fyll (cover)",
+          "mask-size-stretch": "Sträck ut",
+          "mask-shape": "Maskform",
+          "mask-shape-none": "Ingen",
+          "mask-shape-bottle": "Flaska",
+          "mask-shape-battery": "Batteri",
+          "mask-shape-droplet": "Droppe",
+          "mask-shape-tank": "Tank",
+          "mask-shape-custom": "Anpassad (bild)",
+          "level-opacity": "Nivåopacitet (%)",
+          "background-opacity": "Bakgrundsopacitet (%)"
         }
+      },
+      "colors": {
+        "title": "Färger"
+      },
+      "waves": {
+        "title": "Vågor"
+      },
+      "shape": {
+        "title": "Form"
       }
     }
   }
