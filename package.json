@@ -23,7 +23,7 @@
     "lit": "^3.3.3"
   },
   "devDependencies": {
-    "@commitlint/config-conventional": "^21.0.2",
+    "@commitlint/config-conventional": "^21.2.0",
     "@digitalroute/cz-conventional-changelog-for-jira": "^8.0.1",
     "@playwright/test": "^1.61.0",
     "@rollup/plugin-commonjs": "^29.0.3",
