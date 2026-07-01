@@ -52,6 +52,15 @@ export class FluidBackground extends LitElement {
   @property()
   waveStyle: 'classic' | 'realistic' | 'realistic-performance' = 'classic';
 
+  // Fully-resolved mask: a data-URI or image URL (the card does preset/media-source resolution).
+  // Empty = no mask.
+  @property()
+  maskImage = '';
+
+  // CSS mask-size: contain (default) | cover | '100% 100%' (stretch) | any CSS value.
+  @property()
+  maskSize = 'contain';
+
   fm: FluidMeterInstance = FluidMeter();
 
   protected render(): TemplateResult | void {
@@ -101,6 +110,25 @@ export class FluidBackground extends LitElement {
     if (name === 'waveStyle') {
       this.rebuildMeter();
     }
+
+    if (name === 'maskImage' || name === 'maskSize') {
+      this.applyMask();
+    }
+  }
+
+  // CSS mask clips the painted canvas to the image's alpha shape. Native, no JS per frame.
+  private applyMask(): void {
+    const container = this.shadowRoot?.querySelector('.fluid-background') as HTMLElement | null;
+    if (!container) {
+      return;
+    }
+    const value = this.maskImage ? `url("${this.maskImage}")` : '';
+    const size = this.maskSize || 'contain';
+    // -webkit- prefixes via setProperty (the camelCase DOM props are deprecated) for Safari/older WebKit.
+    container.style.setProperty('-webkit-mask-image', value);
+    container.style.maskImage = value;
+    container.style.setProperty('-webkit-mask-size', size);
+    container.style.maskSize = size;
   }
 
   private rebuildMeter(): void {
@@ -111,6 +139,7 @@ export class FluidBackground extends LitElement {
     this.fm.stop();
     container.replaceChildren();
     this.initFluidMeter(container);
+    this.applyMask();
   }
 
   // The setters below guard this.fm: field initializers fire requestUpdate during construction,
@@ -222,6 +251,15 @@ export class FluidBackground extends LitElement {
         left: 0;
         width: 100%;
         height: 100%;
+      }
+      .fluid-background {
+        width: 100%;
+        height: 100%;
+        /* mask-image + mask-size are set inline; these stay constant */
+        -webkit-mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-repeat: no-repeat;
+        mask-position: center;
       }
     `;
   }

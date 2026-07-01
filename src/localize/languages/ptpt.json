@@ -47,8 +47,32 @@
           "wave-style": "Estilo da Onda",
           "wave-style-classic": "Clássico",
           "wave-style-realistic": "Realista",
-          "wave-style-realistic-performance": "Realista (desempenho)"
+          "wave-style-realistic-performance": "Realista (desempenho)",
+          "mask-image": "Imagem de máscara personalizada",
+          "mask-image-help": "Opcional. Recorta o fluido numa forma. Escolha uma silhueta integrada ou selecione Personalizado para escolher ou carregar a sua própria imagem. As áreas transparentes da imagem ocultam o fluido.",
+          "mask-size": "Tamanho da máscara",
+          "mask-size-contain": "Ajustar (contain)",
+          "mask-size-cover": "Preencher (cover)",
+          "mask-size-stretch": "Esticar",
+          "mask-shape": "Forma da máscara",
+          "mask-shape-none": "Nenhuma",
+          "mask-shape-bottle": "Garrafa",
+          "mask-shape-battery": "Bateria",
+          "mask-shape-droplet": "Gota",
+          "mask-shape-tank": "Tanque",
+          "mask-shape-custom": "Personalizado (imagem)",
+          "level-opacity": "Opacidade do nível (%)",
+          "background-opacity": "Opacidade do fundo (%)"
         }
+      },
+      "colors": {
+        "title": "Cores"
+      },
+      "waves": {
+        "title": "Ondas"
+      },
+      "shape": {
+        "title": "Forma"
       }
     }
   }

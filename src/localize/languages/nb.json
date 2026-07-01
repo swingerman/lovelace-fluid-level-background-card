@@ -47,8 +47,32 @@
           "wave-style": "Bølgestil",
           "wave-style-classic": "Klassisk",
           "wave-style-realistic": "Realistisk",
-          "wave-style-realistic-performance": "Realistisk (ytelse)"
+          "wave-style-realistic-performance": "Realistisk (ytelse)",
+          "mask-image": "Egendefinert maskebilde",
+          "mask-image-help": "Valgfritt. Klipp væsken til en form. Velg en innebygd silhuett, eller velg Egendefinert for å velge eller laste opp et eget bilde. Bildets gjennomsiktige områder skjuler væsken.",
+          "mask-size": "Maskestørrelse",
+          "mask-size-contain": "Tilpass (contain)",
+          "mask-size-cover": "Fyll (cover)",
+          "mask-size-stretch": "Strekk",
+          "mask-shape": "Maskeform",
+          "mask-shape-none": "Ingen",
+          "mask-shape-bottle": "Flaske",
+          "mask-shape-battery": "Batteri",
+          "mask-shape-droplet": "Dråpe",
+          "mask-shape-tank": "Tank",
+          "mask-shape-custom": "Egendefinert (bilde)",
+          "level-opacity": "Nivåopasitet (%)",
+          "background-opacity": "Bakgrunnsopasitet (%)"
         }
+      },
+      "colors": {
+        "title": "Farger"
+      },
+      "waves": {
+        "title": "Bølger"
+      },
+      "shape": {
+        "title": "Form"
       }
     }
   }

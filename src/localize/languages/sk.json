@@ -47,8 +47,32 @@
           "wave-style": "Štýl vlny",
           "wave-style-classic": "Klasický",
           "wave-style-realistic": "Realistický",
-          "wave-style-realistic-performance": "Realistický (výkon)"
+          "wave-style-realistic-performance": "Realistický (výkon)",
+          "mask-image": "Vlastný obrázok masky",
+          "mask-image-help": "Voliteľné. Oreže kvapalinu do tvaru. Vyberte vstavanú siluetu alebo zvoľte Vlastná pre výber či nahranie vlastného obrázka. Priehľadné oblasti obrázka skryjú kvapalinu.",
+          "mask-size": "Veľkosť masky",
+          "mask-size-contain": "Prispôsobiť (contain)",
+          "mask-size-cover": "Vyplniť (cover)",
+          "mask-size-stretch": "Roztiahnuť",
+          "mask-shape": "Tvar masky",
+          "mask-shape-none": "Žiadna",
+          "mask-shape-bottle": "Fľaša",
+          "mask-shape-battery": "Batéria",
+          "mask-shape-droplet": "Kvapka",
+          "mask-shape-tank": "Nádrž",
+          "mask-shape-custom": "Vlastná (obrázok)",
+          "level-opacity": "Nepriehľadnosť hladiny (%)",
+          "background-opacity": "Nepriehľadnosť pozadia (%)"
         }
+      },
+      "colors": {
+        "title": "Farby"
+      },
+      "waves": {
+        "title": "Vlny"
+      },
+      "shape": {
+        "title": "Tvar"
       }
     }
   }

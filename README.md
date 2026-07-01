@@ -27,6 +27,15 @@ Options can be cofigured in the UI or in the card configuration. The following o
   - `classic` - the original look
   - `realistic` - liquid with a depth gradient, surface sheen and waves that flatten near empty/full; smoothest motion (redraws every frame, best for a handful of cards)
   - `realistic-performance` - the same realistic look, animated via a cheaper render-once technique that stays at 60fps even with many cards on a dashboard
+- `mask_image` - clip the fluid to a shape so it fills, e.g. a bottle or battery instead of the whole card. Only the fluid background is masked — the card on top stays unchanged. (default: none) Either:
+  - a **built-in shape**: `bottle`, `battery`, `droplet`, or `tank` (no files needed), or
+  - **your own image**: in the editor pick **Shape → Custom**, then **Pick media** to browse or upload an image (stored as a `media-source://…` reference the card resolves at runtime). In YAML you can also point at any URL or path directly, e.g. `/local/bottle.svg` (your `config/www/` folder). The image's transparent areas hide the fluid; a solid silhouette on a transparent background works best.
+- `mask_size` - how the shape maps onto the card (default `contain`):
+  - `contain` - fit the whole shape inside the card, keeping its aspect ratio (may leave gaps if the card and image aspect differ)
+  - `cover` - scale the shape to fill the card, cropping overflow
+  - `100% 100%` - stretch the shape to the exact card size (may distort it)
+
+> Tip: size your card close to the shape's aspect ratio for the cleanest result. The built-in shapes are roughly portrait (5:7).
 
 ---
 
@@ -61,6 +70,8 @@ top_margin: 5
 wave_height: 60
 wave_speed: 50
 wave_style: realistic
+mask_image: bottle
+mask_size: contain
 ```
 
 ### Supported Color Formats
@@ -83,7 +94,7 @@ level_color: rgba(242,142,28,1)
 level_color: 'rgba(242,142,28,1)'
 ```
 
-Note: RGBA alpha channel can be set only in the yaml configuration.
+Note: in the editor, use the **Level Opacity** / **Background Opacity** sliders (Colors tab) to set transparency; in YAML, pass it as the 4th (alpha) value of an RGBA array.
 
 ## How To Install
 
@@ -114,6 +125,8 @@ You can set the severity of the fluid level by using the `severity` property. Th
 
 - `value`: The level at which the severity should be applied
 - `color`: The color of the severity. use can use any of the [supported color formats](#supported-color-formats)
+
+Severity colors inherit the **Level Opacity** setting, so they fade with the rest of the fluid. To give one severity its own transparency, pass an explicit alpha (e.g. `color: [255,0,0,0.5]`) — that wins over the level opacity.
 
 ```yaml
 severity:

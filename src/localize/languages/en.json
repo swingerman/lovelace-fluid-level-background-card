@@ -47,8 +47,32 @@
           "wave-style": "Wave Style",
           "wave-style-classic": "Classic",
           "wave-style-realistic": "Realistic",
-          "wave-style-realistic-performance": "Realistic (performance)"
+          "wave-style-realistic-performance": "Realistic (performance)",
+          "mask-image": "Custom Mask Image",
+          "mask-image-help": "Optional. Clip the fluid to a shape. Pick a built-in silhouette, or choose Custom to pick or upload your own image. The image's transparent areas hide the fluid.",
+          "mask-size": "Mask Size",
+          "mask-size-contain": "Fit (contain)",
+          "mask-size-cover": "Fill (cover)",
+          "mask-size-stretch": "Stretch",
+          "mask-shape": "Mask Shape",
+          "mask-shape-none": "None",
+          "mask-shape-bottle": "Bottle",
+          "mask-shape-battery": "Battery",
+          "mask-shape-droplet": "Droplet",
+          "mask-shape-tank": "Tank",
+          "mask-shape-custom": "Custom (image)",
+          "level-opacity": "Level Opacity (%)",
+          "background-opacity": "Background Opacity (%)"
         }
+      },
+      "colors": {
+        "title": "Colors"
+      },
+      "waves": {
+        "title": "Waves"
+      },
+      "shape": {
+        "title": "Shape"
       }
     }
   }

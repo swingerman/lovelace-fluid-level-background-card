@@ -30,6 +30,7 @@ import pjson from '../package.json';
 import { localize } from './localize/localize';
 import { getThemeColor } from './utils/theme-parser';
 import { parseCssColor } from './utils/color';
+import { resolveMask } from './masks';
 import { LovelaceCard, LovelaceCardConfig } from './lovelace-types';
 
 export interface FluidThemes extends Themes {
@@ -133,6 +134,17 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   @state() protected _wave_style: 'classic' | 'realistic' | 'realistic-performance' = 'classic';
 
+  @state() protected _mask_image = '';
+
+  @state() protected _mask_size = 'contain';
+
+  // _mask_image is the raw config value: a preset name, a URL, or a media-source URI.
+  // _mask_resolved is the final value handed to the renderer: presets -> data-URI, media-source
+  // -> a servable URL (async), URLs pass through. Single resolution point for the mask.
+  @state() protected _mask_resolved = '';
+
+  private _maskResolvedFor?: string;
+
   @state() private config!: FluidLevelBackgroundCardConfig;
 
   private _darkModeLastValue!: boolean;
@@ -189,58 +201,63 @@ export class FluidLevelBackgroundCard extends LitElement {
           config.wave_style === 'realistic' || config.wave_style === 'realistic-performance'
             ? config.wave_style
             : 'classic';
+        this._mask_image = config.mask_image ?? '';
+        this._mask_size = config.mask_size || 'contain';
+        this.updateResolvedMask();
       });
     }
   }
 
+  // Property changes that always drive a re-render. hass is special: it ticks constantly, so we
+  // only re-render on it when a relevant entity is configured (and _card only when there's a card).
+  private static readonly RENDER_PROPS = new Set<PropertyKey>([
+    'size',
+    '_level_entity',
+    '_fill_entity',
+    '_level_color',
+    '_background_color',
+    '_full_value',
+    '_severity',
+    '_random_start',
+    'config',
+    '_mask_resolved',
+  ]);
+
   requestUpdate(name?: PropertyKey, oldValue?: unknown): void {
-    if (name === '_card' && this.config.card) {
+    const shouldRender =
+      (name !== undefined && FluidLevelBackgroundCard.RENDER_PROPS.has(name)) ||
+      (name === '_card' && !!this.config?.card) ||
+      (name === 'hass' && !!(this.config?.entity || this.config?.fill_entity));
+    if (shouldRender) {
       super.requestUpdate(name, oldValue);
     }
+  }
 
-    if (name === 'hass' && this.config.entity) {
-      super.requestUpdate(name, oldValue);
+  // Turn the raw mask value into the final one the renderer uses: media-source URIs resolve to a
+  // servable URL (async, needs hass), presets -> data-URI and URLs pass through (via resolveMask).
+  // Guarded by _maskResolvedFor so it only does work when the raw value actually changes.
+  private updateResolvedMask(): void {
+    const raw = this._mask_image;
+    if (this._maskResolvedFor === raw) {
+      return;
     }
-
-    if (name === 'hass' && this.config.fill_entity) {
-      super.requestUpdate(name, oldValue);
+    if (!raw.startsWith('media-source://')) {
+      this._maskResolvedFor = raw;
+      this._mask_resolved = resolveMask(raw);
+      return;
     }
-
-    if (name === 'size') {
-      super.requestUpdate(name, oldValue);
+    if (!this.hass) {
+      return; // hass not ready yet; updated() retries once it is
     }
-
-    if (name === '_level_entity') {
-      super.requestUpdate(name, oldValue);
-    }
-
-    if (name === '_fill_entity') {
-      super.requestUpdate(name, oldValue);
-    }
-
-    if (name === '_level_color') {
-      super.requestUpdate(name, oldValue);
-    }
-
-    if (name === '_background_color') {
-      super.requestUpdate(name, oldValue);
-    }
-
-    if (name === '_full_value') {
-      super.requestUpdate(name, oldValue);
-    }
-
-    if (name === '_severity') {
-      super.requestUpdate(name, oldValue);
-    }
-
-    if (name === '_random_start') {
-      super.requestUpdate(name, oldValue);
-    }
-
-    if (name === 'config') {
-      super.requestUpdate(name, oldValue);
-    }
+    this._maskResolvedFor = raw;
+    this.hass.connection
+      .sendMessagePromise<{ url: string }>({ type: 'media_source/resolve_media', media_content_id: raw })
+      .then((res) => {
+        this._mask_resolved = res.url;
+      })
+      .catch(() => {
+        this._mask_resolved = '';
+      });
   }
 
   private _createCardElement(createCardElement: any, cardConfig?: LovelaceCardConfig) {
@@ -366,6 +383,7 @@ export class FluidLevelBackgroundCard extends LitElement {
 
   protected updated(changedProps: PropertyValues): void {
     super.updated(changedProps);
+    this.updateResolvedMask(); // cheap no-op unless the raw mask changed or hass just became available
 
     if (!this._card || (!changedProps.has('hass') && !changedProps.has('editMode'))) {
       return;
@@ -477,10 +495,24 @@ export class FluidLevelBackgroundCard extends LitElement {
     return 0;
   }
 
+  // An active severity colour replaces the level colour; reuse the level's opacity so the
+  // opacity slider applies to severity colours too (an explicit alpha on the severity wins).
+  private resolveLevelColor(severityColor: string | number[] | undefined): number[] | undefined {
+    if (!severityColor) {
+      return this._level_color;
+    }
+    const parsed = parseCssColor(severityColor);
+    if (!parsed || parsed.length > 3) {
+      return parsed;
+    }
+    const alpha = this._level_color && this._level_color.length > 3 ? this._level_color[3] : 1;
+    return [...parsed, alpha];
+  }
+
   private makeFluidBackground(): TemplateResult {
     const value = this.getSafeLevelValue(this._level_entity);
     const severityColor = this._severity.length > 0 ? this._severity.find((s) => s.value <= value)?.color : undefined;
-    const levelColor = severityColor ? parseCssColor(severityColor) : this._level_color;
+    const levelColor = this.resolveLevelColor(severityColor);
 
     const filling =
       this._fill_entity && this.hass.states[this._fill_entity]
@@ -498,6 +530,8 @@ export class FluidLevelBackgroundCard extends LitElement {
       .waveHeight=${this._wave_height}
       .waveSpeed=${this._wave_speed}
       .waveStyle=${this._wave_style}
+      .maskImage=${this._mask_resolved}
+      .maskSize=${this._mask_size}
     ></fluid-background>`;
   }
 

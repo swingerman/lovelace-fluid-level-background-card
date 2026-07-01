@@ -23,6 +23,7 @@ import {
 import { getThemeColor } from './utils/theme-parser';
 import { parseCssColor } from './utils/color';
 import { clamp } from './utils/clamp';
+import { MASK_PRESETS } from './masks';
 import { mdiMinus, mdiPlus } from '@mdi/js';
 import { LovelaceCardConfig } from './lovelace-types';
 
@@ -47,9 +48,21 @@ const editorTabs = [
     enabled: true,
   },
   {
-    slug: 'appearance',
-    localizedLabel: localize('editor.tab.appearance.title'),
-    renderer: 'renderAppearanceTab',
+    slug: 'colors',
+    localizedLabel: localize('editor.tab.colors.title'),
+    renderer: 'renderColorsTab',
+    enabled: true,
+  },
+  {
+    slug: 'waves',
+    localizedLabel: localize('editor.tab.waves.title'),
+    renderer: 'renderWavesTab',
+    enabled: true,
+  },
+  {
+    slug: 'shape',
+    localizedLabel: localize('editor.tab.shape.title'),
+    renderer: 'renderShapeTab',
     enabled: true,
   },
   {
@@ -205,6 +218,30 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return v === 'realistic' || v === 'realistic-performance' ? v : 'classic';
   }
 
+  get _mask_image(): string {
+    return this._config?.mask_image || '';
+  }
+
+  get _mask_size(): string {
+    return this._config?.mask_size || 'contain';
+  }
+
+  // 'custom' chosen in the dropdown but no URL typed yet (transient, UI-only).
+  @state() private _maskCustom = false;
+
+  // True once HA's picture-upload widget is loaded & confirmed to render; until then a URL field shows.
+  @state() private _pictureUploadReady = false;
+
+  private _pictureUploadTried = false;
+
+  // Dropdown value: '' (none) | preset name | 'custom'.
+  get _mask_shape(): string {
+    const v = this._mask_image;
+    if (v && !MASK_PRESETS.includes(v)) return 'custom';
+    if (this._maskCustom) return 'custom';
+    return v;
+  }
+
   private _lastUsedBackgroundColor: number[] | undefined;
   private _lastUsedLevelColor: number[] | undefined;
 
@@ -216,6 +253,35 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     return this._config?.background_color === undefined;
   }
 
+  // Opacity (0-100%) read from a colour's 4th array element; full when absent.
+  private _opacityOf(color: number[] | string | undefined): number {
+    return Array.isArray(color) && color.length > 3 ? Math.round(clamp(color[3], 0, 1) * 100) : 100;
+  }
+
+  get _level_opacity(): number {
+    return this._opacityOf(this._config?.level_color);
+  }
+
+  get _background_opacity(): number {
+    return this._opacityOf(this._config?.background_color);
+  }
+
+  // RGB of a config colour (array/string/unset → resolve theme as the fallback), always 3 elements.
+  private _effectiveRgb(value: number[] | string | undefined, themeVar: string, fallback: number[]): number[] {
+    if (Array.isArray(value)) return value.slice(0, 3);
+    if (typeof value === 'string') {
+      const parsed = parseCssColor(value);
+      if (parsed) return parsed.slice(0, 3);
+    }
+    return getThemeColor(themeVar, fallback).slice(0, 3);
+  }
+
+  // Combine rgb + opacity%; drop the alpha element when fully opaque to keep configs tidy.
+  private _withAlpha(rgb: number[], pct: number): number[] {
+    const a = clamp(Math.round(pct), 0, 100) / 100;
+    return a >= 1 ? rgb.slice(0, 3) : [...rgb.slice(0, 3), a];
+  }
+
   protected render(): TemplateResult | void {
     if (!this.hass || !this._helpers) {
       return html``;
@@ -225,6 +291,14 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     this._helpers.importMoreInfoControl('climate');
 
     return html` <div class="card-config">${this.renderToolbar()}</div> `;
+  }
+
+  protected updated(): void {
+    // Lazily force-load the picture-upload widget the first time a custom mask is being edited.
+    if (this._mask_shape === 'custom' && !this._pictureUploadTried) {
+      this._pictureUploadTried = true;
+      this._ensurePictureUpload();
+    }
   }
 
   private _initialize(): void {
@@ -391,10 +465,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     }
   };
 
-  renderAppearanceTab(): TemplateResult {
-    const themePrimaryColor = getThemeColor(THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR);
-    const themeBackgroundColor = getThemeColor(THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
-
+  renderColorsTab(): TemplateResult {
     return html`
       <h3>${localize('editor.tab.appearance.choose-colors')}</h3>
       <p>${localize('editor.tab.appearance.labels.color-description')}</p>
@@ -403,7 +474,7 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
           .hass=${this.hass}
           .selector=${{ color_rgb: {} }}
           .label=${localize('editor.tab.appearance.labels.level-color')}
-          .value=${this._config?.level_color || themePrimaryColor}
+          .value=${this._effectiveRgb(this._config?.level_color, THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR)}
           .configValue=${'level_color'}
           @value-changed=${this._levelColorChanged}
         ></ha-selector>
@@ -411,12 +482,13 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
           <ha-switch .checked=${this.usesLevelThemeColor} @change=${this._toggleLevelDefaultColor}> </ha-switch>
         </ha-formfield>
       </div>
+      ${this.renderOpacitySlider('level-opacity', this._level_opacity, this._levelOpacityChanged)}
       <div class="form-row-dual">
         <ha-selector
           .hass=${this.hass}
           .selector=${{ color_rgb: {} }}
           .label=${localize('editor.tab.appearance.labels.background-color')}
-          .value=${this._config?.background_color || themeBackgroundColor}
+          .value=${this._effectiveRgb(this._config?.background_color, THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR)}
           .configValue=${'background_color'}
           @value-changed=${this._backgroundColorChanged}
         ></ha-selector>
@@ -425,12 +497,33 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
           </ha-switch>
         </ha-formfield>
       </div>
+      ${this.renderOpacitySlider('background-opacity', this._background_opacity, this._backgroundOpacityChanged)}
       <div class="form-row-dual">
-        <ha-formfield label=${localize('editor.tab.appearance.labels.random-start')}>
-          <ha-switch .checked=${this._random_start === true} @change=${this._toggelRandomStart}> </ha-switch>
+        <ha-formfield label=${localize('editor.tab.appearance.labels.use-severity')}>
+          <ha-switch .checked=${this._severity.length > 0} @change=${this._toggleSeverity}> </ha-switch>
         </ha-formfield>
       </div>
-      ${this.renderNumberSlider('top-margin', 'top_margin', this._top_margin, 20, 1)}
+
+      ${this.severitySection()}
+    `;
+  }
+
+  renderOpacitySlider(labelKey: string, value: number, handler: (ev: CustomEvent) => void): TemplateResult {
+    return html`
+      <div class="form-row-dual">
+        <ha-selector
+          .hass=${this.hass}
+          .selector=${{ number: { min: 0, max: 100, step: 1, mode: 'slider' } }}
+          .label=${localize(`editor.tab.appearance.labels.${labelKey}`)}
+          .value=${value}
+          @value-changed=${handler}
+        ></ha-selector>
+      </div>
+    `;
+  }
+
+  renderWavesTab(): TemplateResult {
+    return html`
       <div class="form-row-dual">
         <ha-selector
           .hass=${this.hass}
@@ -456,12 +549,60 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
       ${this.renderNumberSlider('wave-height', 'wave_height', this._wave_height, 100, 5)}
       ${this.renderNumberSlider('wave-speed', 'wave_speed', this._wave_speed, 100, 5)}
       <div class="form-row-dual">
-        <ha-formfield label=${localize('editor.tab.appearance.labels.use-severity')}>
-          <ha-switch .checked=${this._severity.length > 0} @change=${this._toggleSeverity}> </ha-switch>
+        <ha-formfield label=${localize('editor.tab.appearance.labels.random-start')}>
+          <ha-switch .checked=${this._random_start === true} @change=${this._toggelRandomStart}> </ha-switch>
         </ha-formfield>
       </div>
+      ${this.renderNumberSlider('top-margin', 'top_margin', this._top_margin, 20, 1)}
+    `;
+  }
 
-      ${this.severitySection()}
+  renderShapeTab(): TemplateResult {
+    return html`
+      <div class="form-row-dual">
+        <ha-selector
+          .hass=${this.hass}
+          .selector=${{
+            select: {
+              mode: 'dropdown',
+              options: [
+                { value: '', label: localize('editor.tab.appearance.labels.mask-shape-none') },
+                ...MASK_PRESETS.map((p) => ({
+                  value: p,
+                  label: localize(`editor.tab.appearance.labels.mask-shape-${p}`),
+                })),
+                { value: 'custom', label: localize('editor.tab.appearance.labels.mask-shape-custom') },
+              ],
+            },
+          }}
+          .label=${localize('editor.tab.appearance.labels.mask-shape')}
+          .value=${this._mask_shape}
+          @value-changed=${this._maskShapeChanged}
+        ></ha-selector>
+      </div>
+      <div class="help-text">${localize('editor.tab.appearance.labels.mask-image-help')}</div>
+      ${this._mask_shape === 'custom' ? this.renderMaskImageControl() : ''}
+      ${this._mask_image
+        ? html`<div class="form-row-dual">
+            <ha-selector
+              .hass=${this.hass}
+              .selector=${{
+                select: {
+                  mode: 'dropdown',
+                  options: [
+                    { value: 'contain', label: localize('editor.tab.appearance.labels.mask-size-contain') },
+                    { value: 'cover', label: localize('editor.tab.appearance.labels.mask-size-cover') },
+                    { value: '100% 100%', label: localize('editor.tab.appearance.labels.mask-size-stretch') },
+                  ],
+                },
+              }}
+              .label=${localize('editor.tab.appearance.labels.mask-size')}
+              .value=${this._mask_size}
+              .configValue=${'mask_size'}
+              @value-changed=${this._selectorChanged}
+            ></ha-selector>
+          </div>`
+        : ''}
     `;
   }
 
@@ -705,7 +846,8 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     if (!this._config) {
       return;
     }
-    const color = ev.detail.value;
+    // Picker gives [r,g,b]; keep the current opacity so changing the hue doesn't reset it.
+    const color = this._withAlpha(ev.detail.value, this._level_opacity);
     this._lastUsedLevelColor = color;
     this._config = { ...this._config, level_color: color };
     fireEvent(this, 'config-changed', { config: this._config });
@@ -715,7 +857,30 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
     if (!this._config) {
       return;
     }
-    const color = ev.detail.value;
+    const color = this._withAlpha(ev.detail.value, this._background_opacity);
+    this._lastUsedBackgroundColor = color;
+    this._config = { ...this._config, background_color: color };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  // Opacity sliders: pin the colour's RGB (materialising the theme colour) and set its alpha.
+  private _levelOpacityChanged(ev: CustomEvent): void {
+    if (!this._config) {
+      return;
+    }
+    const rgb = this._effectiveRgb(this._config.level_color, THEME_PRIMARY_COLOR_VARIABLE, LEVEL_COLOR);
+    const color = this._withAlpha(rgb, ev.detail.value);
+    this._lastUsedLevelColor = color;
+    this._config = { ...this._config, level_color: color };
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  private _backgroundOpacityChanged(ev: CustomEvent): void {
+    if (!this._config) {
+      return;
+    }
+    const rgb = this._effectiveRgb(this._config.background_color, THEME_BACKGROUND_COLOR_VARIABLE, BACKGROUND_COLOR);
+    const color = this._withAlpha(rgb, ev.detail.value);
     this._lastUsedBackgroundColor = color;
     this._config = { ...this._config, background_color: color };
     fireEvent(this, 'config-changed', { config: this._config });
@@ -741,6 +906,113 @@ export class FluidLevelBackgroundCardEditor extends LitElement implements Lovela
         };
       }
     }
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  private _maskShapeChanged(ev: CustomEvent): void {
+    if (!this._config) {
+      return;
+    }
+    const shape = (ev.detail.value as string) ?? '';
+
+    if (shape === 'custom') {
+      this._maskCustom = true;
+      // Drop a preset value so the custom URL field starts empty; keep an existing URL.
+      if (MASK_PRESETS.includes(this._mask_image)) {
+        this._setMaskImage('');
+      }
+      return;
+    }
+
+    this._maskCustom = false;
+    this._setMaskImage(shape);
+  }
+
+  // HA's picture-upload widget ('+ Pick media', as used by the picture/picture-glance cards) is the
+  // cleanest browse/upload control, but its chunk isn't loaded for third-party cards by default.
+  // We force-load it (see _ensurePictureUpload); until it's confirmed to render, use a URL text field.
+  renderMaskImageControl(): TemplateResult {
+    const label = localize('editor.tab.appearance.labels.mask-image');
+    if (this._pictureUploadReady) {
+      return html`<div class="form-row-dual">
+        <ha-picture-upload
+          .hass=${this.hass}
+          .value=${this._mask_image || null}
+          .label=${label}
+          select-media
+          @change=${this._maskPictureChanged}
+          @value-changed=${this._maskPictureChanged}
+        ></ha-picture-upload>
+      </div>`;
+    }
+    return html`<div class="form-row-dual">
+      <ha-selector
+        .hass=${this.hass}
+        .selector=${{ text: {} }}
+        .label=${label}
+        .value=${this._mask_image}
+        .configValue=${'mask_image'}
+        @value-changed=${this._selectorChanged}
+      ></ha-selector>
+    </div>`;
+  }
+
+  private _maskPictureChanged(ev: Event): void {
+    const target = ev.target as { value?: string } | null;
+    const value = (ev as CustomEvent).detail?.value ?? target?.value ?? '';
+    this._setMaskImage(value || '');
+  }
+
+  // ha-picture-upload isn't registered for third-party cards until HA's own picture editor renders
+  // (its render fires the lazy import). So: build that editor, mount it off-screen so it renders and
+  // registers the widget, then probe a real instance actually paints; otherwise keep the text field.
+  private async _ensurePictureUpload(): Promise<void> {
+    const holder = document.createElement('div');
+    holder.style.cssText = 'position:fixed;left:-9999px;top:0;width:320px;height:1px;overflow:hidden';
+    try {
+      const helpers = this._helpers ?? (await (window as any).loadCardHelpers());
+      helpers.createCardElement?.({ type: 'picture', image: '' });
+      await customElements.whenDefined('hui-picture-card');
+      const cls = customElements.get('hui-picture-card') as { getConfigElement?: () => Promise<unknown> } | undefined;
+      const pictureEditor = (await cls?.getConfigElement?.()) as (HTMLElement & { hass?: HomeAssistant; setConfig?: (c: unknown) => void }) | undefined;
+      if (!pictureEditor) {
+        return;
+      }
+      pictureEditor.hass = this.hass;
+      pictureEditor.setConfig?.({ type: 'picture', image: '' });
+      holder.appendChild(pictureEditor);
+      document.body.appendChild(holder);
+      // Wait for the widget to register (bounded, so a future HA change can't hang us here).
+      await Promise.race([customElements.whenDefined('ha-picture-upload'), new Promise((r) => setTimeout(r, 4000))]);
+      if (!customElements.get('ha-picture-upload')) {
+        return;
+      }
+      const probe = document.createElement('ha-picture-upload') as HTMLElement & { hass?: HomeAssistant };
+      probe.hass = this.hass;
+      holder.appendChild(probe);
+      await new Promise((r) => setTimeout(r, 100));
+      this._pictureUploadReady = !!probe.shadowRoot && probe.getBoundingClientRect().height > 0;
+    } catch {
+      // Any failure here just means we keep the URL text-field fallback.
+      this._pictureUploadReady = false;
+    } finally {
+      holder.remove();
+    }
+  }
+
+  // Set/clear mask_image; clearing also drops mask_size so 'none' fully resets the mask.
+  private _setMaskImage(value: string): void {
+    if (!this._config) {
+      return;
+    }
+    const config = { ...this._config };
+    if (value) {
+      config.mask_image = value;
+    } else {
+      delete config.mask_image;
+      delete config.mask_size;
+    }
+    this._config = config;
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
