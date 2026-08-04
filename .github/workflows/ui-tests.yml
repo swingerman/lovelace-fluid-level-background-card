@@ -22,7 +22,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci --legacy-peer-deps --ignore-scripts
 
       - name: Run unit tests
         run: npm run test
@@ -44,7 +44,7 @@ jobs:
   #         cache: 'npm'
 
   #     - name: Install dependencies
-  #       run: npm ci --legacy-peer-deps
+  #       run: npm ci --legacy-peer-deps --ignore-scripts
 
   #     - name: Install Playwright browsers (with dependencies)
   #       run: npx playwright install --with-deps
@@ -93,7 +93,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci --legacy-peer-deps --ignore-scripts
 
       - name: Build
         run: npm run build

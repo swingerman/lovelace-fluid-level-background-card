@@ -30,7 +30,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci --legacy-peer-deps --ignore-scripts
 
       - name: Run npm audit
         run: |
@@ -75,12 +75,12 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci --legacy-peer-deps --ignore-scripts
 
       - name: Check for known vulnerabilities
         run: |
           echo "Checking for known vulnerabilities..."
-          npx audit-ci --config .audit-ci.json || true
+          npx --yes --ignore-scripts audit-ci@7.7.0 --config .audit-ci.json || true
 
       - name: Check for outdated packages
         run: |

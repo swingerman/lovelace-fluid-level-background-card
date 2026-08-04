@@ -15,7 +15,7 @@ jobs:
       # Build
       - name: Build the file
         run: |
-          npm ci --legacy-peer-deps
+          npm ci --legacy-peer-deps --ignore-scripts
           npm run build
           ls
 

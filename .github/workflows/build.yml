@@ -20,7 +20,7 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci --legacy-peer-deps --ignore-scripts
       - name: Build
         run: npm run build
       - name: Check bundle size
@@ -48,7 +48,7 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci --legacy-peer-deps --ignore-scripts
       - name: Run unit tests with coverage
         run: npm run test:coverage
         env:
@@ -108,7 +108,7 @@ jobs:
   #         node-version: '20'
   #         cache: 'npm'
   #     - name: Install dependencies
-  #       run: npm ci --legacy-peer-deps
+  #       run: npm ci --legacy-peer-deps --ignore-scripts
   #     - name: Install Playwright Browsers
   #       run: npx playwright install --with-deps
   #     - name: Build card

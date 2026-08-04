@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # need the base ref to diff against
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -24,15 +26,18 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci --legacy-peer-deps --ignore-scripts
 
       - name: Analyze PR changes
         id: analyze-pr
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          BASE_REF: ${{ github.base_ref }}
         run: |
           echo "Analyzing Dependabot PR changes..."
-          
+
           # Get the list of changed files
-          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+          CHANGED_FILES=$(git diff --name-only "origin/$BASE_REF...HEAD")
           echo "Changed files: $CHANGED_FILES"
           
           # Check if only package files were changed
@@ -45,7 +50,6 @@ jobs:
           fi
           
           # Extract package name and version from PR title
-          PR_TITLE="${{ github.event.pull_request.title }}"
           echo "PR Title: $PR_TITLE"
           
           # Check if it's a major version update

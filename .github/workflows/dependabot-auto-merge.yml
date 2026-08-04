@@ -26,7 +26,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci --legacy-peer-deps --ignore-scripts
 
       - name: Run linting
         run: npm run lint
@@ -39,9 +39,10 @@ jobs:
 
       - name: Check if PR is safe to auto-merge
         id: safety-check
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           # Check if this is a minor or patch update
-          PR_TITLE="${{ github.event.pull_request.title }}"
           echo "PR Title: $PR_TITLE"
           
           # Extract version information from PR title

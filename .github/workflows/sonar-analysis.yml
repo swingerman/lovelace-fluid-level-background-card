@@ -32,7 +32,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci --legacy-peer-deps --ignore-scripts
 
       - name: Build project
         run: npm run build
