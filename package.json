@@ -1,6 +1,6 @@
 {
   "name": "fluid-level-background-card",
-  "version": "0.3.0-beta1",
+  "version": "0.3.0",
   "description": "Lovelace fluid-level-background-card",
   "type": "module",
   "keywords": [
